@@ -27,7 +27,7 @@
 // -------------------------------------------------------------------
 // How To Use
 //
-//  * Set Enable All Extensions On. (default Off)
+//  * Set mruby for handler phase
 //      mrubyHandler /path/to/file.mrb
 //
 // -------------------------------------------------------------------
