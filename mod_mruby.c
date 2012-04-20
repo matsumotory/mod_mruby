@@ -67,7 +67,8 @@ module AP_MODULE_DECLARE_DATA mruby_module;
 
 static void *create_config(apr_pool_t *p, server_rec *s)
 {
-    mruby_config_t *conf = apr_palloc(p, sizeof (*conf));
+    mruby_config_t *conf = 
+        (mruby_config_t *) apr_pcalloc(p, sizeof (*conf));
 
     conf->mruby_handler_file = NULL;
 
@@ -77,8 +78,9 @@ static void *create_config(apr_pool_t *p, server_rec *s)
 
 static const char *set_mruby_handler(cmd_parms *cmd, void *mconfig, const char *arg)
 {
-    mruby_config_t *conf = (mruby_config_t *)mconfig;
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
 
     if (err != NULL)
         return err;
