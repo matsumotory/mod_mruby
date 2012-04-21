@@ -12,7 +12,6 @@ ap_mrb_sleep(mrb_state *mrb, mrb_value str) {
 
     struct RProc *b;
     mrb_value argc, *argv;
-    int nargs;
     
     mrb_get_args(mrb, "b*", &b, &argv, &argc);
     if (mrb_fixnum(argc) != 1) {
