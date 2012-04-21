@@ -1,0 +1,3 @@
+Compile
+
+apxs -c -I /usr/local/src/mruby/src/ -I/usr/local/src/mruby/include/ -lm /usr/local/src/mruby/lib/ritevm.a mod_mruby.c

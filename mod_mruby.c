@@ -45,10 +45,8 @@
 #include "http_request.h"
 #include "mpm_common.h"
 #include <unistd.h>
-#include <mruby.h>
-#include <mruby/proc.h>
-#include <compile.h>
 
+#include "ap_mrb_string.h"
 
 #define MODULE_NAME        "mod_mruby"
 #define MODULE_VERSION     "0.01"
@@ -56,6 +54,7 @@
 #define SET                1
 #define ON                 1
 #define OFF                0
+
 
 typedef struct {
 
@@ -115,6 +114,13 @@ static int mruby_handler(request_rec *r)
     struct mrb_parser_state* p;
     int n;
     FILE *mrb_file;
+
+    struct RClass *ap_mrb_string_lib;
+    
+    ap_mrb_string_lib = mrb_define_module(mrb, "Apache");
+    mrb_define_class_method(mrb, ap_mrb_string_lib, "sleep", ap_mrb_sleep, ARGS_REQ(1));
+//    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs", ap_mrb_rputs, ARGS_REQ(1));
+//    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs_test", ap_mrb_rputs_test, ARGS_REQ(1));
     
     if ((mrb_file = fopen(conf->mruby_handler_file, "r")) == NULL) {
         ap_log_error(APLOG_MARK
@@ -133,7 +139,8 @@ static int mruby_handler(request_rec *r)
     mrb_pool_close(p->pool);
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
 
-    return DECLINED;
+    //return DECLINED;
+    return OK;
 }
 
 
