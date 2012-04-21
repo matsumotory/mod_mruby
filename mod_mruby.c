@@ -118,7 +118,7 @@ static int mruby_handler(request_rec *r)
     struct RClass *ap_mrb_string_lib;
     
     ap_mrb_string_lib = mrb_define_module(mrb, "Apache");
-    mrb_define_class_method(mrb, ap_mrb_string_lib, "sleep", ap_mrb_sleep, ARGS_REQ(1));
+    mrb_define_class_method(mrb, ap_mrb_string_lib, "sleep", ap_mrb_sleep, ARGS_ANY());
 //    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs", ap_mrb_rputs, ARGS_REQ(1));
 //    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs_test", ap_mrb_rputs_test, ARGS_REQ(1));
     
@@ -139,8 +139,7 @@ static int mruby_handler(request_rec *r)
     mrb_pool_close(p->pool);
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
 
-    //return DECLINED;
-    return OK;
+    return DECLINED;
 }
 
 
