@@ -116,7 +116,18 @@ static int mruby_handler(request_rec *r)
     int n;
     FILE *mrb_file;
     
-    mrb_file = fopen(conf->mruby_handler_file, "r");
+    if ((mrb_file = fopen(conf->mruby_handler_file, "r")) == NULL) {
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: mrb file oepn failed: %s"
+            , MODULE_NAME
+            , __func__
+            , conf->mruby_handler_file
+        );
+
+    }
     p = mrb_parse_file(mrb, mrb_file);
     n = mrb_generate_code(mrb, p->tree);
     mrb_pool_close(p->pool);
