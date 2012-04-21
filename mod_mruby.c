@@ -133,7 +133,7 @@ static int mruby_handler(request_rec *r)
     mrb_pool_close(p->pool);
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
 
-    return OK;
+    return DECLINED;
 }
 
 
