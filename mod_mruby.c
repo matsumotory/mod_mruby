@@ -59,7 +59,7 @@
 
 typedef struct {
 
-    const char *mruby_handler_file;
+    const char *mruby_code_file;
 
 } mruby_config_t;
 
@@ -70,7 +70,7 @@ static void *create_config(apr_pool_t *p, server_rec *s)
     mruby_config_t *conf = 
         (mruby_config_t *) apr_pcalloc(p, sizeof (*conf));
 
-    conf->mruby_handler_file = NULL;
+    conf->mruby_code_file = NULL;
 
     return conf;
 }
@@ -85,7 +85,7 @@ static const char *set_mruby_handler(cmd_parms *cmd, void *mconfig, const char *
     if (err != NULL)
         return err;
 
-    conf->mruby_handler_file = apr_pstrdup(cmd->pool, arg);
+    conf->mruby_code_file = apr_pstrdup(cmd->pool, arg);
 
     return NULL;
 }
@@ -106,24 +106,28 @@ static int mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server
     return OK;
 }
 
-static int mruby_handler(request_rec *r)
+static int ap_mruby_class_init(mrb_state *mrb)
 {
 
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    struct RClass *class;
 
-    mrb_state *mrb = mrb_open();
+    class = mrb_define_module(mrb, "Apache");
+    mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
+//    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs", ap_mrb_rputs, ARGS_REQ(1));
+//    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs_test", ap_mrb_rputs_test, ARGS_REQ(1));
+
+    return OK;
+
+}
+
+static int ap_mruby_run(mrb_state *mrb, const char *code_file)
+{
+
     struct mrb_parser_state* p;
     int n;
     FILE *mrb_file;
 
-    struct RClass *ap_mrb_string_lib;
-    
-    ap_mrb_string_lib = mrb_define_module(mrb, "Apache");
-    mrb_define_class_method(mrb, ap_mrb_string_lib, "sleep", ap_mrb_sleep, ARGS_ANY());
-//    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs", ap_mrb_rputs, ARGS_REQ(1));
-//    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs_test", ap_mrb_rputs_test, ARGS_REQ(1));
-    
-    if ((mrb_file = fopen(conf->mruby_handler_file, "r")) == NULL) {
+    if ((mrb_file = fopen(code_file, "r")) == NULL) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -131,7 +135,7 @@ static int mruby_handler(request_rec *r)
             , "%s ERROR %s: mrb file oepn failed: %s"
             , MODULE_NAME
             , __func__
-            , conf->mruby_handler_file
+            , code_file
         );
 
     }
@@ -141,6 +145,17 @@ static int mruby_handler(request_rec *r)
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
 
     return DECLINED;
+}
+
+static int mruby_handler(request_rec *r)
+{
+
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+
+    mrb_state *mrb = mrb_open();
+    ap_mruby_class_init(mrb);
+    
+    return ap_mruby_run(mrb, conf->mruby_code_file);
 }
 
 

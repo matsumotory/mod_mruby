@@ -1,3 +1,4 @@
+#include <unistd.h>
 
 mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str);
 
