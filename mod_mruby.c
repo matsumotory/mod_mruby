@@ -34,8 +34,6 @@
 */
 
 #include "apr_strings.h"
-#include "apr_md5.h"
-#include "apr_file_info.h"
 #include "ap_config.h"
 #include "httpd.h"
 #include "http_config.h"
@@ -43,9 +41,12 @@
 #include "http_log.h"
 #include "http_protocol.h"
 #include "http_request.h"
-#include "mpm_common.h"
-#include <unistd.h>
 
+#include <mruby.h>
+#include <mruby/proc.h>
+#include <compile.h>
+
+#include "ap_mrb_utils.h"
 #include "ap_mrb_string.h"
 
 #define MODULE_NAME        "mod_mruby"
