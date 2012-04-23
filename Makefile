@@ -8,7 +8,7 @@ TARGET=mod_mruby.c
 
 #   the used tools
 APXS=/usr/sbin/apxs
-APACHECTL=/etc/ini.d/httpd
+APACHECTL=/etc/init.d/httpd
 
 #   additional user defines, includes and libraries
 #DEF=-D__DEBUG__

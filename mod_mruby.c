@@ -113,7 +113,7 @@ static int ap_mruby_class_init(mrb_state *mrb)
 
     class = mrb_define_module(mrb, "Apache");
     mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
-//    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs", ap_mrb_rputs, ARGS_REQ(1));
+    mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
 //    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs_test", ap_mrb_rputs_test, ARGS_REQ(1));
 
     return OK;
@@ -144,13 +144,15 @@ static int ap_mruby_run(mrb_state *mrb, const char *code_file)
     mrb_pool_close(p->pool);
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
 
-    return DECLINED;
+    return OK;
 }
 
 static int mruby_handler(request_rec *r)
 {
 
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+
+    ap_mrb_push_request(r);
 
     mrb_state *mrb = mrb_open();
     ap_mruby_class_init(mrb);

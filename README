@@ -10,16 +10,24 @@ make install
 
 - Settings
 
-cat /etc/httpd/conf.d/mruby.conf
+cat /etc/httpd/conf.d/mruby.so
     LoadModule mruby_module modules/mod_mruby.so
     mrubyHandler /var/www/html/sleep.mrb
 
-cat /var/www/html/sleep.mrb
-    require 'Apache'
-    Apache.sleep(5)
-
 /etc/init.d/httpd restart
 
-Experiment
+- Experiment 1
+    cat /var/www/html/sleep.mrb
+        require 'Apache'
+        Apache.sleep(5)
+
     access to http://example.com/
     sleeping 5 is success.
+
+- Experiment 2
+    cat /var/www/html/hello.mrb
+        require 'Apache'
+        Apache.rputs("<h5>hellow mod_mruby world!</h5>")
+
+    access to http://example.com/
+    output "hellow mod_mruby world!" by h5 tag on your browser.
