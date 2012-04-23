@@ -1,10 +1,14 @@
-Compile
+mod_mruby - to provide an alternative to mod_lua
 
-apxs -c -I /usr/local/src/mruby/src/ -I/usr/local/src/mruby/include/ -lm /usr/local/src/mruby/lib/ritevm.a mod_mruby.c
+- Compile
 
-Install
+make
 
-cp .libs/mod_mruby.so /etc/httpd/modules/.
+- Install
+
+make install
+
+- Settings
 
 cat /etc/httpd/conf.d/mruby.so
     LoadModule mruby_module modules/mod_mruby.so
