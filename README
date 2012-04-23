@@ -10,7 +10,7 @@ make install
 
 - Settings
 
-cat /etc/httpd/conf.d/mruby.so
+cat /etc/httpd/conf.d/mruby.conf
     LoadModule mruby_module modules/mod_mruby.so
     mrubyHandler /var/www/html/sleep.mrb
 
