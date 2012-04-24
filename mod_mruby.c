@@ -114,7 +114,7 @@ static int ap_mruby_class_init(mrb_state *mrb)
     class = mrb_define_module(mrb, "Apache");
     mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
-//    mrb_define_class_method(mrb, ap_mrb_string_lib, "mrb_rputs_test", ap_mrb_rputs_test, ARGS_REQ(1));
+    mrb_define_class_method(mrb, class, "errlogger", ap_mrb_err_logger, ARGS_ANY());
 
     return OK;
 
