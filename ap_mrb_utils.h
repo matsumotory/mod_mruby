@@ -5,8 +5,8 @@ mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_err_logger(mrb_state *mrb, mrb_value str);
 
 
-mrb_value
-ap_mrb_sleep(mrb_state *mrb, mrb_value str) {
+mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
+{
 
     struct RProc *b;
     mrb_value argc, *argv;
@@ -21,8 +21,8 @@ ap_mrb_sleep(mrb_state *mrb, mrb_value str) {
     return str;
 }
 
-mrb_value
-ap_mrb_err_logger(mrb_state *mrb, mrb_value str) {
+mrb_value ap_mrb_err_logger(mrb_state *mrb, mrb_value str)
+{
 
     struct RProc *b;
     mrb_value argc, *argv;
