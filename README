@@ -31,3 +31,30 @@ cat /etc/httpd/conf.d/mruby.so
 
     access to http://example.com/
     output "hellow mod_mruby world!" by h5 tag on your browser.
+
+- Experiment 3
+    cat /var/www/html/syslogger.mrb
+        require 'Apache'
+        Apache.syslogger("notice", "error!")
+
+    access to http://example.com/
+    output "error!" on /var/log/syslog
+
+- Experiment 4
+    cat /var/www/html/errlogger.mrb
+        require 'Apache'
+        Apache.errlogger(5, "this is error")
+
+    access to http://example.com/
+    output "this is error" on /var/log/httpd/error_log
+
+    argv1 is the following priority list.
+
+    #define APLOG_EMERG 0   /* system is unusable */
+    #define APLOG_ALERT 1   /* action must be taken immediately */
+    #define APLOG_CRIT  2   /* critical conditions */
+    #define APLOG_ERR   3   /* error conditions */
+    #define APLOG_WARNING   4   /* warning conditions */
+    #define APLOG_NOTICE    5   /* normal but significant condition */
+    #define APLOG_INFO  6   /* informational */
+    #define APLOG_DEBUG 7   /* debug-level messages */

@@ -11,7 +11,7 @@ APXS=/usr/sbin/apxs
 APACHECTL=/etc/init.d/httpd
 
 #   additional user defines, includes and libraries
-#DEF=-D__DEBUG__
+DEF=-DSYSLOG_NAMES
 INC=-I/usr/local/src/mruby/src -I/usr/local/src/mruby/include
 LIB=-lm /usr/local/src/mruby/lib/ritevm.a
 

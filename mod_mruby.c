@@ -46,9 +46,6 @@
 #include <mruby/proc.h>
 #include <compile.h>
 
-#include "ap_mrb_utils.h"
-#include "ap_mrb_string.h"
-
 #define MODULE_NAME        "mod_mruby"
 #define MODULE_VERSION     "0.01"
 #define UNSET              -1
@@ -56,6 +53,8 @@
 #define ON                 1
 #define OFF                0
 
+#include "ap_mrb_utils.h"
+#include "ap_mrb_string.h"
 
 typedef struct {
 
@@ -115,6 +114,7 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
     mrb_define_class_method(mrb, class, "errlogger", ap_mrb_errlogger, ARGS_ANY());
+    mrb_define_class_method(mrb, class, "syslogger", ap_mrb_syslogger, ARGS_ANY());
 
     return OK;
 
