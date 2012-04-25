@@ -152,6 +152,9 @@ static int mruby_handler(request_rec *r)
 
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
 
+    if (strcmp(r->handler, "mruby"))
+        return DECLINED;
+
     ap_mrb_push_request(r);
 
     mrb_state *mrb = mrb_open();
