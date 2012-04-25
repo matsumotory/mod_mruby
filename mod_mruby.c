@@ -152,7 +152,7 @@ static int mruby_handler(request_rec *r)
 
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
 
-    if (strcmp(r->handler, "mruby") == 0)
+    if (strcmp(r->handler, "mruby-script") == 0)
         conf->mruby_code_file = apr_pstrdup(r->pool, r->filename);
     else
         return DECLINED;
