@@ -1,0 +1,7 @@
+cache_table fix.
+
+add expire time on cache_table.
+
+add stat check on cache_table.
+
+discuss cache_table on shared memory.
