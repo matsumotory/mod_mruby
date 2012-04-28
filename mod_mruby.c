@@ -55,7 +55,6 @@
 #define SET                1
 #define ON                 1
 #define OFF                0
-#define MOD_MRUBY_CACHE_TABLE_SIZE 32
 
 #include "ap_mrb_utils.h"
 #include "ap_mrb_string.h"
@@ -135,8 +134,10 @@ static const char *set_mruby_cache_table_size(cmd_parms *cmd, void *mconfig, con
     signed long int table_size = strtol(arg, (char **) NULL, 10);
     conf->mruby_cache_table_size = table_size;
 
-    cache_table_t *mod_mruby_cache_table = 
-        (cache_table_t *) apr_pcalloc(cmd->pool , sizeof(*mod_mruby_cache_table) + sizeof(mod_mruby_cache_table->cache_code_slot) * table_size);
+    mod_mruby_cache_table = 
+        (cache_table_t *) apr_pcalloc(cmd->pool , sizeof(*mod_mruby_cache_table));
+    mod_mruby_cache_table->cache_code_slot = 
+        (cache_code_t *)apr_pcalloc(cmd->pool, sizeof(mod_mruby_cache_table->cache_code_slot) * table_size);
 
     int i;
     for (i = 0; i < table_size; i++) {
@@ -364,23 +365,23 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
 #endif
 
     if (conf->mruby_cache_table_size > 0) {
-    for(i = 0; i < conf->mruby_cache_table_size; i++) {
-        if (cache_table_data->cache_code_slot[i].filename != NULL && strcmp(conf->mruby_code_file, cache_table_data->cache_code_slot[i].filename) == 0) {
-            n = cache_table_data->cache_code_slot[i].ireq_id;
-            mrb = cache_table_data->cache_code_slot[i].mrb;
-            cache_hit = 1;
-            ap_log_error(APLOG_MARK
-                , APLOG_ERR
-                , 0
-                , NULL
-                , "%s DEBUG %s: cache hits!: %s"
-                , MODULE_NAME
-                , __func__
-                , conf->mruby_code_file
-            );
-            break;
+        for(i = 0; i < conf->mruby_cache_table_size; i++) {
+            if (strcmp(cache_table_data->cache_code_slot[i].filename, conf->mruby_code_file) == 0) {
+                n = cache_table_data->cache_code_slot[i].ireq_id;
+                mrb = cache_table_data->cache_code_slot[i].mrb;
+                cache_hit = 1;
+                ap_log_error(APLOG_MARK
+                    , APLOG_ERR
+                    , 0
+                    , NULL
+                    , "%s DEBUG %s: cache hits!: %s"
+                    , MODULE_NAME
+                    , __func__
+                    , conf->mruby_code_file
+                );
+                break;
+            }
         }
-    }
     }
 
     if (cache_hit == 0) {
