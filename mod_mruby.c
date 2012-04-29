@@ -357,7 +357,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
     if (conf->mruby_cache_table_size > 0) {
         for(i = 0; i < conf->mruby_cache_table_size; i++) {
                 ap_log_error(APLOG_MARK
-                    , APLOG_ERR
+                    , APLOG_DEBUG
                     , 0
                     , NULL
                     , "%s DEBUG %s: %d: %s <=> %s"
@@ -375,7 +375,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
                 mrb = cache_table_data->cache_code_slot[i].mrb;
                 cache_hit = 1;
                 ap_log_error(APLOG_MARK
-                    , APLOG_ERR
+                    , APLOG_DEBUG
                     , 0
                     , NULL
                     , "%s DEBUG %s: cache hits! on pid %d: %s"
@@ -403,7 +403,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
         }
 
        ap_log_error(APLOG_MARK
-           , APLOG_ERR
+           , APLOG_DEBUG
            , 0
            , NULL
            , "%s DEBUG %s: cache nothing on pid %d, compile code: %s"
@@ -461,7 +461,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
     }
 
     ap_log_error(APLOG_MARK
-        , APLOG_ERR
+        , APLOG_DEBUG
         , 0
         , NULL
         , "%s DEBUG %s: run mruby code.: %s"
@@ -499,7 +499,7 @@ static int mruby_handler(request_rec *r)
             mod_mruby_cache_table->cache_code_slot[i].ireq_id  = -1;
         }
         ap_log_error(APLOG_MARK
-            , APLOG_ERR
+            , APLOG_DEBUG
             , 0
             , NULL
             , "%s DEBUG %s: cache initialized."
