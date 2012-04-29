@@ -134,6 +134,15 @@ static const char *set_mruby_cache_table_size(cmd_parms *cmd, void *mconfig, con
 
     signed long int table_size = strtol(arg, (char **) NULL, 10);
     conf->mruby_cache_table_size = table_size;
+    ap_log_error(APLOG_MARK
+        , APLOG_NOTICE
+        , 0
+        , NULL
+        , "%s INFO %s: mod_mruby cache table enabled. table size %d."
+        , MODULE_NAME
+        , __func__
+        , table_size
+    );
 
     return NULL;
 }
@@ -375,7 +384,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
                 mrb = cache_table_data->cache_code_slot[i].mrb;
                 cache_hit = 1;
                 ap_log_error(APLOG_MARK
-                    , APLOG_DEBUG
+                    , APLOG_NOTICE
                     , 0
                     , NULL
                     , "%s DEBUG %s: cache hits! on pid %d: %s"
