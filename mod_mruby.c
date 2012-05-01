@@ -49,6 +49,8 @@
 #include <mruby/proc.h>
 #include <compile.h>
 
+#include <sys/stat.h>
+
 #define MODULE_NAME        "mod_mruby"
 #define MODULE_VERSION     "0.01"
 #define UNSET              -1
@@ -59,29 +61,9 @@
 #include "ap_mrb_utils.h"
 #include "ap_mrb_string.h"
 
+#include "mod_mruby.h"
+
 module AP_MODULE_DECLARE_DATA mruby_module;
-
-typedef struct {
-
-    const char *mruby_code_file;
-    int mruby_cache_table_size;
-
-} mruby_config_t;
-
-typedef struct cache_code_str {
-
-    int cache_id;
-    int ireq_id;
-    char *filename;
-    mrb_state *mrb;
-
-} cache_code_t;
-
-typedef struct cache_shm_table {
-
-    cache_code_t *cache_code_slot;
-
-} cache_table_t;
 
 #ifdef __MOD_MRUBY_SHARE_CACHE_TABLE__
 // shared memory
@@ -95,8 +77,10 @@ cache_table_t *mod_mruby_cache_table = NULL;
 #endif
 
 static int initialized = 0;
+static mrb_state *mod_mruby_share_state;
 
-static void *create_config(apr_pool_t *p, server_rec *s)
+
+static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
 {
     mruby_config_t *conf = 
         (mruby_config_t *) apr_pcalloc(p, sizeof (*conf));
@@ -108,7 +92,7 @@ static void *create_config(apr_pool_t *p, server_rec *s)
 }
 
 
-static const char *set_mruby_handler(cmd_parms *cmd, void *mconfig, const char *arg)
+static const char *set_mod_mruby_handler(cmd_parms *cmd, void *mconfig, const char *arg)
 {
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
     mruby_config_t *conf = 
@@ -123,7 +107,7 @@ static const char *set_mruby_handler(cmd_parms *cmd, void *mconfig, const char *
 }
 
 
-static const char *set_mruby_cache_table_size(cmd_parms *cmd, void *mconfig, const char *arg)
+static const char *set_mod_mruby_cache_table_size(cmd_parms *cmd, void *mconfig, const char *arg)
 {
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
     mruby_config_t *conf = 
@@ -148,7 +132,7 @@ static const char *set_mruby_cache_table_size(cmd_parms *cmd, void *mconfig, con
 }
 
 
-static int mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
+static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
 {
     void *data;
     const char *userdata_key = "mruby_init";
@@ -304,6 +288,7 @@ static int mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server
     }
 #endif
 
+
     ap_log_error(APLOG_MARK
         , APLOG_ERR
         , 0                
@@ -351,6 +336,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
 
     int i, n;
     struct mrb_parser_state* p;
+    struct stat st;
     FILE *mrb_file;
     int cache_hit = 0;
 
@@ -359,14 +345,14 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
 #ifdef __MOD_MRUBY_SHARED_CACHE_TABLE__
     cache_table_data = shm_table_data_base;
 #else
-    cache_table_data = (cache_table_t *)apr_pcalloc(r->pool, sizeof(*cache_table_data));
+    //cache_table_data = (cache_table_t *)apr_pcalloc(r->pool, sizeof(*cache_table_data));
     cache_table_data = mod_mruby_cache_table;
 #endif
 
     if (conf->mruby_cache_table_size > 0) {
         for(i = 0; i < conf->mruby_cache_table_size; i++) {
                 ap_log_error(APLOG_MARK
-                    , APLOG_DEBUG
+                    , APLOG_ERR
                     , 0
                     , NULL
                     , "%s DEBUG %s: %d: %s <=> %s"
@@ -380,13 +366,43 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
                 continue;
 
             if (strcmp(cache_table_data->cache_code_slot[i].filename, conf->mruby_code_file) == 0) {
+                if (stat(conf->mruby_code_file, &st) == -1) {
+                    ap_log_rerror(APLOG_MARK
+                        , APLOG_ERR
+                        , 0
+                        , r
+                        , "%s ERROR %s: cache check phase. stat failed: %s"
+                        , MODULE_NAME
+                        , __func__
+                        , conf->mruby_code_file
+                    );
+                    return DECLINED;
+                }
+                if (cache_table_data->cache_code_slot[i].stat_mtime != (int)st.st_mtime) {
+                    ap_log_rerror(APLOG_MARK
+                        , APLOG_DEBUG
+                        , 0
+                        , r
+                        , "%s DEBUG %s: stat changed. cache deleted: %s"
+                        , MODULE_NAME
+                        , __func__
+                        , conf->mruby_code_file
+                    );
+                    mod_mruby_cache_table->cache_code_slot[i].filename   = NULL;
+                    mod_mruby_cache_table->cache_code_slot[i].mrb        = NULL;
+                    mod_mruby_cache_table->cache_code_slot[i].cache_id   = -1;
+                    mod_mruby_cache_table->cache_code_slot[i].ireq_id    = -1;
+                    mod_mruby_cache_table->cache_code_slot[i].stat_mtime = -1;
+
+                    continue;
+                }
                 n = cache_table_data->cache_code_slot[i].ireq_id;
                 mrb = cache_table_data->cache_code_slot[i].mrb;
                 cache_hit = 1;
-                ap_log_error(APLOG_MARK
-                    , APLOG_NOTICE
+                ap_log_rerror(APLOG_MARK
+                    , APLOG_DEBUG
                     , 0
-                    , NULL
+                    , r
                     , "%s DEBUG %s: cache hits! on pid %d: %s"
                     , MODULE_NAME
                     , __func__
@@ -411,16 +427,20 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
             );
         }
 
-       ap_log_error(APLOG_MARK
+       ap_log_rerror(APLOG_MARK
            , APLOG_DEBUG
            , 0
-           , NULL
+           , r
            , "%s DEBUG %s: cache nothing on pid %d, compile code: %s"
            , MODULE_NAME
            , __func__
            , getpid()
            , conf->mruby_code_file
        );
+
+        //mod_mruby_share_state = mrb_open();
+        //ap_mruby_class_init(mod_mruby_share_state);
+        //mrb = mod_mruby_share_state;
 
         p = mrb_parse_file(mrb, mrb_file);
         n = mrb_generate_code(mrb, p->tree);
@@ -441,13 +461,40 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
         }
 #endif
         if (conf->mruby_cache_table_size > 0) {
+            if (stat(conf->mruby_code_file, &st) == -1) {
+                ap_log_rerror(APLOG_MARK
+                    , APLOG_ERR
+                    , 0 
+                    , r 
+                    , "%s ERROR %s: cache update phase. stat failed: %s"
+                    , MODULE_NAME
+                    , __func__
+                    , conf->mruby_code_file
+                );  
+                return DECLINED;
+            }   
+
             for(i = 0; i <= conf->mruby_cache_table_size; i++) {
                 if (cache_table_data->cache_code_slot[i].cache_id == -1) {
+                    cache_table_data->cache_code_slot[i].filename = (char *)apr_pcalloc(r->pool, sizeof(conf->mruby_code_file));
                     cache_table_data->cache_code_slot[i].filename = apr_pstrdup(r->pool, conf->mruby_code_file);
                     cache_table_data->cache_code_slot[i].mrb = (mrb_state *)apr_pcalloc(r->pool, sizeof(*mrb)); 
                     cache_table_data->cache_code_slot[i].mrb = mrb; 
                     cache_table_data->cache_code_slot[i].ireq_id = n;
                     cache_table_data->cache_code_slot[i].cache_id = i; 
+                    cache_table_data->cache_code_slot[i].stat_mtime = (int)st.st_mtime; 
+
+                    ap_log_rerror(APLOG_MARK
+                        , APLOG_DEBUG
+                        , 0
+                        , r
+                        , "%s DEBUG %s: cache created: %s"
+                        , MODULE_NAME
+                        , __func__
+                        , conf->mruby_code_file
+                    );
+
+                    break;
                 }
             }
         }
@@ -469,11 +516,11 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
         mrb_pool_close(p->pool);
     }
 
-    ap_log_error(APLOG_MARK
+    ap_log_rerror(APLOG_MARK
         , APLOG_DEBUG
         , 0
-        , NULL
-        , "%s DEBUG %s: run mruby code.: %s"
+        , r
+        , "%s DEBUG %s: run mruby code: %s"
         , MODULE_NAME
         , __func__
         , conf->mruby_code_file
@@ -484,7 +531,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
     return OK;
 }
 
-static int mruby_handler(request_rec *r)
+static int mod_mruby_handler(request_rec *r)
 {
 
     int i;
@@ -501,16 +548,20 @@ static int mruby_handler(request_rec *r)
         mod_mruby_cache_table->cache_code_slot = 
             (cache_code_t *)apr_pcalloc(r->pool, sizeof(mod_mruby_cache_table->cache_code_slot) * conf->mruby_cache_table_size);
 
+        mod_mruby_share_state = mrb_open();
+        ap_mruby_class_init(mod_mruby_share_state);
+
         for (i = 0; i < conf->mruby_cache_table_size; i++) {
-            mod_mruby_cache_table->cache_code_slot[i].filename = NULL;
-            mod_mruby_cache_table->cache_code_slot[i].mrb      = NULL;
-            mod_mruby_cache_table->cache_code_slot[i].cache_id = -1;
-            mod_mruby_cache_table->cache_code_slot[i].ireq_id  = -1;
+            mod_mruby_cache_table->cache_code_slot[i].filename   = NULL;
+            mod_mruby_cache_table->cache_code_slot[i].mrb        = NULL;
+            mod_mruby_cache_table->cache_code_slot[i].cache_id   = -1;
+            mod_mruby_cache_table->cache_code_slot[i].ireq_id    = -1;
+            mod_mruby_cache_table->cache_code_slot[i].stat_mtime = -1;
         }
-        ap_log_error(APLOG_MARK
+        ap_log_rerror(APLOG_MARK
             , APLOG_DEBUG
             , 0
-            , NULL
+            , r
             , "%s DEBUG %s: cache initialized."
             , MODULE_NAME
             , __func__
@@ -519,25 +570,23 @@ static int mruby_handler(request_rec *r)
     }
 
     ap_mrb_push_request(r);
-    mrb_state *mrb = mrb_open();
-    ap_mruby_class_init(mrb);
     
-    return ap_mruby_run(mrb, r, conf);
+    return ap_mruby_run(mod_mruby_share_state, r, conf);
 }
 
 
-static const command_rec mruby_cmds[] = {
+static const command_rec mod_mruby_cmds[] = {
 
-    AP_INIT_TAKE1("mrubyHandler", set_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
-    AP_INIT_TAKE1("mrubyCacheSize", set_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
+    AP_INIT_TAKE1("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
+    AP_INIT_TAKE1("mrubyCacheSize", set_mod_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
     {NULL}
 };
 
 
 static void register_hooks(apr_pool_t *p)
 {
-    ap_hook_post_config(mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_handler(mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
+    ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_handler(mod_mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
 }
 
 
@@ -545,8 +594,8 @@ module AP_MODULE_DECLARE_DATA mruby_module = {
     STANDARD20_MODULE_STUFF,
     NULL,                      /* dir config creater */
     NULL,                      /* dir merger */
-    create_config,             /* server config */
+    mod_mruby_create_config,   /* server config */
     NULL,                      /* merge server config */
-    mruby_cmds,                /* command apr_table_t */
+    mod_mruby_cmds,                /* command apr_table_t */
     register_hooks             /* register hooks */
 };
