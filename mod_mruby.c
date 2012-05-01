@@ -52,7 +52,7 @@
 #include <sys/stat.h>
 
 #define MODULE_NAME        "mod_mruby"
-#define MODULE_VERSION     "0.01"
+#define MODULE_VERSION     "0.1.1"
 #define UNSET              -1
 #define SET                1
 #define ON                 1
@@ -118,11 +118,11 @@ static const char *set_mod_mruby_cache_table_size(cmd_parms *cmd, void *mconfig,
 
     signed long int table_size = strtol(arg, (char **) NULL, 10);
     conf->mruby_cache_table_size = table_size;
-    ap_log_error(APLOG_MARK
+    ap_log_perror(APLOG_MARK
         , APLOG_NOTICE
         , 0
-        , NULL
-        , "%s INFO %s: mod_mruby cache table enabled. table size %d."
+        , cmd->pool
+        , "%s %s: mod_mruby cache table enabled. table size %d."
         , MODULE_NAME
         , __func__
         , table_size
@@ -289,11 +289,11 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
 #endif
 
 
-    ap_log_error(APLOG_MARK
-        , APLOG_ERR
+    ap_log_perror(APLOG_MARK
+        , APLOG_NOTICE
         , 0                
-        , NULL
-        , "%s INFO %s: Initialized."
+        , p
+        , "%s %s: Initialized."
         , MODULE_NAME
         , __func__
     );  
@@ -303,14 +303,15 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     if (!data)
         apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null, s->process->pool);
 
-    ap_log_error(APLOG_MARK
-        , APLOG_ERR
+    ap_log_perror(APLOG_MARK
+        , APLOG_NOTICE
         , 0                
-        , NULL
-        , "%s INFO %s: %s mechanism enabled."
+        , p
+        , "%s %s: %s / %s mechanism enabled."
         , MODULE_NAME
         , __func__
         , MODULE_NAME
+        , MODULE_VERSION
     );  
     
     return OK;
@@ -351,10 +352,10 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
 
     if (conf->mruby_cache_table_size > 0) {
         for(i = 0; i < conf->mruby_cache_table_size; i++) {
-                ap_log_error(APLOG_MARK
-                    , APLOG_ERR
+                ap_log_rerror(APLOG_MARK
+                    , APLOG_DEBUG
                     , 0
-                    , NULL
+                    , r
                     , "%s DEBUG %s: %d: %s <=> %s"
                     , MODULE_NAME
                     , __func__
@@ -414,7 +415,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
         }
     }
 
-    if (cache_hit == 0) {
+    if (!cache_hit) {
         if ((mrb_file = fopen(conf->mruby_code_file, "r")) == NULL) {
             ap_log_error(APLOG_MARK
                 , APLOG_ERR
@@ -551,22 +552,35 @@ static int mod_mruby_handler(request_rec *r)
         mod_mruby_share_state = mrb_open();
         ap_mruby_class_init(mod_mruby_share_state);
 
-        for (i = 0; i < conf->mruby_cache_table_size; i++) {
-            mod_mruby_cache_table->cache_code_slot[i].filename   = NULL;
-            mod_mruby_cache_table->cache_code_slot[i].mrb        = NULL;
-            mod_mruby_cache_table->cache_code_slot[i].cache_id   = -1;
-            mod_mruby_cache_table->cache_code_slot[i].ireq_id    = -1;
-            mod_mruby_cache_table->cache_code_slot[i].stat_mtime = -1;
+        if (conf->mruby_cache_table_size > 0) {
+            for (i = 0; i < conf->mruby_cache_table_size; i++) {
+                mod_mruby_cache_table->cache_code_slot[i].filename   = NULL;
+                mod_mruby_cache_table->cache_code_slot[i].mrb        = NULL;
+                mod_mruby_cache_table->cache_code_slot[i].cache_id   = -1;
+                mod_mruby_cache_table->cache_code_slot[i].ireq_id    = -1;
+                mod_mruby_cache_table->cache_code_slot[i].stat_mtime = -1;
+            }
+            ap_log_rerror(APLOG_MARK
+                , APLOG_NOTICE
+                , 0
+                , r
+                , "%s NOTICE %s: cache initialized."
+                , MODULE_NAME
+                , __func__
+            );
         }
+
+        initialized = 1;
+
         ap_log_rerror(APLOG_MARK
-            , APLOG_DEBUG
+            , APLOG_NOTICE
             , 0
             , r
-            , "%s DEBUG %s: cache initialized."
+            , "%s %s: child process (pid=%d) initialized."
             , MODULE_NAME
             , __func__
+            , getpid()
         );
-        initialized = 1;
     }
 
     ap_mrb_push_request(r);
