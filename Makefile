@@ -7,13 +7,15 @@
 TARGET=mod_mruby.c
 
 #   the used tools
+#APXS=/usr/sbin/apxs
+#APACHECTL=/etc/init.d/httpd
 APXS=/usr/local/apache2.4/bin/apxs
 APACHECTL=/usr/local/apache2.4/bin/apachectl
 
 #   additional user defines, includes and libraries
 DEF=-DSYSLOG_NAMES
 INC=-I/usr/local/src/mruby/src -I/usr/local/src/mruby/include
-LIB=-lm /usr/local/src/mruby/lib/ritevm.a
+LIB=-lm /usr/local/src/mruby/lib/ritevm.a -lm /usr/local/src/mruby/mrblib/mrblib.o
 
 #   the default target
 all: mod_mruby.so
