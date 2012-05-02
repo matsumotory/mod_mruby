@@ -24,4 +24,4 @@ typedef struct cache_shm_table {
 static int ap_mruby_class_init(mrb_state *mrb);
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s);
 static int ap_mruby_class_init(mrb_state *mrb);
-static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf);
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, int module_status);

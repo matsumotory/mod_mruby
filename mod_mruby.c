@@ -332,7 +332,7 @@ static int ap_mruby_class_init(mrb_state *mrb)
 
 }
 
-static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, int module_status)
 {
 
     int i, n;
@@ -529,13 +529,57 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r,  mruby_config_t *conf)
 
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
 
-    return OK;
+    return module_status;
 }
+
+
+static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
+{
+
+    int i;
+    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
+
+    mod_mruby_cache_table =
+        (cache_table_t *)apr_pcalloc(pool , sizeof(*mod_mruby_cache_table));
+    mod_mruby_cache_table->cache_code_slot =
+        (cache_code_t *)apr_pcalloc(pool, sizeof(mod_mruby_cache_table->cache_code_slot) * conf->mruby_cache_table_size);
+
+    mod_mruby_share_state = mrb_open();
+    ap_mruby_class_init(mod_mruby_share_state);
+
+    if (conf->mruby_cache_table_size > 0) {
+        for (i = 0; i < conf->mruby_cache_table_size; i++) {
+            mod_mruby_cache_table->cache_code_slot[i].filename   = NULL;
+            mod_mruby_cache_table->cache_code_slot[i].mrb        = NULL;
+            mod_mruby_cache_table->cache_code_slot[i].cache_id   = -1;
+            mod_mruby_cache_table->cache_code_slot[i].ireq_id    = -1;
+            mod_mruby_cache_table->cache_code_slot[i].stat_mtime = -1;
+        }
+        ap_log_perror(APLOG_MARK
+            , APLOG_NOTICE
+            , 0
+            , pool
+            , "%s NOTICE %s: cache initialized."
+            , MODULE_NAME
+            , __func__
+        );
+    }
+
+    ap_log_perror(APLOG_MARK
+        , APLOG_NOTICE
+        , 0
+        , pool
+        , "%s %s: child process (pid=%d) initialized."
+        , MODULE_NAME
+        , __func__
+        , getpid()
+    );
+}
+
 
 static int mod_mruby_handler(request_rec *r)
 {
 
-    int i;
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
 
     if (strcmp(r->handler, "mruby-script") == 0)
@@ -543,49 +587,9 @@ static int mod_mruby_handler(request_rec *r)
     else
         return DECLINED;
 
-    if (!initialized) {
-        mod_mruby_cache_table = 
-            (cache_table_t *)apr_pcalloc(r->pool , sizeof(*mod_mruby_cache_table));
-        mod_mruby_cache_table->cache_code_slot = 
-            (cache_code_t *)apr_pcalloc(r->pool, sizeof(mod_mruby_cache_table->cache_code_slot) * conf->mruby_cache_table_size);
-
-        mod_mruby_share_state = mrb_open();
-        ap_mruby_class_init(mod_mruby_share_state);
-
-        if (conf->mruby_cache_table_size > 0) {
-            for (i = 0; i < conf->mruby_cache_table_size; i++) {
-                mod_mruby_cache_table->cache_code_slot[i].filename   = NULL;
-                mod_mruby_cache_table->cache_code_slot[i].mrb        = NULL;
-                mod_mruby_cache_table->cache_code_slot[i].cache_id   = -1;
-                mod_mruby_cache_table->cache_code_slot[i].ireq_id    = -1;
-                mod_mruby_cache_table->cache_code_slot[i].stat_mtime = -1;
-            }
-            ap_log_rerror(APLOG_MARK
-                , APLOG_NOTICE
-                , 0
-                , r
-                , "%s NOTICE %s: cache initialized."
-                , MODULE_NAME
-                , __func__
-            );
-        }
-
-        initialized = 1;
-
-        ap_log_rerror(APLOG_MARK
-            , APLOG_NOTICE
-            , 0
-            , r
-            , "%s %s: child process (pid=%d) initialized."
-            , MODULE_NAME
-            , __func__
-            , getpid()
-        );
-    }
-
     ap_mrb_push_request(r);
     
-    return ap_mruby_run(mod_mruby_share_state, r, conf);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, OK);
 }
 
 
@@ -600,6 +604,7 @@ static const command_rec mod_mruby_cmds[] = {
 static void register_hooks(apr_pool_t *p)
 {
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_child_init(mod_mruby_child_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_handler(mod_mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
 }
 
