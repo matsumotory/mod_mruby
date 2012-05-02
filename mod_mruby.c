@@ -8,7 +8,6 @@
 //          email: matsumoto_r at net.ist.i.kyoto-u.ac.jp
 //
 // Date     2012/04/21
-// Version  0.01
 //
 // change log
 //  2012/04/21 1.00 matsumoto_r first release
@@ -76,7 +75,6 @@ apr_global_mutex_t *mod_mruby_mutex;
 cache_table_t *mod_mruby_cache_table = NULL;
 #endif
 
-static int initialized = 0;
 static mrb_state *mod_mruby_share_state;
 
 
@@ -85,8 +83,11 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
     mruby_config_t *conf = 
         (mruby_config_t *) apr_pcalloc(p, sizeof (*conf));
 
-    conf->mruby_code_file = NULL;
-    conf->mruby_cache_table_size = 0;
+    conf->mod_mruby_handler_code                = NULL;
+    conf->mod_mruby_translate_name_first_code   = NULL;
+    conf->mod_mruby_translate_name_middle_code  = NULL;
+    conf->mod_mruby_translate_name_last_code    = NULL;
+    conf->mruby_cache_table_size                = 0;
 
     return conf;
 }
@@ -101,7 +102,52 @@ static const char *set_mod_mruby_handler(cmd_parms *cmd, void *mconfig, const ch
     if (err != NULL)
         return err;
 
-    conf->mruby_code_file = apr_pstrdup(cmd->pool, arg);
+    conf->mod_mruby_handler_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_translate_name_first(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_translate_name_first_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_translate_name_middle(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_translate_name_middle_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_translate_name_last(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_translate_name_last_code = apr_pstrdup(cmd->pool, arg);
 
     return NULL;
 }
@@ -293,9 +339,10 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         , APLOG_NOTICE
         , 0                
         , p
-        , "%s %s: Initialized."
+        , "%s %s: main process / thread (pid=%d) initialized."
         , MODULE_NAME
         , __func__
+        , getpid()
     );  
 
     apr_pool_userdata_get(&data, userdata_key, s->process->pool);
@@ -332,7 +379,7 @@ static int ap_mruby_class_init(mrb_state *mrb)
 
 }
 
-static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, int module_status)
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
 {
 
     int i, n;
@@ -360,14 +407,14 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                     , MODULE_NAME
                     , __func__
                     , i
-                    , conf->mruby_code_file
+                    , mruby_code_file
                     , cache_table_data->cache_code_slot[i].filename
                 );
             if (cache_table_data->cache_code_slot[i].filename == NULL)
                 continue;
 
-            if (strcmp(cache_table_data->cache_code_slot[i].filename, conf->mruby_code_file) == 0) {
-                if (stat(conf->mruby_code_file, &st) == -1) {
+            if (strcmp(cache_table_data->cache_code_slot[i].filename, mruby_code_file) == 0) {
+                if (stat(mruby_code_file, &st) == -1) {
                     ap_log_rerror(APLOG_MARK
                         , APLOG_ERR
                         , 0
@@ -375,7 +422,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                         , "%s ERROR %s: cache check phase. stat failed: %s"
                         , MODULE_NAME
                         , __func__
-                        , conf->mruby_code_file
+                        , mruby_code_file
                     );
                     return DECLINED;
                 }
@@ -387,7 +434,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                         , "%s DEBUG %s: stat changed. cache deleted: %s"
                         , MODULE_NAME
                         , __func__
-                        , conf->mruby_code_file
+                        , mruby_code_file
                     );
                     mod_mruby_cache_table->cache_code_slot[i].filename   = NULL;
                     mod_mruby_cache_table->cache_code_slot[i].mrb        = NULL;
@@ -408,7 +455,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                     , MODULE_NAME
                     , __func__
                     , getpid()
-                    , conf->mruby_code_file
+                    , mruby_code_file
                 );
                 break;
             }
@@ -416,7 +463,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
     }
 
     if (!cache_hit) {
-        if ((mrb_file = fopen(conf->mruby_code_file, "r")) == NULL) {
+        if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
             ap_log_error(APLOG_MARK
                 , APLOG_ERR
                 , 0
@@ -424,7 +471,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                 , "%s ERROR %s: mrb file oepn failed: %s"
                 , MODULE_NAME
                 , __func__
-                , conf->mruby_code_file
+                , mruby_code_file
             );
         }
 
@@ -436,7 +483,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
            , MODULE_NAME
            , __func__
            , getpid()
-           , conf->mruby_code_file
+           , mruby_code_file
        );
 
         //mod_mruby_share_state = mrb_open();
@@ -456,13 +503,13 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                 , "%s ERROR %s: mod_mruby_mutex lock failed: %s"
                 , MODULE_NAME
                 , __func__
-                , conf->mruby_code_file
+                , mruby_code_file
             );
             return OK;
         }
 #endif
         if (conf->mruby_cache_table_size > 0) {
-            if (stat(conf->mruby_code_file, &st) == -1) {
+            if (stat(mruby_code_file, &st) == -1) {
                 ap_log_rerror(APLOG_MARK
                     , APLOG_ERR
                     , 0 
@@ -470,15 +517,15 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                     , "%s ERROR %s: cache update phase. stat failed: %s"
                     , MODULE_NAME
                     , __func__
-                    , conf->mruby_code_file
+                    , mruby_code_file
                 );  
                 return DECLINED;
             }   
 
             for(i = 0; i <= conf->mruby_cache_table_size; i++) {
                 if (cache_table_data->cache_code_slot[i].cache_id == -1) {
-                    cache_table_data->cache_code_slot[i].filename = (char *)apr_pcalloc(r->pool, sizeof(conf->mruby_code_file));
-                    cache_table_data->cache_code_slot[i].filename = apr_pstrdup(r->pool, conf->mruby_code_file);
+                    cache_table_data->cache_code_slot[i].filename = (char *)apr_pcalloc(r->pool, sizeof(mruby_code_file));
+                    cache_table_data->cache_code_slot[i].filename = apr_pstrdup(r->pool, mruby_code_file);
                     cache_table_data->cache_code_slot[i].mrb = (mrb_state *)apr_pcalloc(r->pool, sizeof(*mrb)); 
                     cache_table_data->cache_code_slot[i].mrb = mrb; 
                     cache_table_data->cache_code_slot[i].ireq_id = n;
@@ -492,7 +539,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                         , "%s DEBUG %s: cache created: %s"
                         , MODULE_NAME
                         , __func__
-                        , conf->mruby_code_file
+                        , mruby_code_file
                     );
 
                     break;
@@ -509,7 +556,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
                 , "%s ERROR %s: mod_mruby_mutex unlock failed: %s"
                 , MODULE_NAME
                 , __func__
-                , conf->mruby_code_file
+                , mruby_code_file
             );
             return OK;
         }
@@ -524,7 +571,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, in
         , "%s DEBUG %s: run mruby code: %s"
         , MODULE_NAME
         , __func__
-        , conf->mruby_code_file
+        , mruby_code_file
     );
 
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
@@ -583,22 +630,44 @@ static int mod_mruby_handler(request_rec *r)
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
 
     if (strcmp(r->handler, "mruby-script") == 0)
-        conf->mruby_code_file = apr_pstrdup(r->pool, r->filename);
+        conf->mod_mruby_handler_code = apr_pstrdup(r->pool, r->filename);
     else
         return DECLINED;
 
     ap_mrb_push_request(r);
     
-    return ap_mruby_run(mod_mruby_share_state, r, conf, OK);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_code, OK);
 }
 
 
-static const command_rec mod_mruby_cmds[] = {
+static int mod_mruby_translate_name_first(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_translate_name_first_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_first_code, DECLINED);
+}
 
-    AP_INIT_TAKE1("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
-    AP_INIT_TAKE1("mrubyCacheSize", set_mod_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
-    {NULL}
-};
+
+static int mod_mruby_translate_name_middle(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_translate_name_middle_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_middle_code, DECLINED);
+}
+
+
+static int mod_mruby_translate_name_last(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_translate_name_last_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_last_code, DECLINED);
+}
 
 
 static void register_hooks(apr_pool_t *p)
@@ -606,7 +675,21 @@ static void register_hooks(apr_pool_t *p)
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_child_init(mod_mruby_child_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_handler(mod_mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
+    ap_hook_translate_name(mod_mruby_translate_name_first, NULL, NULL, APR_HOOK_FIRST);
+    ap_hook_translate_name(mod_mruby_translate_name_middle, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_translate_name(mod_mruby_translate_name_last, NULL, NULL, APR_HOOK_LAST);
 }
+
+
+static const command_rec mod_mruby_cmds[] = {
+
+    AP_INIT_TAKE1("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
+    AP_INIT_TAKE1("mrubyTranslateNameFirst", set_mod_mruby_translate_name_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name first phase."),
+    AP_INIT_TAKE1("mrubyTranslateNameMiddle", set_mod_mruby_translate_name_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name middle phase."),
+    AP_INIT_TAKE1("mrubyTranslateNameLast", set_mod_mruby_translate_name_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name last phase."),
+    AP_INIT_TAKE1("mrubyCacheSize", set_mod_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
+    {NULL}
+};
 
 
 module AP_MODULE_DECLARE_DATA mruby_module = {
