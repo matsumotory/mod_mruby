@@ -1,3 +1,6 @@
+#ifndef AP_MRB_UTILS_H
+#define AP_MRB_UTILS_H
+
 #include <unistd.h>
 #include <string.h>
 #include <mruby/string.h>
@@ -112,3 +115,5 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
     return str;
 
 }
+
+#endif

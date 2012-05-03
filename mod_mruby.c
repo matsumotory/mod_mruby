@@ -57,12 +57,14 @@
 #define ON                 1
 #define OFF                0
 
-#include "ap_mrb_utils.h"
-#include "ap_mrb_string.h"
-
-#include "mod_mruby.h"
+mrb_state *mod_mruby_share_state = NULL;
+request_rec *mrb_request_rec_state = NULL;
 
 module AP_MODULE_DECLARE_DATA mruby_module;
+
+#include "ap_mrb_utils.h"
+#include "ap_mrb_string.h"
+#include "mod_mruby.h"
 
 #ifdef __MOD_MRUBY_SHARE_CACHE_TABLE__
 // shared memory
@@ -75,8 +77,11 @@ apr_global_mutex_t *mod_mruby_mutex;
 cache_table_t *mod_mruby_cache_table = NULL;
 #endif
 
-static mrb_state *mod_mruby_share_state;
 
+static int ap_mruby_class_init(mrb_state *mrb);
+static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s);
+static int ap_mruby_class_init(mrb_state *mrb);
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status);
 
 static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
 {

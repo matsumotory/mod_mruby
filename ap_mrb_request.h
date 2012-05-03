@@ -1,14 +1,16 @@
+#ifndef AP_MRB_REQUEST_H
+#define AP_MRB_REQUEST_H
+
 #include <string.h>
 #include "mruby/string.h"
 
-request_rec *mrb_request_rec_state = NULL;
 
-static int ap_mrb_push_request(request_rec *r);
+int ap_mrb_push_request(request_rec *r);
 request_rec *ap_mrb_get_request();
 mrb_value ap_mrb_request(mrb_state *mrb, mrb_value str);
 
 
-static int ap_mrb_push_request(request_rec *r)
+int ap_mrb_push_request(request_rec *r)
 {
     mrb_request_rec_state = (request_rec *)apr_pcalloc(r->pool, sizeof (*mrb_request_rec_state));
     mrb_request_rec_state = r;
@@ -51,4 +53,5 @@ mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
 
     return str;
 }
-    
+
+#endif

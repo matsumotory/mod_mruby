@@ -1,3 +1,6 @@
+#ifndef MOD_MURBY_H
+#define MOD_MRUBY_H
+
 typedef struct {
 
     const char *mod_mruby_handler_code;
@@ -24,7 +27,5 @@ typedef struct cache_shm_table {
 
 } cache_table_t;
 
-static int ap_mruby_class_init(mrb_state *mrb);
-static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s);
-static int ap_mruby_class_init(mrb_state *mrb);
-static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status);
+
+#endif

@@ -1,3 +1,7 @@
+#ifndef AP_MRB_STRING_H
+#define AP_MRB_STRING_H
+
+
 #include "mruby/string.h"
 #include "ap_mrb_request.h"
 
@@ -13,3 +17,4 @@ mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
     return str;
 }
 
+#endif
