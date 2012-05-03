@@ -375,6 +375,7 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
     mrb_define_class_method(mrb, class, "errlogger", ap_mrb_errlogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "syslogger", ap_mrb_syslogger, ARGS_ANY());
+    mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
 
     return OK;
 

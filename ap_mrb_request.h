@@ -1,7 +1,11 @@
+#include <string.h>
+#include "mruby/string.h"
+
 request_rec *mrb_request_rec_state = NULL;
 
 static int ap_mrb_push_request(request_rec *r);
 request_rec *ap_mrb_get_request();
+mrb_value ap_mrb_request(mrb_state *mrb, mrb_value str);
 
 
 static int ap_mrb_push_request(request_rec *r)
@@ -16,3 +20,33 @@ request_rec *ap_mrb_get_request()
     return mrb_request_rec_state;
 }
 
+mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
+{   
+
+    struct RProc *b;
+    mrb_value argc, *argv;
+    char *member, *value;
+    request_rec *r = ap_mrb_get_request();
+
+    mrb_get_args(mrb, "b*", &b, &argv, &argc);
+    if (mrb_fixnum(argc) != 2) {
+        ap_log_error(APLOG_MARK
+            , APLOG_WARNING
+            , 0
+            , NULL
+            , "%s ERROR %s: argument is not 2"
+            , MODULE_NAME
+            , __func__
+        );
+        return str;
+    }
+
+    member = RSTRING_PTR(argv[0]);
+    value  = RSTRING_PTR(argv[1]);
+
+    if (strcmp(member, "filename") == 0)
+        r->filename = apr_pstrdup(r->pool, value);
+
+    return str;
+}
+    
