@@ -1,4 +1,5 @@
 #include "mruby/string.h"
+#include "ap_mrb_request.h"
 
 mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str);
 
