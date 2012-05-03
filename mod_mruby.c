@@ -364,6 +364,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     return OK;
 }
 
+
 static int ap_mruby_class_init(mrb_state *mrb)
 {
 
@@ -646,7 +647,7 @@ static int mod_mruby_translate_name_first(request_rec *r)
     if (conf->mod_mruby_translate_name_first_code == NULL)
         return DECLINED;
     ap_mrb_push_request(r);
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_first_code, DECLINED);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_first_code, OK);
 }
 
 
@@ -656,7 +657,7 @@ static int mod_mruby_translate_name_middle(request_rec *r)
     if (conf->mod_mruby_translate_name_middle_code == NULL)
         return DECLINED;
     ap_mrb_push_request(r);
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_middle_code, DECLINED);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_middle_code, OK);
 }
 
 
@@ -666,7 +667,7 @@ static int mod_mruby_translate_name_last(request_rec *r)
     if (conf->mod_mruby_translate_name_last_code == NULL)
         return DECLINED;
     ap_mrb_push_request(r);
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_last_code, DECLINED);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_last_code, OK);
 }
 
 
