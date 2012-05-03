@@ -57,6 +57,7 @@
 #define ON                 1
 #define OFF                0
 
+#include "ap_mrb_request.h"
 #include "ap_mrb_utils.h"
 #include "ap_mrb_string.h"
 
