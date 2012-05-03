@@ -46,6 +46,8 @@ mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
 
     if (strcmp(member, "filename") == 0)
         r->filename = apr_pstrdup(r->pool, value);
+    else if (strcmp(member, "uri") == 0)
+        r->uri = apr_pstrdup(r->pool, value);
 
     return str;
 }
