@@ -4,6 +4,7 @@
 #include <string.h>
 #include "mruby/string.h"
 
+request_rec *mrb_request_rec_state = NULL;
 
 int ap_mrb_push_request(request_rec *r);
 request_rec *ap_mrb_get_request();

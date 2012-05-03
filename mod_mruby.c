@@ -58,7 +58,6 @@
 #define OFF                0
 
 mrb_state *mod_mruby_share_state = NULL;
-request_rec *mrb_request_rec_state = NULL;
 
 module AP_MODULE_DECLARE_DATA mruby_module;
 
