@@ -1,10 +1,10 @@
 ##
 ##  Makefile -- Build procedure for sample mod_mruby Apache module
-##      MATSUMOTO, Ryosuke
+##	  MATSUMOTO, Ryosuke
 ##
 
 # target module source
-TARGET=mod_mruby.c
+TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c
 
 #   the used tools
 #APXS=/usr/sbin/apxs
@@ -13,8 +13,8 @@ APXS=/usr/local/apache2.4/bin/apxs
 APACHECTL=/usr/local/apache2.4/bin/apachectl
 
 #   additional user defines, includes and libraries
-DEF=-DSYSLOG_NAMES
-INC=-I/usr/local/src/mruby/src -I/usr/local/src/mruby/include
+#DEF=-DSYSLOG_NAMES
+INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include
 LIB=-lm /usr/local/src/mruby/lib/ritevm.a -lm /usr/local/src/mruby/mrblib/mrblib.o
 
 #   the default target
@@ -31,7 +31,7 @@ install: all
 
 #   cleanup
 clean:
-	-rm -rf .libs mod_mruby.o mod_mruby.so mod_mruby.lo mod_mruby.la mod_mruby.slo mod_mruby.loT
+	-rm -rf .libs *.o *.so *.lo *.la *.slo *.loT
 
 #   reload the module by installing and restarting Apache
 reload: install restart

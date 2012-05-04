@@ -44,26 +44,19 @@
 #include "apr_global_mutex.h"
 #include "unixd.h"
 
-#include <mruby.h>
 #include <mruby/proc.h>
 #include <compile.h>
 
 #include <sys/stat.h>
-
-#define MODULE_NAME        "mod_mruby"
-#define MODULE_VERSION     "0.1.1"
-#define UNSET              -1
-#define SET                1
-#define ON                 1
-#define OFF                0
+#include "mod_mruby.h"
+#include "ap_mrb_utils.h"
+#include "ap_mrb_string.h"
+#include "ap_mrb_request.h"
 
 mrb_state *mod_mruby_share_state = NULL;
 
 module AP_MODULE_DECLARE_DATA mruby_module;
 
-#include "ap_mrb_utils.h"
-#include "ap_mrb_string.h"
-#include "mod_mruby.h"
 
 #ifdef __MOD_MRUBY_SHARE_CACHE_TABLE__
 // shared memory

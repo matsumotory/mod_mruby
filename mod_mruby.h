@@ -1,6 +1,19 @@
 #ifndef MOD_MURBY_H
 #define MOD_MRUBY_H
 
+#define MODULE_NAME        "mod_mruby"
+#define MODULE_VERSION     "0.2.1"
+#define UNSET              -1
+#define SET                1
+#define ON                 1
+#define OFF                0
+
+#include "mruby.h"
+#include "mruby/string.h"
+#include "http_request.h"
+#include "http_log.h"
+
+
 typedef struct {
 
     const char *mod_mruby_handler_code;
