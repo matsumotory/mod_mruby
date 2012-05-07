@@ -18,6 +18,41 @@ CODE logpriority[] =
 };
 
 
+int ap_mrb_get_status_code()
+{
+    return mod_mruby_return_code;
+}
+
+int ap_mrb_set_status_code(mrb_value val)
+{
+    mod_mruby_return_code = mrb_fixnum(val);
+    return 0;
+}
+
+mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
+{
+
+    struct RProc *b;
+    mrb_value argc, *argv;
+    
+    mrb_get_args(mrb, "b*", &b, &argv, &argc);
+    if (mrb_fixnum(argc) != 1) {
+        ap_log_error(APLOG_MARK
+            , APLOG_WARNING
+            , 0
+            , NULL
+            , "%s ERROR %s: argument is not 1"
+            , MODULE_NAME
+            , __func__
+        );
+        return self;
+    }
+    ap_mrb_set_status_code(argv[0]);
+
+    return self;
+}
+
+
 mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
 {
 

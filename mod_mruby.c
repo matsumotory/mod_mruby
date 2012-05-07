@@ -428,6 +428,7 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_const(mrb, class, "VARIANT_ALSO_VARIES", mrb_fixnum_value(HTTP_VARIANT_ALSO_VARIES));
     mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
+    mrb_define_class_method(mrb, class, "return", ap_mrb_return, ARGS_ANY());
     mrb_define_class_method(mrb, class, "errlogger", ap_mrb_errlogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "syslogger", ap_mrb_syslogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
@@ -450,7 +451,6 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     struct stat st;
     FILE *mrb_file;
     int cache_hit = 0;
-
 
     cache_table_t *cache_table_data;
 #ifdef __MOD_MRUBY_SHARED_CACHE_TABLE__
@@ -637,6 +637,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         , mruby_code_file
     );
 
+    ap_mrb_set_status_code(mrb_fixnum_value(OK));
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
 
     ap_log_rerror(APLOG_MARK
@@ -646,11 +647,11 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         , "%s ERROR %s: return mruby code(%d): %s"
         , MODULE_NAME
         , __func__
-        , mrb_fixnum(mrb_obj_value(mrb->exc))
+        , ap_mrb_get_status_code()
         , mruby_code_file
     );
 
-    return module_status;
+    return ap_mrb_get_status_code();
 }
 
 
