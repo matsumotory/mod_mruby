@@ -366,6 +366,66 @@ static int ap_mruby_class_init(mrb_state *mrb)
 {
 
     class = mrb_define_module(mrb, "Apache");
+    mrb_define_const(mrb, class, "OK", mrb_fixnum_value(OK));
+    mrb_define_const(mrb, class, "DECLINED", mrb_fixnum_value(DECLINED));
+    mrb_define_const(mrb, class, "HTTP_SERVICE_UNAVAILABLE", mrb_fixnum_value(HTTP_SERVICE_UNAVAILABLE));
+    mrb_define_const(mrb, class, "HTTP_CONTINUE", mrb_fixnum_value(HTTP_CONTINUE));
+    mrb_define_const(mrb, class, "HTTP_SWITCHING_PROTOCOLS", mrb_fixnum_value(HTTP_SWITCHING_PROTOCOLS));
+    mrb_define_const(mrb, class, "HTTP_PROCESSING", mrb_fixnum_value(HTTP_PROCESSING));
+    mrb_define_const(mrb, class, "HTTP_OK", mrb_fixnum_value(HTTP_OK));
+    mrb_define_const(mrb, class, "HTTP_CREATED", mrb_fixnum_value(HTTP_CREATED));
+    mrb_define_const(mrb, class, "HTTP_ACCEPTED", mrb_fixnum_value(HTTP_ACCEPTED));
+    mrb_define_const(mrb, class, "HTTP_NON_AUTHORITATIVE", mrb_fixnum_value(HTTP_NON_AUTHORITATIVE));
+    mrb_define_const(mrb, class, "HTTP_NO_CONTENT", mrb_fixnum_value(HTTP_NO_CONTENT));
+    mrb_define_const(mrb, class, "HTTP_RESET_CONTENT", mrb_fixnum_value(HTTP_RESET_CONTENT));
+    mrb_define_const(mrb, class, "HTTP_PARTIAL_CONTENT", mrb_fixnum_value(HTTP_PARTIAL_CONTENT));
+    mrb_define_const(mrb, class, "HTTP_MULTI_STATUS", mrb_fixnum_value(HTTP_MULTI_STATUS));
+    mrb_define_const(mrb, class, "HTTP_MULTIPLE_CHOICES", mrb_fixnum_value(HTTP_MULTIPLE_CHOICES));
+    mrb_define_const(mrb, class, "HTTP_MOVED_PERMANENTLY", mrb_fixnum_value(HTTP_MOVED_PERMANENTLY));
+    mrb_define_const(mrb, class, "HTTP_MOVED_TEMPORARILY", mrb_fixnum_value(HTTP_MOVED_TEMPORARILY));
+    mrb_define_const(mrb, class, "HTTP_SEE_OTHER", mrb_fixnum_value(HTTP_SEE_OTHER));
+    mrb_define_const(mrb, class, "HTTP_NOT_MODIFIED", mrb_fixnum_value(HTTP_NOT_MODIFIED));
+    mrb_define_const(mrb, class, "HTTP_USE_PROXY", mrb_fixnum_value(HTTP_USE_PROXY));
+    mrb_define_const(mrb, class, "HTTP_TEMPORARY_REDIRECT", mrb_fixnum_value(HTTP_TEMPORARY_REDIRECT));
+    mrb_define_const(mrb, class, "HTTP_BAD_REQUEST", mrb_fixnum_value(HTTP_BAD_REQUEST));
+    mrb_define_const(mrb, class, "HTTP_UNAUTHORIZED", mrb_fixnum_value(HTTP_UNAUTHORIZED));
+    mrb_define_const(mrb, class, "HTTP_PAYMENT_REQUIRED", mrb_fixnum_value(HTTP_PAYMENT_REQUIRED));
+    mrb_define_const(mrb, class, "HTTP_FORBIDDEN", mrb_fixnum_value(HTTP_FORBIDDEN));
+    mrb_define_const(mrb, class, "HTTP_NOT_FOUND", mrb_fixnum_value(HTTP_NOT_FOUND));
+    mrb_define_const(mrb, class, "HTTP_METHOD_NOT_ALLOWED", mrb_fixnum_value(HTTP_METHOD_NOT_ALLOWED));
+    mrb_define_const(mrb, class, "HTTP_NOT_ACCEPTABLE", mrb_fixnum_value(HTTP_NOT_ACCEPTABLE));
+    mrb_define_const(mrb, class, "HTTP_PROXY_AUTHENTICATION_REQUIRED", mrb_fixnum_value(HTTP_PROXY_AUTHENTICATION_REQUIRED));
+    mrb_define_const(mrb, class, "HTTP_REQUEST_TIME_OUT", mrb_fixnum_value(HTTP_REQUEST_TIME_OUT));
+    mrb_define_const(mrb, class, "HTTP_CONFLICT", mrb_fixnum_value(HTTP_CONFLICT));
+    mrb_define_const(mrb, class, "HTTP_GONE", mrb_fixnum_value(HTTP_GONE));
+    mrb_define_const(mrb, class, "HTTP_LENGTH_REQUIRED", mrb_fixnum_value(HTTP_LENGTH_REQUIRED));
+    mrb_define_const(mrb, class, "HTTP_PRECONDITION_FAILED", mrb_fixnum_value(HTTP_PRECONDITION_FAILED));
+    mrb_define_const(mrb, class, "HTTP_REQUEST_ENTITY_TOO_LARGE", mrb_fixnum_value(HTTP_REQUEST_ENTITY_TOO_LARGE));
+    mrb_define_const(mrb, class, "HTTP_REQUEST_URI_TOO_LARGE", mrb_fixnum_value(HTTP_REQUEST_URI_TOO_LARGE));
+    mrb_define_const(mrb, class, "HTTP_UNSUPPORTED_MEDIA_TYPE", mrb_fixnum_value(HTTP_UNSUPPORTED_MEDIA_TYPE));
+    mrb_define_const(mrb, class, "HTTP_RANGE_NOT_SATISFIABLE", mrb_fixnum_value(HTTP_RANGE_NOT_SATISFIABLE));
+    mrb_define_const(mrb, class, "HTTP_EXPECTATION_FAILED", mrb_fixnum_value(HTTP_EXPECTATION_FAILED));
+    mrb_define_const(mrb, class, "HTTP_UNPROCESSABLE_ENTITY", mrb_fixnum_value(HTTP_UNPROCESSABLE_ENTITY));
+    mrb_define_const(mrb, class, "HTTP_LOCKED", mrb_fixnum_value(HTTP_LOCKED));
+    mrb_define_const(mrb, class, "HTTP_NOT_EXTENDED", mrb_fixnum_value(HTTP_NOT_EXTENDED));
+    mrb_define_const(mrb, class, "DOCUMENT_FOLLOWS", mrb_fixnum_value(HTTP_OK));
+    mrb_define_const(mrb, class, "PARTIAL_CONTENT", mrb_fixnum_value(HTTP_PARTIAL_CONTENT));
+    mrb_define_const(mrb, class, "MULTIPLE_CHOICES", mrb_fixnum_value(HTTP_MULTIPLE_CHOICES));
+    mrb_define_const(mrb, class, "MOVED", mrb_fixnum_value(HTTP_MOVED_PERMANENTLY));
+    mrb_define_const(mrb, class, "REDIRECT", mrb_fixnum_value(HTTP_MOVED_TEMPORARILY));
+    mrb_define_const(mrb, class, "USE_LOCAL_COPY", mrb_fixnum_value(HTTP_NOT_MODIFIED));
+    mrb_define_const(mrb, class, "BAD_REQUEST", mrb_fixnum_value(HTTP_BAD_REQUEST));
+    mrb_define_const(mrb, class, "AUTH_REQUIRED", mrb_fixnum_value(HTTP_UNAUTHORIZED));
+    mrb_define_const(mrb, class, "FORBIDDEN", mrb_fixnum_value(HTTP_FORBIDDEN));
+    mrb_define_const(mrb, class, "NOT_FOUND", mrb_fixnum_value(HTTP_NOT_FOUND));
+    mrb_define_const(mrb, class, "METHOD_NOT_ALLOWED", mrb_fixnum_value(HTTP_METHOD_NOT_ALLOWED));
+    mrb_define_const(mrb, class, "NOT_ACCEPTABLE", mrb_fixnum_value(HTTP_NOT_ACCEPTABLE));
+    mrb_define_const(mrb, class, "LENGTH_REQUIRED", mrb_fixnum_value(HTTP_LENGTH_REQUIRED));
+    mrb_define_const(mrb, class, "PRECONDITION_FAILED", mrb_fixnum_value(HTTP_PRECONDITION_FAILED));
+    mrb_define_const(mrb, class, "SERVER_ERROR", mrb_fixnum_value(HTTP_INTERNAL_SERVER_ERROR));
+    mrb_define_const(mrb, class, "NOT_IMPLEMENTED", mrb_fixnum_value(HTTP_NOT_IMPLEMENTED));
+    mrb_define_const(mrb, class, "BAD_GATEWAY", mrb_fixnum_value(HTTP_BAD_GATEWAY));
+    mrb_define_const(mrb, class, "VARIANT_ALSO_VARIES", mrb_fixnum_value(HTTP_VARIANT_ALSO_VARIES));
     mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
     mrb_define_class_method(mrb, class, "errlogger", ap_mrb_errlogger, ARGS_ANY());
@@ -373,8 +433,10 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
 
     class_request = mrb_define_class_under(mrb, class, "Request", mrb->object_class);
+    mrb_define_method(mrb, class_request, "Initialize", ap_mrb_init_request, ARGS_NONE());
     mrb_define_method(mrb, class_request, "filename=", ap_mrb_set_request_filename, ARGS_ANY());
-    mrb_define_method(mrb, class_request, "filename", ap_mrb_get_request_filename, ARGS_ANY());
+    mrb_define_method(mrb, class_request, "filename", ap_mrb_get_request_filename, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "uri", ap_mrb_get_request_uri, ARGS_NONE());
 
     return OK;
 }
@@ -576,6 +638,17 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     );
 
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
+
+    ap_log_rerror(APLOG_MARK
+        , APLOG_ERR
+        , 0
+        , r
+        , "%s ERROR %s: return mruby code(%d): %s"
+        , MODULE_NAME
+        , __func__
+        , mrb_fixnum(mrb_obj_value(mrb->exc))
+        , mruby_code_file
+    );
 
     return module_status;
 }

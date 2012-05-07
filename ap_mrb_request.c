@@ -20,9 +20,8 @@ request_rec *ap_mrb_get_request()
     return mrb_request_rec_state;
 }
 
-mrb_value ap_mruby_init_request(mrb_state *mrb, mrb_value str)
+mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str)
 {
-
     str = mrb_class_new_instance(mrb, 0, NULL, class_request);
     mrb_iv_set(mrb
         , str
@@ -34,26 +33,48 @@ mrb_value ap_mruby_init_request(mrb_state *mrb, mrb_value str)
         )
     );
 
+    ap_log_error(APLOG_MARK
+        , APLOG_WARNING
+        , 0
+        , NULL
+        , "%s ERROR %s: Initialied."
+        , MODULE_NAME
+        , __func__
+    );
+
     return str;
+}
+
+mrb_value ap_mrb_get_request_rec(mrb_state *mrb, const char *member)
+{
+    char *val;
+    request_rec *r = ap_mrb_get_request();
+
+    if (strcmp(member, "filename") == 0) {
+        val = apr_pstrdup(r->pool, r->filename);
+    } else if (strcmp(member, "uri") == 0) {
+        val = apr_pstrdup(r->pool, r->uri);
+    }
+
+    if (val == NULL)
+        val = apr_pstrdup(r->pool, "(null)");
+    
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_filename(mrb_state *mrb, mrb_value str)
 {   
+    return ap_mrb_get_request_rec(mrb, "filename");
+}
 
-    struct RProc *b;
-    mrb_value val;
-
-    request_rec *r = ap_mrb_get_request();
-    mrb_get_args(mrb, "o", &val);
-    r->filename = apr_pstrdup(r->pool, RSTRING_PTR(val));
-
-    return val;
+mrb_value ap_mrb_get_request_uri(mrb_state *mrb, mrb_value str)
+{   
+    return ap_mrb_get_request_rec(mrb, "uri");
 }
 
 mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
 {   
 
-    struct RProc *b;
     mrb_value val;
 
     request_rec *r = ap_mrb_get_request();
