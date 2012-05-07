@@ -8,6 +8,10 @@
 
 int ap_mrb_push_request(request_rec *r);
 request_rec *ap_mrb_get_request();
+mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_filename(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_write_request_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str);
 
 #endif

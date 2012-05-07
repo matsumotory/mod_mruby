@@ -15,7 +15,7 @@ APACHECTL=/usr/local/apache2.4/bin/apachectl
 #   additional user defines, includes and libraries
 #DEF=-DSYSLOG_NAMES
 INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include
-LIB=-lm /usr/local/src/mruby/lib/ritevm.a -lm /usr/local/src/mruby/mrblib/mrblib.o
+LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o
 
 #   the default target
 all: mod_mruby.so

@@ -365,8 +365,6 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
 static int ap_mruby_class_init(mrb_state *mrb)
 {
 
-    struct RClass *class;
-
     class = mrb_define_module(mrb, "Apache");
     mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
@@ -374,9 +372,13 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_class_method(mrb, class, "syslogger", ap_mrb_syslogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
 
-    return OK;
+    class_request = mrb_define_class_under(mrb, class, "Request", mrb->object_class);
+    mrb_define_method(mrb, class_request, "filename=", ap_mrb_set_request_filename, ARGS_ANY());
+    mrb_define_method(mrb, class_request, "filename", ap_mrb_get_request_filename, ARGS_ANY());
 
+    return OK;
 }
+
 
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
 {
