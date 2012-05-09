@@ -439,6 +439,8 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "filename", ap_mrb_get_request_filename, ARGS_NONE());
     mrb_define_method(mrb, class_request, "uri=", ap_mrb_set_request_uri, ARGS_ANY());
     mrb_define_method(mrb, class_request, "uri", ap_mrb_get_request_uri, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "user=", ap_mrb_set_request_user, ARGS_ANY());
+    mrb_define_method(mrb, class_request, "user", ap_mrb_get_request_user, ARGS_NONE());
 
     return OK;
 }
