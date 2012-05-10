@@ -56,6 +56,8 @@ mrb_value ap_mrb_get_request_rec(mrb_state *mrb, const char *member)
         val = apr_pstrdup(r->pool, r->uri);
     else if (strcmp(member, "user") == 0)
         val = apr_pstrdup(r->pool, r->user);
+    else if (strcmp(member, "content_type") == 0)
+        val = apr_pstrdup(r->pool, r->content_type);
 
     if (val == NULL)
         val = apr_pstrdup(r->pool, "(null)");
@@ -76,6 +78,8 @@ mrb_value ap_mrb_set_request_rec(mrb_state *mrb, const char *member, mrb_value s
         r->uri = apr_pstrdup(r->pool, RSTRING_PTR(val));
     else if (strcmp(member, "user") == 0)
         r->user = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    else if (strcmp(member, "content_type") == 0)
+        r->content_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
 
     return val;
 }
@@ -95,6 +99,10 @@ mrb_value ap_mrb_get_request_user(mrb_state *mrb, mrb_value str)
     return ap_mrb_get_request_rec(mrb, "user");
 }
 
+mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "content_type");
+}
 mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
 {
     return ap_mrb_set_request_rec(mrb, "filename", str);
@@ -108,6 +116,11 @@ mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str)
 {
     return ap_mrb_set_request_rec(mrb, "user", str);
+}
+
+mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_set_request_rec(mrb, "content_type", str);
 }
 
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)

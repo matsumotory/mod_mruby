@@ -443,6 +443,8 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "uri", ap_mrb_get_request_uri, ARGS_NONE());
     mrb_define_method(mrb, class_request, "user=", ap_mrb_set_request_user, ARGS_ANY());
     mrb_define_method(mrb, class_request, "user", ap_mrb_get_request_user, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "content_type=", ap_mrb_set_request_content_type, ARGS_ANY());
+    mrb_define_method(mrb, class_request, "content_type", ap_mrb_get_request_content_type, ARGS_NONE());
 
     return OK;
 }

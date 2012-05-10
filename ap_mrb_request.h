@@ -19,6 +19,8 @@ mrb_value ap_mrb_get_request_uri(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_user(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str);
 
 mrb_value ap_mrb_write_request_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str);
