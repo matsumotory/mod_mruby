@@ -1,6 +1,13 @@
 #include "mod_mruby.h"
 #include "ap_mrb_utils.h"
 
+#ifndef _WIN32
+#define SUPPORT_SYSLOG
+#else
+#define sleep(x) Sleep(x*1000)
+#endif
+
+#ifdef SUPPORT_SYSLOG
 CODE logpriority[] =
 {
     { "alert", LOG_ALERT },
@@ -16,6 +23,7 @@ CODE logpriority[] =
     { "warning", LOG_WARNING },
     { NULL, -1 }
 };
+#endif
 
 
 int ap_mrb_get_status_code()
@@ -104,6 +112,7 @@ mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
 {   
 
+#ifdef SUPPORT_SYSLOG
     struct RProc *b;
     mrb_value argc, *argv;
     char *i_pri,*msg;
@@ -151,6 +160,7 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
     openlog(NULL, LOG_PID, LOG_SYSLOG);
     syslog(pri, msg);
     closelog();
+#endif
 
     return str;
 

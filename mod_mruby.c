@@ -42,7 +42,9 @@
 #include "http_request.h"
 
 #include "apr_global_mutex.h"
+#ifndef _WIN32
 #include "unixd.h"
+#endif
 
 #include <mruby/proc.h>
 #include <compile.h>
