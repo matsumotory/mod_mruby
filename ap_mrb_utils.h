@@ -1,9 +1,13 @@
 #ifndef AP_MRB_UTILS_H
 #define AP_MRB_UTILS_H
 
+#ifndef _WIN32
 #include <unistd.h>
 #include <string.h>
 #include <sys/syslog.h>
+#else
+#include <string.h>
+#endif
 #include "mruby.h"
 
 
