@@ -58,6 +58,12 @@ mrb_value ap_mrb_get_request_rec(mrb_state *mrb, const char *member)
         val = apr_pstrdup(r->pool, r->user);
     else if (strcmp(member, "content_type") == 0)
         val = apr_pstrdup(r->pool, r->content_type);
+    else if (strcmp(member, "the_request") == 0)
+        val = apr_pstrdup(r->pool, r->the_request);
+    else if (strcmp(member, "protocol") == 0)
+        val = apr_pstrdup(r->pool, r->protocol);
+    else if (strcmp(member, "hostname") == 0)
+        val = apr_pstrdup(r->pool, r->hostname);
 
     if (val == NULL)
         val = apr_pstrdup(r->pool, "(null)");
@@ -80,6 +86,10 @@ mrb_value ap_mrb_set_request_rec(mrb_state *mrb, const char *member, mrb_value s
         r->user = apr_pstrdup(r->pool, RSTRING_PTR(val));
     else if (strcmp(member, "content_type") == 0)
         r->content_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    else if (strcmp(member, "the_request") == 0)
+        r->the_request = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    else if (strcmp(member, "protocol") == 0)
+        r->protocol = apr_pstrdup(r->pool, RSTRING_PTR(val));
 
     return val;
 }
@@ -103,6 +113,22 @@ mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str)
 {
     return ap_mrb_get_request_rec(mrb, "content_type");
 }
+
+mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "the_request");
+}
+
+mrb_value ap_mrb_get_request_protocol(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "protocol");
+}
+
+mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "hostname");
+}
+
 mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
 {
     return ap_mrb_set_request_rec(mrb, "filename", str);
@@ -121,6 +147,16 @@ mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
 {
     return ap_mrb_set_request_rec(mrb, "content_type", str);
+}
+
+mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_set_request_rec(mrb, "the_request", str);
+}
+
+mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_set_request_rec(mrb, "protocol", str);
 }
 
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)

@@ -59,12 +59,22 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server installe
         Apache.rputs("HTTP_SERVICE_UNAVAILABLE status= "+Apache::HTTP_SERVICE_UNAVAILABLE+"<BR>")
         Apache.rputs("filename= "+r.filename+"<BR>")
         Apache.rputs("uri= "+r.uri+"<BR>")
+        Apache.rputs("user= "+r.user+"<BR>")
+        Apache.rputs("the_request= "+r.the_request+"<BR>")
+        Apache.rputs("protocol= "+r.protocol+"<BR>")
         r.filename = "/usr/local/apache2.4/htdocs/index.html"
-        r.uri = "/ndex.html"
+        r.uri = "/index.html"
+        r.user = "hoge"
+        r.the_request = "hoge"
+        r.protocol = "hoge"
         Apache.rputs("---- request_rec changed ----<br>")
         Apache.rputs("filename= "+r.filename+"<BR>")
         Apache.rputs("uri= "+r.uri+"<BR>")
+        Apache.rputs("user= "+r.user+"<BR>")
         Apache.rputs("content_type= "+r.content_type+"<BR>")
+        Apache.rputs("the_request= "+r.the_request+"<BR>")
+        Apache.rputs("protocol= "+r.protocol+"<BR>")
+        Apache.rputs("hostname= "+r.hostname+"<BR>")
         
         Apache.return(Apache::OK)
 
