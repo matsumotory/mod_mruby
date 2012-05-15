@@ -62,6 +62,16 @@ mrb_value ap_mrb_get_request_rec(mrb_state *mrb, const char *member)
         val = apr_pstrdup(r->pool, r->the_request);
     else if (strcmp(member, "protocol") == 0)
         val = apr_pstrdup(r->pool, r->protocol);
+    else if (strcmp(member, "vlist_validator") == 0)
+        val = apr_pstrdup(r->pool, r->vlist_validator);
+    else if (strcmp(member, "ap_auth_type") == 0)
+        val = apr_pstrdup(r->pool, r->ap_auth_type);
+    else if (strcmp(member, "unparsed_uri") == 0)
+        val = apr_pstrdup(r->pool, r->unparsed_uri);
+    else if (strcmp(member, "canonical_filename") == 0)
+        val = apr_pstrdup(r->pool, r->canonical_filename);
+    else if (strcmp(member, "path_info") == 0)
+        val = apr_pstrdup(r->pool, r->path_info);
     else if (strcmp(member, "hostname") == 0)
         val = apr_pstrdup(r->pool, r->hostname);
 
@@ -90,6 +100,16 @@ mrb_value ap_mrb_set_request_rec(mrb_state *mrb, const char *member, mrb_value s
         r->the_request = apr_pstrdup(r->pool, RSTRING_PTR(val));
     else if (strcmp(member, "protocol") == 0)
         r->protocol = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    else if (strcmp(member, "vlist_validator") == 0)
+        r->vlist_validator = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    else if (strcmp(member, "ap_auth_type") == 0)
+        r->ap_auth_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    else if (strcmp(member, "unparsed_uri") == 0)
+        r->unparsed_uri = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    else if (strcmp(member, "canonical_filename") == 0)
+        r->canonical_filename = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    else if (strcmp(member, "path_info") == 0)
+        r->path_info = apr_pstrdup(r->pool, RSTRING_PTR(val));
 
     return val;
 }
@@ -122,6 +142,31 @@ mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_get_request_protocol(mrb_state *mrb, mrb_value str)
 {
     return ap_mrb_get_request_rec(mrb, "protocol");
+}
+
+mrb_value ap_mrb_get_request_vlist_validator(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "vlist_validator");
+}
+
+mrb_value ap_mrb_get_request_ap_auth_type(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "ap_auth_type");
+}
+
+mrb_value ap_mrb_get_request_unparsed_uri(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "unparsed_uri");
+}
+
+mrb_value ap_mrb_get_request_canonical_filename(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "canonical_filename");
+}
+
+mrb_value ap_mrb_get_request_path_info(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_get_request_rec(mrb, "path_info");
 }
 
 mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str)
@@ -157,6 +202,31 @@ mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
 {
     return ap_mrb_set_request_rec(mrb, "protocol", str);
+}
+
+mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_set_request_rec(mrb, "vlist_validator", str);
+}
+
+mrb_value ap_mrb_set_request_ap_auth_type(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_set_request_rec(mrb, "ap_auth_type", str);
+}
+
+mrb_value ap_mrb_set_request_unparsed_uri(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_set_request_rec(mrb, "unparsed_uri", str);
+}
+
+mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_set_request_rec(mrb, "canonical_filename", str);
+}
+
+mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str)
+{
+    return ap_mrb_set_request_rec(mrb, "path_info", str);
 }
 
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
