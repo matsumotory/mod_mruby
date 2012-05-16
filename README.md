@@ -78,5 +78,5 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server installe
         
         Apache.return(Apache::OK)
 
-* access to http://example.com/test.mrb
+* access to http://example.com/example.html
 
