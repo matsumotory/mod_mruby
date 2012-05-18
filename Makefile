@@ -14,15 +14,16 @@ APACHECTL=/etc/init.d/httpd
 
 #   additional user defines, includes and libraries
 #DEF=-DSYSLOG_NAMES
-INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include
-LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o
+INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include -I/usr/include/json
+LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o -lm /usr/lib/libjson.la
+WC=-Wc,-std=c99
 
 #   the default target
 all: mod_mruby.so
 
 #   compile the DSO file
 mod_mruby.so: $(TARGET)
-	$(APXS) -c $(DEF) $(INC) $(LIB) $(TARGET)
+	$(APXS) -c $(DEF) $(INC) $(LIB) $(WC) $(TARGET)
 
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
