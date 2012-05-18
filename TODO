@@ -7,3 +7,5 @@ add stat check on cache_table.
 discuss cache_table on shared memory.
 
 ap_mruby_run fix.
+
+change function pointer
