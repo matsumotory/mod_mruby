@@ -46,8 +46,9 @@
 #include "unixd.h"
 #endif
 
+#include <mruby.h>
 #include <mruby/proc.h>
-#include <compile.h>
+#include <mruby/compile.h>
 
 #include <sys/stat.h>
 #include "mod_mruby.h"
