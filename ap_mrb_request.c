@@ -2,6 +2,8 @@
 #include "ap_mrb_request.h"
 #include "json.h"
 
+static char *ap_mrb_string_check(apr_pool_t *p, char *str);
+
 request_rec *mrb_request_rec_state = NULL;
 
 struct mrb_data_type request_rec_type = {
@@ -82,6 +84,15 @@ mrb_value ap_mrb_get_request_rec(mrb_state *mrb, const char *member)
     return mrb_str_new(mrb, val, strlen(val));
 }
 
+
+static char *ap_mrb_string_check(apr_pool_t *p, char *str)
+{
+    if (str == NULL)
+        str = apr_pstrdup(p, "null");
+
+    return str;
+}
+
 mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, const char *member)
 {
     char *val;
@@ -89,17 +100,17 @@ mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, const char *member)
     json_object *my_object;
 
     my_object = json_object_new_object();
-    //json_object_object_add(my_object, "filename", json_object_new_string(r->filename));
-    json_object_object_add(my_object, "uri", json_object_new_string(r->uri));
-    //json_object_object_add(my_object, "user", json_object_new_string(r->user));
-    //json_object_object_add(my_object, "content_type", json_object_new_string(r->content_type));
-    //json_object_object_add(my_object, "protocol", json_object_new_string(r->protocol));
-    //json_object_object_add(my_object, "vlist_validator", json_object_new_string(r->vlist_validator));
-    //json_object_object_add(my_object, "ap_auth_type", json_object_new_string(r->ap_auth_type));
-    //json_object_object_add(my_object, "unparsed_uri", json_object_new_string(r->unparsed_uri));
-    //json_object_object_add(my_object, "canonical_filename", json_object_new_string(r->canonical_filename));
-    //json_object_object_add(my_object, "path_info", json_object_new_string(r->path_info));
-    json_object_object_add(my_object, "hostname", json_object_new_string(r->hostname));
+    json_object_object_add(my_object, "filename", json_object_new_string(ap_mrb_string_check(r->pool, r->filename)));
+    json_object_object_add(my_object, "uri", json_object_new_string(ap_mrb_string_check(r->pool, r->uri)));
+    json_object_object_add(my_object, "user", json_object_new_string(ap_mrb_string_check(r->pool, r->user)));
+    json_object_object_add(my_object, "content_type", json_object_new_string(ap_mrb_string_check(r->pool, r->content_type)));
+    json_object_object_add(my_object, "protocol", json_object_new_string(ap_mrb_string_check(r->pool, r->protocol)));
+    json_object_object_add(my_object, "vlist_validator", json_object_new_string(ap_mrb_string_check(r->pool, r->vlist_validator)));
+    json_object_object_add(my_object, "ap_auth_type", json_object_new_string(ap_mrb_string_check(r->pool, r->ap_auth_type)));
+    json_object_object_add(my_object, "unparsed_uri", json_object_new_string(ap_mrb_string_check(r->pool, r->unparsed_uri)));
+    json_object_object_add(my_object, "canonical_filename", json_object_new_string(ap_mrb_string_check(r->pool, r->canonical_filename)));
+    json_object_object_add(my_object, "path_info", json_object_new_string(ap_mrb_string_check(r->pool, r->path_info)));
+    json_object_object_add(my_object, "hostname", json_object_new_string(ap_mrb_string_check(r->pool, r->hostname)));
 
     val = json_object_to_json_string(my_object);
 
