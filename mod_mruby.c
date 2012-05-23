@@ -162,7 +162,7 @@ static const char *set_mod_mruby_cache_table_size(cmd_parms *cmd, void *mconfig,
     if (err != NULL)
         return err;
 
-    signed long int table_size = strtol(arg, (char **) NULL, 10);
+    int table_size = strtol(arg, (char **) NULL, 10);
     conf->mruby_cache_table_size = table_size;
     ap_log_perror(APLOG_MARK
         , APLOG_NOTICE

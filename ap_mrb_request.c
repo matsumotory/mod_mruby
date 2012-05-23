@@ -60,7 +60,7 @@ static const char *ap_mrb_string_check(apr_pool_t *p, const char *str)
     return str;
 }
 
-mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, const char *member)
+mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str)
 {
     char *val;
     request_rec *r = ap_mrb_get_request();
@@ -79,7 +79,7 @@ mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, const char *member)
     json_object_object_add(my_object, "path_info", json_object_new_string(ap_mrb_string_check(r->pool, r->path_info)));
     json_object_object_add(my_object, "hostname", json_object_new_string(ap_mrb_string_check(r->pool, r->hostname)));
 
-    val = (char *) json_object_to_json_string(my_object);
+    val = (char *)json_object_to_json_string(my_object);
 
     if (val == NULL)
         val = apr_pstrdup(r->pool, "(null)");
