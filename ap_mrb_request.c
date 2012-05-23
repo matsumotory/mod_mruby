@@ -2,12 +2,12 @@
 #include "ap_mrb_request.h"
 #include "json.h"
 
-static char *ap_mrb_string_check(apr_pool_t *p, char *str);
+static const char *ap_mrb_string_check(apr_pool_t *p, const char *str);
 
 request_rec *mrb_request_rec_state = NULL;
 
 struct mrb_data_type request_rec_type = {
-  "request_rec", 0,
+    "request_rec", 0,
 };
 
 
@@ -48,47 +48,14 @@ mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str)
     return str;
 }
 
-mrb_value ap_mrb_get_request_rec(mrb_state *mrb, const char *member)
+static const char *ap_mrb_string_check(apr_pool_t *p, const char *str)
 {
     char *val;
-    request_rec *r = ap_mrb_get_request();
 
-    if (strcmp(member, "filename") == 0)
-        val = apr_pstrdup(r->pool, r->filename);
-    else if (strcmp(member, "uri") == 0)
-        val = apr_pstrdup(r->pool, r->uri);
-    else if (strcmp(member, "user") == 0)
-        val = apr_pstrdup(r->pool, r->user);
-    else if (strcmp(member, "content_type") == 0)
-        val = apr_pstrdup(r->pool, r->content_type);
-    else if (strcmp(member, "the_request") == 0)
-        val = apr_pstrdup(r->pool, r->the_request);
-    else if (strcmp(member, "protocol") == 0)
-        val = apr_pstrdup(r->pool, r->protocol);
-    else if (strcmp(member, "vlist_validator") == 0)
-        val = apr_pstrdup(r->pool, r->vlist_validator);
-    else if (strcmp(member, "ap_auth_type") == 0)
-        val = apr_pstrdup(r->pool, r->ap_auth_type);
-    else if (strcmp(member, "unparsed_uri") == 0)
-        val = apr_pstrdup(r->pool, r->unparsed_uri);
-    else if (strcmp(member, "canonical_filename") == 0)
-        val = apr_pstrdup(r->pool, r->canonical_filename);
-    else if (strcmp(member, "path_info") == 0)
-        val = apr_pstrdup(r->pool, r->path_info);
-    else if (strcmp(member, "hostname") == 0)
-        val = apr_pstrdup(r->pool, r->hostname);
-
-    if (val == NULL)
-        val = apr_pstrdup(r->pool, "(null)");
-    
-    return mrb_str_new(mrb, val, strlen(val));
-}
-
-
-static char *ap_mrb_string_check(apr_pool_t *p, char *str)
-{
-    if (str == NULL)
-        str = apr_pstrdup(p, "null");
+    if (str == NULL) {
+        val = apr_pstrdup(p, "null");
+        return val;
+    }
 
     return str;
 }
@@ -112,162 +79,197 @@ mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, const char *member)
     json_object_object_add(my_object, "path_info", json_object_new_string(ap_mrb_string_check(r->pool, r->path_info)));
     json_object_object_add(my_object, "hostname", json_object_new_string(ap_mrb_string_check(r->pool, r->hostname)));
 
-    val = json_object_to_json_string(my_object);
+    val = (char *) json_object_to_json_string(my_object);
 
     if (val == NULL)
         val = apr_pstrdup(r->pool, "(null)");
     
     return mrb_str_new(mrb, val, strlen(val));
 
-
 }
 
-mrb_value ap_mrb_set_request_rec(mrb_state *mrb, const char *member, mrb_value str)
-{
-    mrb_value val;
-
-    request_rec *r = ap_mrb_get_request();
-    mrb_get_args(mrb, "o", &val);
-
-    if (strcmp(member, "filename") == 0)
-        r->filename = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "uri") == 0)
-        r->uri = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "user") == 0)
-        r->user = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "content_type") == 0)
-        r->content_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "the_request") == 0)
-        r->the_request = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "protocol") == 0)
-        r->protocol = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "vlist_validator") == 0)
-        r->vlist_validator = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "ap_auth_type") == 0)
-        r->ap_auth_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "unparsed_uri") == 0)
-        r->unparsed_uri = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "canonical_filename") == 0)
-        r->canonical_filename = apr_pstrdup(r->pool, RSTRING_PTR(val));
-    else if (strcmp(member, "path_info") == 0)
-        r->path_info = apr_pstrdup(r->pool, RSTRING_PTR(val));
-
-    return val;
-}
 
 mrb_value ap_mrb_get_request_filename(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "filename");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->filename));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_uri(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "uri");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->uri));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_user(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "user");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->user));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "content_type");
+    request_rec *r = ap_mrb_get_request();
+    const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->content_type));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "the_request");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->the_request));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_protocol(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "protocol");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->protocol));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_vlist_validator(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "vlist_validator");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->vlist_validator));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_ap_auth_type(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "ap_auth_type");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->ap_auth_type));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_unparsed_uri(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "unparsed_uri");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->unparsed_uri));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_canonical_filename(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "canonical_filename");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->canonical_filename));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_path_info(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "path_info");
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->path_info));
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_get_request_rec(mrb, "hostname");
+    request_rec *r = ap_mrb_get_request();
+    const char *val = apr_pstrdup(r->pool, r->hostname);
+    return mrb_str_new(mrb, val, strlen(val));
 }
 
 mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "filename", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->filename = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "uri", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->uri = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "user", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->user = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "content_type", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->content_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "the_request", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->the_request = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "protocol", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->protocol = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "vlist_validator", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->vlist_validator = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_ap_auth_type(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "ap_auth_type", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->ap_auth_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_unparsed_uri(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "unparsed_uri", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->unparsed_uri = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "canonical_filename", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->canonical_filename = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str)
 {
-    return ap_mrb_set_request_rec(mrb, "path_info", str);
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->path_info = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
 }
 
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
