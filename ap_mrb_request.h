@@ -12,30 +12,37 @@ request_rec *ap_mrb_get_request();
 mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str);
 
-mrb_value ap_mrb_get_request_filename(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_get_request_uri(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_get_request_user(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_protocol(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_vlist_validator(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_user(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_ap_auth_type(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_unparsed_uri(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_uri(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_canonical_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_path_info(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_args(mrb_state *mrb, mrb_value str);
 
-mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_status_line(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_method(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_range(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_handler(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_content_encoding(mrb_state *mrb, mrb_value str);
+
 mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_ap_auth_type(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_unparsed_uri(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str);
 
 mrb_value ap_mrb_write_request_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str);
