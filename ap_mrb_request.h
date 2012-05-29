@@ -44,6 +44,20 @@ mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str);
 
+mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_proxyreq(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_header_only(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_proto_num(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_status(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_method_number(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_chunked(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_read_body(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_read_chunked(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_eos_sent(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_no_cache(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_no_local_copy(mrb_state *mrb, mrb_value str);
+
 mrb_value ap_mrb_write_request_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str);
 

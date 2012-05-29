@@ -316,6 +316,98 @@ mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str)
 }
 
 
+mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->assbackwards;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_proxyreq(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->proxyreq;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_header_only(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->header_only;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_proto_num(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->proto_num;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_status(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->status;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_method_number(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->method_number;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_chunked(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->chunked;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_read_body(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->read_body;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_read_chunked(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->read_chunked;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->used_path_info;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_eos_sent(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->eos_sent;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_no_cache(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->no_cache;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_no_local_copy(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    int val = r->no_local_copy;
+    return mrb_fixnum_value(val);
+}
+
+
 mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
 {   
 
