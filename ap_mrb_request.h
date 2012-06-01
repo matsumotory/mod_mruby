@@ -5,6 +5,7 @@
 #include "apr_strings.h"
 #include "http_request.h"
 #include "mruby.h"
+#include "mruby/data.h"
 #include "mruby/variable.h"
 
 int ap_mrb_push_request(request_rec *r);

@@ -6,7 +6,7 @@ static const char *ap_mrb_string_check(apr_pool_t *p, const char *str);
 
 request_rec *mrb_request_rec_state = NULL;
 
-struct mrb_data_type request_rec_type = {
+static struct mrb_data_type request_rec_type = {
     "request_rec", 0,
 };
 
