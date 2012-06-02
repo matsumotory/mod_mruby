@@ -64,23 +64,10 @@ mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
 mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
 {
 
-    struct RProc *b;
-    mrb_value argc, *argv;
+    mrb_int *time;
     
-    mrb_get_args(mrb, "b*", &b, &argv, &argc);
-    if (mrb_fixnum(argc) != 1) {
-        ap_log_error(APLOG_MARK
-            , APLOG_WARNING
-            , 0
-            , NULL
-            , "%s ERROR %s: argument is not 1"
-            , MODULE_NAME
-            , __func__
-        );
-        return str;
-    }
-
-    sleep(mrb_fixnum(argv[0]));
+    mrb_get_args(mrb, "i", &time);
+    sleep((int)time);
 
     return str;
 }
@@ -88,11 +75,11 @@ mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
 {
 
-    struct RProc *b;
-    mrb_value argc, *argv;
+    mrb_value *argv;
+    mrb_int argc;
     
-    mrb_get_args(mrb, "b*", &b, &argv, &argc);
-    if (mrb_fixnum(argc) != 2) {
+    mrb_get_args(mrb, "*", &argv, &argc);
+    if (argc != 2) {
         ap_log_error(APLOG_MARK
             , APLOG_WARNING
             , 0
@@ -113,14 +100,14 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
 {   
 
 #ifdef SUPPORT_SYSLOG
-    struct RProc *b;
-    mrb_value argc, *argv;
+    mrb_value *argv;
+    mrb_int argc;
     char *i_pri,*msg;
     int i;
     int pri = INVALID_PRIORITY;
 
-    mrb_get_args(mrb, "b*", &b, &argv, &argc);
-    if (mrb_fixnum(argc) != 2) {
+    mrb_get_args(mrb, "*", &argv, &argc);
+    if (argc != 2) {
         ap_log_error(APLOG_MARK
             , APLOG_WARNING
             , 0
