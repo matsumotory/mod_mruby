@@ -696,10 +696,10 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     
 
     ap_log_rerror(APLOG_MARK
-        , APLOG_ERR
+        , APLOG_DEBUG
         , 0
         , r
-        , "%s ERROR %s: return mruby code(%d): %s"
+        , "%s DEBUG %s: return mruby code(%d): %s"
         , MODULE_NAME
         , __func__
         , ap_mrb_get_status_code()
