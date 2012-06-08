@@ -483,13 +483,6 @@ static int ap_mruby_class_init(mrb_state *mrb)
     return OK;
 }
 
-int test_test_mrb(mrb_value val)
-{
-
-    mrb_fixnum(val);
-
-}
-
 
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
 {
@@ -686,9 +679,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     );
 
     ap_mrb_set_status_code(OK);
-    mrb_value ret = mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
-    test_test_mrb(ret);
-    
+    mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_nil_value());
 
     ap_log_rerror(APLOG_MARK
         , APLOG_DEBUG
