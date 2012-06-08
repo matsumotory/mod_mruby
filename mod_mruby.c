@@ -459,7 +459,9 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "status_line", ap_mrb_get_request_status_line, ARGS_NONE());
     mrb_define_method(mrb, class_request, "method", ap_mrb_get_request_method, ARGS_NONE());
     mrb_define_method(mrb, class_request, "range", ap_mrb_get_request_range, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "content_type=", ap_mrb_set_request_content_type, ARGS_ANY());
     mrb_define_method(mrb, class_request, "content_type", ap_mrb_get_request_content_type, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "handler=", ap_mrb_set_request_handler, ARGS_ANY());
     mrb_define_method(mrb, class_request, "handler", ap_mrb_get_request_handler, ARGS_NONE());
     mrb_define_method(mrb, class_request, "content_encoding", ap_mrb_get_request_content_encoding, ARGS_NONE());
 
