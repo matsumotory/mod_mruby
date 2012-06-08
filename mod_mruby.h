@@ -16,6 +16,7 @@
 
 struct RClass *class;
 struct RClass *class_request;
+struct RClass *class_server;
 
 
 typedef struct {

@@ -2,14 +2,13 @@
 #include "ap_mrb_request.h"
 #include "json.h"
 
-static const char *ap_mrb_string_check(apr_pool_t *p, const char *str);
-
-request_rec *mrb_request_rec_state = NULL;
 
 static struct mrb_data_type request_rec_type = {
     "request_rec", 0,
 };
 
+
+request_rec *mrb_request_rec_state = NULL;
 
 int ap_mrb_push_request(request_rec *r)
 {
@@ -21,6 +20,18 @@ int ap_mrb_push_request(request_rec *r)
 request_rec *ap_mrb_get_request()
 {
     return mrb_request_rec_state;
+}
+
+const char *ap_mrb_string_check(apr_pool_t *p, const char *str)
+{
+    char *val;
+
+    if (str == NULL) {
+        val = apr_pstrdup(p, "null");
+        return val;
+    }
+
+    return str;
 }
 
 mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str)
@@ -44,18 +55,6 @@ mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str)
         , MODULE_NAME
         , __func__
     );
-
-    return str;
-}
-
-static const char *ap_mrb_string_check(apr_pool_t *p, const char *str)
-{
-    char *val;
-
-    if (str == NULL) {
-        val = apr_pstrdup(p, "null");
-        return val;
-    }
 
     return str;
 }

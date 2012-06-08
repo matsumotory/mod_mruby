@@ -48,6 +48,7 @@
 #include "ap_mrb_utils.h"
 #include "ap_mrb_string.h"
 #include "ap_mrb_request.h"
+#include "ap_mrb_server.h"
 
 mrb_state *mod_mruby_share_state = NULL;
 
@@ -428,6 +429,12 @@ static int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_class_method(mrb, class, "errlogger", ap_mrb_errlogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "syslogger", ap_mrb_syslogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
+
+    class_server = mrb_define_class_under(mrb, class, "Server", mrb->object_class);
+    mrb_define_method(mrb, class_server, "error_fname=", ap_mrb_set_server_error_fname, ARGS_ANY());
+    mrb_define_method(mrb, class_server, "error_fname", ap_mrb_get_server_error_fname, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "loglevel=", ap_mrb_set_server_loglevel, ARGS_ANY());
+    mrb_define_method(mrb, class_server, "loglevel", ap_mrb_get_server_loglevel, ARGS_NONE());
 
     class_request = mrb_define_class_under(mrb, class, "Request", mrb->object_class);
     mrb_define_method(mrb, class_request, "Initialize", ap_mrb_init_request, ARGS_NONE());
