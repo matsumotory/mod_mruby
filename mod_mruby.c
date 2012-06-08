@@ -5,6 +5,7 @@
 //
 //      By matsumoto_r (MATSUMOTO, Ryosuke) Sep 2012 in Japan
 //          Academic Center for Computing and Media Studies, Kyoto University
+//          Graduate School of Informatics, Kyoto University
 //          email: matsumoto_r at net.ist.i.kyoto-u.ac.jp
 //
 // Date     2012/04/21
@@ -16,18 +17,10 @@
 // -------------------------------------------------------------------
 // How To Compile
 // [Use DSO]
-// apxs -i -c -l cap mod_mruby.c
+// make install
 //
 // <add to httpd.conf or conf.d/mruby.conf>
 // LoadModule mruby_module   modules/mod_mruby.so
-//
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-// How To Use
-//
-//  * Set mruby for handler phase
-//      mrubyHandler /path/to/file.mrb
 //
 // -------------------------------------------------------------------
 */
