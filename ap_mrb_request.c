@@ -1,4 +1,5 @@
 #include "mod_mruby.h"
+#include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
 #include "json.h"
 

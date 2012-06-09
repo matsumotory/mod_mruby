@@ -7,6 +7,7 @@
 #include "mruby.h"
 #include "mruby/data.h"
 #include "mruby/variable.h"
+#include "mruby/class.h"
 
 const char *ap_mrb_string_check(apr_pool_t *p, const char *str);
 int ap_mrb_push_request(request_rec *r);

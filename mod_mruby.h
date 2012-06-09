@@ -14,11 +14,6 @@
 #include "http_log.h"
 
 
-struct RClass *class;
-struct RClass *class_request;
-struct RClass *class_server;
-
-
 typedef struct {
 
     const char *mod_mruby_handler_code;
