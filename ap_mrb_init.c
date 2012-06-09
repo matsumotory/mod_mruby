@@ -5,9 +5,8 @@
 #include "ap_mrb_request.h"
 #include "ap_mrb_server.h"
 
-static int ap_mruby_class_init(mrb_state *mrb);
 
-static int ap_mruby_class_init(mrb_state *mrb)
+int ap_mruby_class_init(mrb_state *mrb)
 {
 
     class = mrb_define_module(mrb, "Apache");
