@@ -4,7 +4,7 @@
 ##
 
 # target module source
-TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server.c ap_mrb_init.c
+TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server.c
 
 #   the used tools
 APXS=/usr/sbin/apxs
