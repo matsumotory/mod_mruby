@@ -23,6 +23,13 @@ mrb_value ap_mrb_get_server_error_fname(mrb_state *mrb, mrb_value str)
     return mrb_str_new(mrb, val, strlen(val));
 }
 
+mrb_value ap_mrb_get_server_document_root(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    char *val = apr_pstrdup(r->pool, ap_document_root(r));
+    return mrb_str_new(mrb, val, strlen(val));
+}
+
 // int
 mrb_value ap_mrb_set_server_loglevel(mrb_state *mrb, mrb_value str)
 {

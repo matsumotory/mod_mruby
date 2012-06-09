@@ -88,6 +88,7 @@ static int ap_mruby_class_init(mrb_state *mrb)
     class_server = mrb_define_class_under(mrb, class, "Server", mrb->object_class);
     mrb_define_method(mrb, class_server, "error_fname=", ap_mrb_set_server_error_fname, ARGS_ANY());
     mrb_define_method(mrb, class_server, "error_fname", ap_mrb_get_server_error_fname, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "document_root", ap_mrb_get_server_document_root, ARGS_NONE());
     mrb_define_method(mrb, class_server, "loglevel=", ap_mrb_set_server_loglevel, ARGS_ANY());
     mrb_define_method(mrb, class_server, "loglevel", ap_mrb_get_server_loglevel, ARGS_NONE());
 
