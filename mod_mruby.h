@@ -17,9 +17,15 @@
 typedef struct {
 
     const char *mod_mruby_handler_code;
+    const char *mod_mruby_post_read_request_first_code;
+    const char *mod_mruby_post_read_request_middle_code;
+    const char *mod_mruby_post_read_request_last_code;
     const char *mod_mruby_translate_name_first_code;
     const char *mod_mruby_translate_name_middle_code;
     const char *mod_mruby_translate_name_last_code;
+    const char *mod_mruby_map_to_storage_first_code;
+    const char *mod_mruby_map_to_storage_middle_code;
+    const char *mod_mruby_map_to_storage_last_code;
     const char *mod_mruby_access_checker_first_code;
     const char *mod_mruby_access_checker_middle_code;
     const char *mod_mruby_access_checker_last_code;
