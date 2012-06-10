@@ -32,6 +32,12 @@ typedef struct {
     const char *mod_mruby_check_user_id_first_code;
     const char *mod_mruby_check_user_id_middle_code;
     const char *mod_mruby_check_user_id_last_code;
+    const char *mod_mruby_fixups_first_code;
+    const char *mod_mruby_fixups_middle_code;
+    const char *mod_mruby_fixups_last_code;
+    const char *mod_mruby_log_transaction_first_code;
+    const char *mod_mruby_log_transaction_middle_code;
+    const char *mod_mruby_log_transaction_last_code;
     int mruby_cache_table_size;
 
 } mruby_config_t;
