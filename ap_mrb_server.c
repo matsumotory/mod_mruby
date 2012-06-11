@@ -2,9 +2,9 @@
 #include "ap_mrb_server.h"
 #include "json.h"
 
-static struct mrb_data_type server_rec_type = {
-    "server_rec", 0,
-};
+//static struct mrb_data_type server_rec_type = {
+//    "server_rec", 0,
+//};
 
 // char
 mrb_value ap_mrb_set_server_error_fname(mrb_state *mrb, mrb_value str)
