@@ -32,6 +32,9 @@ typedef struct {
     const char *mod_mruby_check_user_id_first_code;
     const char *mod_mruby_check_user_id_middle_code;
     const char *mod_mruby_check_user_id_last_code;
+    const char *mod_mruby_auth_checker_first_code;
+    const char *mod_mruby_auth_checker_middle_code;
+    const char *mod_mruby_auth_checker_last_code;
     const char *mod_mruby_fixups_first_code;
     const char *mod_mruby_fixups_middle_code;
     const char *mod_mruby_fixups_last_code;
