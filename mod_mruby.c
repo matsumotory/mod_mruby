@@ -92,6 +92,9 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
     conf->mod_mruby_check_user_id_first_code        = NULL;
     conf->mod_mruby_check_user_id_middle_code       = NULL;
     conf->mod_mruby_check_user_id_last_code         = NULL;
+    conf->mod_mruby_auth_checker_first_code         = NULL;
+    conf->mod_mruby_auth_checker_middle_code        = NULL;
+    conf->mod_mruby_auth_checker_last_code          = NULL;
     conf->mod_mruby_fixups_first_code               = NULL;
     conf->mod_mruby_fixups_middle_code              = NULL;
     conf->mod_mruby_fixups_last_code                = NULL;
@@ -339,6 +342,51 @@ static const char *set_mod_mruby_check_user_id_last(cmd_parms *cmd, void *mconfi
         return err;
 
     conf->mod_mruby_check_user_id_last_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_auth_checker_first(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf =
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_auth_checker_first_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_auth_checker_middle(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf =
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_auth_checker_middle_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_auth_checker_last(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf =
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_auth_checker_last_code = apr_pstrdup(cmd->pool, arg);
 
     return NULL;
 }
@@ -1067,6 +1115,36 @@ static int mod_mruby_check_user_id_last(request_rec *r)
 }
 
 
+static int mod_mruby_auth_checker_first(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_auth_checker_first_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_first_code, OK);
+}
+
+
+static int mod_mruby_auth_checker_middle(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_auth_checker_middle_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_middle_code, OK);
+}
+
+
+static int mod_mruby_auth_checker_last(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_auth_checker_last_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_last_code, OK);
+}
+
+
 static int mod_mruby_fixups_first(request_rec *r)
 {
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
@@ -1147,6 +1225,9 @@ static void register_hooks(apr_pool_t *p)
     ap_hook_check_user_id(mod_mruby_check_user_id_first, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_check_user_id(mod_mruby_check_user_id_middle, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_check_user_id(mod_mruby_check_user_id_last, NULL, NULL, APR_HOOK_LAST);
+    ap_hook_auth_checker(mod_mruby_auth_checker_first, NULL, NULL, APR_HOOK_FIRST);
+    ap_hook_auth_checker(mod_mruby_auth_checker_middle, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_auth_checker(mod_mruby_auth_checker_last, NULL, NULL, APR_HOOK_LAST);
     ap_hook_fixups(mod_mruby_fixups_first, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_fixups(mod_mruby_fixups_middle, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_fixups(mod_mruby_fixups_last, NULL, NULL, APR_HOOK_LAST);
@@ -1174,6 +1255,9 @@ static const command_rec mod_mruby_cmds[] = {
     AP_INIT_TAKE1("mrubyCheckUserIdFirst", set_mod_mruby_check_user_id_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for check_user_id first phase."),
     AP_INIT_TAKE1("mrubyCheckUserIdMiddle", set_mod_mruby_check_user_id_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for check_user_id middle phase."),
     AP_INIT_TAKE1("mrubyCheckUserIdLast", set_mod_mruby_check_user_id_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for check_user_id last phase."),
+    AP_INIT_TAKE1("mrubyAuthCheckerFirst", set_mod_mruby_auth_checker_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for auth_checker first phase."),
+    AP_INIT_TAKE1("mrubyAuthCheckerMiddle", set_mod_mruby_auth_checker_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for auth_checker middle phase."),
+    AP_INIT_TAKE1("mrubyAuthCheckerLast", set_mod_mruby_auth_checker_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for auth_checker last phase."),
     AP_INIT_TAKE1("mrubyFixupsFirst", set_mod_mruby_fixups_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups first phase."),
     AP_INIT_TAKE1("mrubyFixupsMiddle", set_mod_mruby_fixups_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups middle phase."),
     AP_INIT_TAKE1("mrubyFixupsLast", set_mod_mruby_fixups_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups last phase."),
