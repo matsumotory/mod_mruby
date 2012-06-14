@@ -81,6 +81,9 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
     conf->mod_mruby_post_read_request_first_code    = NULL;
     conf->mod_mruby_post_read_request_middle_code   = NULL;
     conf->mod_mruby_post_read_request_last_code     = NULL;
+    conf->mod_mruby_quick_handler_first_code        = NULL;
+    conf->mod_mruby_quick_handler_middle_code       = NULL;
+    conf->mod_mruby_quick_handler_last_code         = NULL;
     conf->mod_mruby_translate_name_first_code       = NULL;
     conf->mod_mruby_translate_name_middle_code      = NULL;
     conf->mod_mruby_translate_name_last_code        = NULL;
@@ -99,6 +102,9 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
     conf->mod_mruby_fixups_first_code               = NULL;
     conf->mod_mruby_fixups_middle_code              = NULL;
     conf->mod_mruby_fixups_last_code                = NULL;
+    conf->mod_mruby_insert_filter_first_code        = NULL;
+    conf->mod_mruby_insert_filter_middle_code       = NULL;
+    conf->mod_mruby_insert_filter_last_code         = NULL;
     conf->mod_mruby_log_transaction_first_code      = NULL;
     conf->mod_mruby_log_transaction_middle_code     = NULL;
     conf->mod_mruby_log_transaction_last_code       = NULL;
@@ -163,6 +169,51 @@ static const char *set_mod_mruby_post_read_request_last(cmd_parms *cmd, void *mc
         return err;
 
     conf->mod_mruby_post_read_request_last_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_quick_handler_first(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_quick_handler_first_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_quick_handler_middle(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_quick_handler_middle_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_quick_handler_last(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_quick_handler_last_code = apr_pstrdup(cmd->pool, arg);
 
     return NULL;
 }
@@ -433,6 +484,51 @@ static const char *set_mod_mruby_fixups_last(cmd_parms *cmd, void *mconfig, cons
         return err;
 
     conf->mod_mruby_fixups_last_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_insert_filter_first(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf =
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_insert_filter_first_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_insert_filter_middle(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf =
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_insert_filter_middle_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_insert_filter_last(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf =
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_insert_filter_last_code = apr_pstrdup(cmd->pool, arg);
 
     return NULL;
 }
@@ -996,6 +1092,36 @@ static int mod_mruby_post_read_request_last(request_rec *r)
 }
 
 
+static int mod_mruby_quick_handler_first(request_rec *r, int lookup)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_quick_handler_first_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_first_code, OK);
+}
+
+
+static int mod_mruby_quick_handler_middle(request_rec *r, int lookup)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_quick_handler_middle_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_middle_code, OK);
+}
+
+
+static int mod_mruby_quick_handler_last(request_rec *r, int lookup)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_quick_handler_last_code == NULL)
+        return DECLINED;
+    ap_mrb_push_request(r);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_last_code, OK);
+}
+
+
 static int mod_mruby_translate_name_first(request_rec *r)
 {
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
@@ -1176,6 +1302,36 @@ static int mod_mruby_fixups_last(request_rec *r)
 }
 
 
+static void mod_mruby_insert_filter_first(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_insert_filter_first_code == NULL)
+        return;
+    ap_mrb_push_request(r);
+    ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_first_code, OK);
+}
+
+
+static void mod_mruby_insert_filter_middle(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_insert_filter_middle_code == NULL)
+        return;
+    ap_mrb_push_request(r);
+    ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_middle_code, OK);
+}
+
+
+static void mod_mruby_insert_filter_last(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_insert_filter_last_code == NULL)
+        return;
+    ap_mrb_push_request(r);
+    ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_last_code, OK);
+}
+
+
 static int mod_mruby_log_transaction_first(request_rec *r)
 {
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
@@ -1214,6 +1370,9 @@ static void register_hooks(apr_pool_t *p)
     ap_hook_post_read_request(mod_mruby_post_read_request_first, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_post_read_request(mod_mruby_post_read_request_middle, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_post_read_request(mod_mruby_post_read_request_last, NULL, NULL, APR_HOOK_LAST);
+    ap_hook_quick_handler(mod_mruby_quick_handler_first, NULL, NULL, APR_HOOK_FIRST);
+    ap_hook_quick_handler(mod_mruby_quick_handler_middle, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_quick_handler(mod_mruby_quick_handler_last, NULL, NULL, APR_HOOK_LAST);
     ap_hook_translate_name(mod_mruby_translate_name_first, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_translate_name(mod_mruby_translate_name_middle, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_translate_name(mod_mruby_translate_name_last, NULL, NULL, APR_HOOK_LAST);
@@ -1232,6 +1391,9 @@ static void register_hooks(apr_pool_t *p)
     ap_hook_fixups(mod_mruby_fixups_first, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_fixups(mod_mruby_fixups_middle, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_fixups(mod_mruby_fixups_last, NULL, NULL, APR_HOOK_LAST);
+    ap_hook_insert_filter(mod_mruby_insert_filter_first, NULL, NULL, APR_HOOK_FIRST);
+    ap_hook_insert_filter(mod_mruby_insert_filter_middle, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_insert_filter(mod_mruby_insert_filter_last, NULL, NULL, APR_HOOK_LAST);
     ap_hook_log_transaction(mod_mruby_log_transaction_first, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_log_transaction(mod_mruby_log_transaction_middle, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_log_transaction(mod_mruby_log_transaction_last, NULL, NULL, APR_HOOK_LAST);
@@ -1244,6 +1406,9 @@ static const command_rec mod_mruby_cmds[] = {
     AP_INIT_TAKE1("mrubyPostReadRequestFirst", set_mod_mruby_post_read_request_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request first phase."),
     AP_INIT_TAKE1("mrubyPostReadRequestMiddle", set_mod_mruby_post_read_request_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request middle phase."),
     AP_INIT_TAKE1("mrubyPostReadRequestLast", set_mod_mruby_post_read_request_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request last phase."),
+    AP_INIT_TAKE1("mrubyQuickHandlerFirst", set_mod_mruby_quick_handler_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for quick_handler first phase."),
+    AP_INIT_TAKE1("mrubyQuickHandlerMiddle", set_mod_mruby_quick_handler_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for quick_handler middle phase."),
+    AP_INIT_TAKE1("mrubyQuickHandlerLast", set_mod_mruby_quick_handler_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for quick_handler last phase."),
     AP_INIT_TAKE1("mrubyTranslateNameFirst", set_mod_mruby_translate_name_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name first phase."),
     AP_INIT_TAKE1("mrubyTranslateNameMiddle", set_mod_mruby_translate_name_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name middle phase."),
     AP_INIT_TAKE1("mrubyTranslateNameLast", set_mod_mruby_translate_name_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name last phase."),
@@ -1262,6 +1427,9 @@ static const command_rec mod_mruby_cmds[] = {
     AP_INIT_TAKE1("mrubyFixupsFirst", set_mod_mruby_fixups_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups first phase."),
     AP_INIT_TAKE1("mrubyFixupsMiddle", set_mod_mruby_fixups_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups middle phase."),
     AP_INIT_TAKE1("mrubyFixupsLast", set_mod_mruby_fixups_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups last phase."),
+    AP_INIT_TAKE1("mrubyInsertFilterFirst", set_mod_mruby_insert_filter_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for insert_filter first phase."),
+    AP_INIT_TAKE1("mrubyInsertFilterMiddle", set_mod_mruby_insert_filter_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for insert_filter middle phase."),
+    AP_INIT_TAKE1("mrubyInsertFilterLast", set_mod_mruby_insert_filter_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for insert_filter last phase."),
     AP_INIT_TAKE1("mrubyLogTransactionFirst", set_mod_mruby_log_transaction_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction first phase."),
     AP_INIT_TAKE1("mrubyLogTransactionMiddle", set_mod_mruby_log_transaction_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction middle phase."),
     AP_INIT_TAKE1("mrubyLogTransactionLast", set_mod_mruby_log_transaction_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction last phase."),
