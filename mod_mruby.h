@@ -20,6 +20,9 @@ typedef struct {
     const char *mod_mruby_post_read_request_first_code;
     const char *mod_mruby_post_read_request_middle_code;
     const char *mod_mruby_post_read_request_last_code;
+    const char *mod_mruby_quick_handler_first_code;
+    const char *mod_mruby_quick_handler_middle_code;
+    const char *mod_mruby_quick_handler_last_code;
     const char *mod_mruby_translate_name_first_code;
     const char *mod_mruby_translate_name_middle_code;
     const char *mod_mruby_translate_name_last_code;
@@ -38,6 +41,9 @@ typedef struct {
     const char *mod_mruby_fixups_first_code;
     const char *mod_mruby_fixups_middle_code;
     const char *mod_mruby_fixups_last_code;
+    const char *mod_mruby_insert_filter_first_code;
+    const char *mod_mruby_insert_filter_middle_code;
+    const char *mod_mruby_insert_filter_last_code;
     const char *mod_mruby_log_transaction_first_code;
     const char *mod_mruby_log_transaction_middle_code;
     const char *mod_mruby_log_transaction_last_code;
