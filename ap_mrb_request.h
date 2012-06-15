@@ -48,8 +48,13 @@ mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str);
 
+mrb_value ap_mrb_set_request_hostname(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_status_line(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_method(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_range(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str);
 
 mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_proxyreq(mrb_state *mrb, mrb_value str);

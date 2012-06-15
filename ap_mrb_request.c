@@ -315,6 +315,42 @@ mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str)
     return val;
 }
 
+mrb_value ap_mrb_set_request_hostname(mrb_state *mrb, mrb_value str)
+{
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->hostname = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
+}
+
+mrb_value ap_mrb_set_request_status_line(mrb_state *mrb, mrb_value str)
+{
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->status_line = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
+}
+
+mrb_value ap_mrb_set_request_method(mrb_state *mrb, mrb_value str)
+{
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->method = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
+}
+
+mrb_value ap_mrb_set_request_range(mrb_state *mrb, mrb_value str)
+{
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->range = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
+}
+
 mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
 {
     mrb_value val;
@@ -330,6 +366,15 @@ mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
     request_rec *r = ap_mrb_get_request();
     mrb_get_args(mrb, "o", &val);
     r->handler = apr_pstrdup(r->pool, RSTRING_PTR(val));
+    return val;
+}
+
+mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
+{
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->content_encoding = apr_pstrdup(r->pool, RSTRING_PTR(val));
     return val;
 }
 
