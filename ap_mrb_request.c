@@ -386,6 +386,17 @@ mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str)
     return mrb_fixnum_value(val);
 }
 
+mrb_value ap_mrb_set_request_proxyreq(mrb_state *mrb, mrb_value str)
+{
+
+    mrb_int ret;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "i", &ret);
+    r->proxyreq = (int)ret;
+
+    return str;
+}
+
 mrb_value ap_mrb_get_request_proxyreq(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();

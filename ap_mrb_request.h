@@ -57,6 +57,7 @@ mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str);
 
 mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_proxyreq(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_proxyreq(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_header_only(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_proto_num(mrb_state *mrb, mrb_value str);

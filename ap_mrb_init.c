@@ -64,6 +64,10 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_const(mrb, class, "NOT_IMPLEMENTED", mrb_fixnum_value(HTTP_NOT_IMPLEMENTED));
     mrb_define_const(mrb, class, "BAD_GATEWAY", mrb_fixnum_value(HTTP_BAD_GATEWAY));
     mrb_define_const(mrb, class, "VARIANT_ALSO_VARIES", mrb_fixnum_value(HTTP_VARIANT_ALSO_VARIES));
+    mrb_define_const(mrb, class, "PROXYREQ_NONE", mrb_fixnum_value(PROXYREQ_NONE));
+    mrb_define_const(mrb, class, "PROXYREQ_PROXY", mrb_fixnum_value(PROXYREQ_PROXY));
+    mrb_define_const(mrb, class, "PROXYREQ_REVERSE", mrb_fixnum_value(PROXYREQ_REVERSE));
+    mrb_define_const(mrb, class, "PROXYREQ_RESPONSE", mrb_fixnum_value(PROXYREQ_RESPONSE));
     mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
     mrb_define_class_method(mrb, class, "return", ap_mrb_return, ARGS_ANY());
@@ -120,6 +124,7 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "content_encoding", ap_mrb_get_request_content_encoding, ARGS_NONE());
 
     mrb_define_method(mrb, class_request, "assbackwards", ap_mrb_get_request_assbackwards, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "proxyreq=", ap_mrb_set_request_proxyreq, ARGS_ANY());
     mrb_define_method(mrb, class_request, "proxyreq", ap_mrb_get_request_proxyreq, ARGS_NONE());
     mrb_define_method(mrb, class_request, "header_only", ap_mrb_get_request_header_only, ARGS_NONE());
     mrb_define_method(mrb, class_request, "proto_num", ap_mrb_get_request_proto_num, ARGS_NONE());
