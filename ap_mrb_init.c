@@ -123,6 +123,9 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "content_encoding=", ap_mrb_set_request_content_encoding, ARGS_ANY());
     mrb_define_method(mrb, class_request, "content_encoding", ap_mrb_get_request_content_encoding, ARGS_NONE());
 
+    mrb_define_method(mrb, class_request, "headers_out[]=", ap_mrb_set_request_readers_out, ARGS_ANY());
+    mrb_define_method(mrb, class_request, "headers_out[]", ap_mrb_get_request_readers_out, ARGS_ANY());
+
     mrb_define_method(mrb, class_request, "assbackwards", ap_mrb_get_request_assbackwards, ARGS_NONE());
     mrb_define_method(mrb, class_request, "proxyreq=", ap_mrb_set_request_proxyreq, ARGS_ANY());
     mrb_define_method(mrb, class_request, "proxyreq", ap_mrb_get_request_proxyreq, ARGS_NONE());

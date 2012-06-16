@@ -379,6 +379,27 @@ mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
 }
 
 
+mrb_value ap_mrb_set_request_readers_out(mrb_state *mrb, mrb_value str)
+{
+    mrb_value key;
+    mrb_value val;
+
+    mrb_get_args(mrb, "oo", &key, &val);
+    request_rec *r = ap_mrb_get_request();
+    apr_table_set(r->headers_out, RSTRING_PTR(key), RSTRING_PTR(val));
+    return str;
+}
+
+mrb_value ap_mrb_get_request_readers_out(mrb_state *mrb, mrb_value str)
+{
+    mrb_value key;
+
+    mrb_get_args(mrb, "o", &key);
+    request_rec *r = ap_mrb_get_request();
+    const char *val = apr_table_get(r->headers_out, RSTRING_PTR(key));
+    return mrb_str_new(mrb, val, strlen(val));
+}
+
 mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();
