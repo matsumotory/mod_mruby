@@ -31,6 +31,8 @@ mrb_value ap_mrb_get_server_document_root(mrb_state *mrb, mrb_value str)
 }
 
 // int
+
+#ifndef __APACHE24__
 mrb_value ap_mrb_set_server_loglevel(mrb_state *mrb, mrb_value str)
 {
     mrb_int val;
@@ -45,4 +47,4 @@ mrb_value ap_mrb_get_server_loglevel(mrb_state *mrb, mrb_value str)
     request_rec *r = ap_mrb_get_request();
     return mrb_fixnum_value(r->server->loglevel);
 }
-
+#endif
