@@ -900,7 +900,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         //ap_mruby_class_init(mod_mruby_share_state);
         //mrb = mod_mruby_share_state;
 
-        p = mrb_parse_file(mrb, mrb_file);
+        p = mrb_parse_file(mrb, mrb_file, NULL);
         n = mrb_generate_code(mrb, p->tree);
 
 #ifdef __MOD_MRUBY_SHARED_CACHE_TABLE__

@@ -8,13 +8,13 @@ TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server
 
 #   the used tools
 # use apache 2.2
-#APXS=/usr/sbin/apxs
-#APACHECTL=/etc/init.d/httpd
+APXS=/usr/sbin/apxs
+APACHECTL=/etc/init.d/httpd
 
 # use apache 2.4
-APXS=/usr/local/apache2.4/bin/apxs
-APACHECTL=/usr/local/apache2.4/bin/apachectl
-DEF=-D__APACHE24__
+#APXS=/usr/local/apache2.4/bin/apxs
+#APACHECTL=/usr/local/apache2.4/bin/apachectl
+#DEF=-D__APACHE24__
 
 #   additional user defines, includes and libraries
 INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include -I/usr/include/json
