@@ -1,6 +1,6 @@
 #include "mod_mruby.h"
 #include "ap_mrb_server.h"
-#include "json.h"
+//#include "json.h"
 
 //static struct mrb_data_type server_rec_type = {
 //    "server_rec", 0,

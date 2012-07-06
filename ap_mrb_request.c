@@ -1,7 +1,7 @@
 #include "mod_mruby.h"
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
-#include "json.h"
+//#include "json.h"
 
 
 static struct mrb_data_type request_rec_type = {
@@ -60,6 +60,7 @@ mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str)
     return str;
 }
 
+/*
 mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str)
 {
     char *val;
@@ -87,6 +88,7 @@ mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str)
     return mrb_str_new(mrb, val, strlen(val));
 
 }
+*/
 
 
 mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str)

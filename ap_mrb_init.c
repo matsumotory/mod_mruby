@@ -85,7 +85,7 @@ int ap_mruby_class_init(mrb_state *mrb)
 
     class_request = mrb_define_class_under(mrb, class, "Request", mrb->object_class);
     mrb_define_method(mrb, class_request, "Initialize", ap_mrb_init_request, ARGS_NONE());
-    mrb_define_method(mrb, class_request, "request_rec_json", ap_mrb_get_request_rec_json, ARGS_NONE());
+    //mrb_define_method(mrb, class_request, "request_rec_json", ap_mrb_get_request_rec_json, ARGS_NONE());
     mrb_define_method(mrb, class_request, "the_request=", ap_mrb_set_request_the_request, ARGS_ANY());
     mrb_define_method(mrb, class_request, "the_request", ap_mrb_get_request_the_request, ARGS_NONE());
     mrb_define_method(mrb, class_request, "protocol=", ap_mrb_set_request_protocol, ARGS_ANY());

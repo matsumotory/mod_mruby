@@ -17,8 +17,10 @@ APACHECTL=/etc/init.d/httpd
 #DEF=-D__APACHE24__
 
 #   additional user defines, includes and libraries
-INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include -I/usr/include/json
-LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o -lm /usr/lib/libjson.la
+#INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include -I/usr/include/json
+#LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o -lm /usr/lib/libjson.la
+INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include
+LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration
 CFLAGS = $(INC) $(LIB) $(WC)
 
