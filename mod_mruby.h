@@ -12,6 +12,7 @@
 #include "mruby/string.h"
 #include "http_request.h"
 #include "http_log.h"
+#include "ap_release.h"
 
 
 typedef struct {
