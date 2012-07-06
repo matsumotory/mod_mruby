@@ -14,5 +14,6 @@ struct RClass *class;
 struct RClass *class_request;
 struct RClass *class_server;
 struct RClass *class_headers_in;
+struct RClass *class_headers_out;
 
 #endif

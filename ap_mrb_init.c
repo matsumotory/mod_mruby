@@ -125,13 +125,19 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "content_encoding=", ap_mrb_set_request_content_encoding, ARGS_ANY());
     mrb_define_method(mrb, class_request, "content_encoding", ap_mrb_get_request_content_encoding, ARGS_NONE());
 
-    //class_headers_in = mrb_define_class_under(mrb, class, "headers_in", mrb->object_class);
-    //mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_readers_in, ARGS_ANY());
-    //mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_readers_in, ARGS_ANY());
-    mrb_define_method(mrb, class_request, "headers_in=", ap_mrb_set_request_readers_in, ARGS_ANY());
-    mrb_define_method(mrb, class_request, "headers_in", ap_mrb_get_request_readers_in, ARGS_ANY());
-    mrb_define_method(mrb, class_request, "headers_out=", ap_mrb_set_request_readers_out, ARGS_ANY());
-    mrb_define_method(mrb, class_request, "headers_out", ap_mrb_get_request_readers_out, ARGS_ANY());
+    //class_headers_in = mrb_define_class(mrb, "headers_in", class_request);
+    class_headers_in = mrb_define_class_under(mrb, class, "Headers_in", mrb->object_class);
+    mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_readers_in, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_readers_in, ARGS_ANY());
+    //mrb_define_method(mrb, class_request, "[]=", ap_mrb_set_request_readers_in, ARGS_ANY());
+    //mrb_define_method(mrb, class_request, "[]", ap_mrb_get_request_readers_in, ARGS_ANY());
+    //mrb_define_method(mrb, class_request, "headers_in=", ap_mrb_set_request_readers_in, ARGS_ANY());
+    //mrb_define_method(mrb, class_request, "headers_in", ap_mrb_get_request_readers_in, ARGS_ANY());
+    class_headers_out = mrb_define_class_under(mrb, class, "Headers_out", mrb->object_class);
+    mrb_define_method(mrb, class_headers_out, "headers_out=", ap_mrb_set_request_readers_out, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_out, "headers_out", ap_mrb_get_request_readers_out, ARGS_ANY());
+    //mrb_define_method(mrb, class_request, "headers_out=", ap_mrb_set_request_readers_out, ARGS_ANY());
+    //mrb_define_method(mrb, class_request, "headers_out", ap_mrb_get_request_readers_out, ARGS_ANY());
 
     mrb_define_method(mrb, class_request, "assbackwards", ap_mrb_get_request_assbackwards, ARGS_NONE());
     mrb_define_method(mrb, class_request, "proxyreq=", ap_mrb_set_request_proxyreq, ARGS_ANY());
