@@ -48,8 +48,6 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server installe
 
 * created /usr/local/apache/htdocs/test.mrb
 
-        require 'Apache'
-        
         r = Apache::Request.new()
         r.content_type = "text/html"
         Apache.rputs("test<br>")
