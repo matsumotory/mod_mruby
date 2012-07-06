@@ -1,5 +1,3 @@
-requeire "Apache"
-
 r = Apache::Request.new()
 s = Apache::Server.new()
 

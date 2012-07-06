@@ -1,5 +1,3 @@
-require 'Apache'
-
 r = Apache::Request.new()
 Apache.rputs("test<br>")
 Apache.rputs("OK status= "+Apache::OK+"<BR>")
