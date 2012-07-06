@@ -9,6 +9,7 @@
 #
 
 Apache.rputs("<b>Test Start.</b><br>")
+Apache.rputs("<br>")
 Apache.rputs("<b>Request Class Test</b><br>")
 r = Apache::Request.new()
 r.content_type = "text/html"
