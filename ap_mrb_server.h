@@ -14,9 +14,7 @@
 mrb_value ap_mrb_set_server_error_fname(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_server_error_fname(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_server_document_root(mrb_state *mrb, mrb_value str);
-#ifndef __APACHE24__
 mrb_value ap_mrb_set_server_loglevel(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_server_loglevel(mrb_state *mrb, mrb_value str);
-#endif
 
 #endif
