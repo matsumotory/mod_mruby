@@ -1,3 +1,14 @@
+#
+# mod_mruby test script
+#
+# vi /etc/httpd/conf.d/mruby.conf
+# LoadModule mruby_module /usr/lib/httpd/modules/mod_mruby.so
+# AddHandler mruby-script .mrb
+#
+# access to http://example.com/test.mrb
+#
+
+Apache.rputs("<b>Test Start.</b><br>")
 Apache.rputs("<b>Request Class Test</b><br>")
 r = Apache::Request.new()
 r.content_type = "text/html"
@@ -35,5 +46,7 @@ Apache.rputs("Accept-Encoding = " + h["Accept-Encoding"] + "<br>")
 h["Accept-Encoding"] = "gzip"
 Apache.rputs("Accept-Encoding = " + h["Accept-Encoding"] + "<br>")
 Apache.rputs("<br>")
+
+Apache.rputs("<b>Test Complete. Wellcome to mod_mruby world!!</b><br>")
 
 Apache.return(Apache::OK)
