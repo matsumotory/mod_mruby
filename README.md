@@ -1,80 +1,68 @@
+# Welcome to the mod_mruby wiki!
 ## What's mod_mruby
 mod_mruby - to provide an alternative to mod_lua.
 
-Apache modules can be implemeted by mruby scripts on Apache HTTP Server installed mod_mruby.
+Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 installed mod_mruby.
 
 ## How to use
-### Compile
+### 1. Download
+    git clone git://github.com/matsumoto-r/mod_mruby.git
+
+### 2. Compile
     make
 
-### Install
+### 3. Install
     make install
 
-### Settings
+### 4. Settings
 * Add to /usr/local/apache/conf/httpd.conf
 
         LoadModule mruby_module modules/mod_mruby.so
         # remove comment out if you use .mrb as Web contens
         # AddHandler mruby-script .mrb
 
-    * hook mrb-script on ap_hook_translateName First phase
-
-             mrubyTranslateNameFirst /path/to/file.mrb
-
     * hook mrb-script on ap_hook_translateName Middle phase
 
              mrubyTranslateNameMiddle /path/to/file.mrb
 
-    * hook mrb-script on ap_hook_translateName last phase
+### 5. Apache Restart
+    /etc/init.d/httpd restart
 
-             mrubyTranslateNamelast /path/to/file.mrb
+### 6. Install Test
+* [Install Test Page](https://github.com/matsumoto-r/mod_mruby/wiki/Test)
 
-    * hook mrb-script on ap_hook_handler phase
+## Example
+* Selecting vhost area like mod_vhost_alias(hook on translatename)
+    ```ruby
+    r = Apache::Request.new()
+    s = Apache::Server.new()
 
-             mrubyHandler /path/to/file.mrb
+    r.filename = s.document_root + "/" + r.hostname + "/" + r.uri
 
-* Apache restart
+    Apache::return(Apache::OK)
+    ```
+* Proxy balancer like mod_proxy_balancer(hook on translatename)
+    ```ruby
+    backends = [
+        "http://192.168.0.101:8888/",
+        "http://192.168.0.102:8888/",
+        "http://192.168.0.103:8888/",
+        "http://192.168.0.104:8888/",
+    ]
+ 
+    # write balancing algorithm here.
+ 
+    r = Apache::Request.new()
+ 
+    r.handler  = "proxy-server"
+    r.proxyreq = Apache::PROXYREQ_REVERSE
+    r.filename = "proxy:" + backends[rand(backends.length)] + r.uri
+ 
+    Apache::return(Apache::OK)
+    ```
 
-        /usr/local/apache/bin/apachectl restart
+## Functions
+* [Functions Page](https://github.com/matsumoto-r/mod_mruby/wiki/Functions)
 
-### Compile, Install and Apache restart
-    make reload
-
-## Example and Test
-* Added to /usr/local/apache/conf/httpd.conf
-
-        LoadModule mruby_module modules/mod_mruby.so
-        mrubyTranslateNameMiddle /usr/local/apache/htdocs/test.mrb
-
-* created /usr/local/apache/htdocs/test.mrb
-
-        r = Apache::Request.new()
-        r.content_type = "text/html"
-        Apache.rputs("test<br>")
-        Apache.rputs("OK status= "+Apache::OK+"<BR>")
-        Apache.rputs("DECLINED status= "+Apache::DECLINED+"<BR>")
-        Apache.rputs("HTTP_OK status= "+Apache::HTTP_OK+"<BR>")
-        Apache.rputs("HTTP_SERVICE_UNAVAILABLE status= "+Apache::HTTP_SERVICE_UNAVAILABLE+"<BR>")
-        Apache.rputs("filename= "+r.filename+"<BR>")
-        Apache.rputs("uri= "+r.uri+"<BR>")
-        Apache.rputs("user= "+r.user+"<BR>")
-        Apache.rputs("the_request= "+r.the_request+"<BR>")
-        Apache.rputs("protocol= "+r.protocol+"<BR>")
-        r.filename = "/usr/local/apache2.4/htdocs/index.html"
-        r.uri = "/index.html"
-        r.user = "hoge"
-        r.the_request = "hoge"
-        r.protocol = "hoge"
-        Apache.rputs("---- request_rec changed ----<br>")
-        Apache.rputs("filename= "+r.filename+"<BR>")
-        Apache.rputs("uri= "+r.uri+"<BR>")
-        Apache.rputs("user= "+r.user+"<BR>")
-        Apache.rputs("content_type= "+r.content_type+"<BR>")
-        Apache.rputs("the_request= "+r.the_request+"<BR>")
-        Apache.rputs("protocol= "+r.protocol+"<BR>")
-        Apache.rputs("hostname= "+r.hostname+"<BR>")
-        
-        Apache.return(Apache::OK)
-
-* access to http://example.com/example.html
-
+## Data Structure
+* [Data Structure Page](https://github.com/matsumoto-r/mod_mruby/wiki/Data-Structure)
