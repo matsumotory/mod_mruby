@@ -23,6 +23,7 @@ typedef struct _code {
 int ap_mrb_get_status_code();
 int ap_mrb_set_status_code(int val);
 mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self);
+mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str);

@@ -74,6 +74,7 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_class_method(mrb, class, "errlogger", ap_mrb_errlogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "syslogger", ap_mrb_syslogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
+    mrb_define_class_method(mrb, class, "mod_mruby_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
 
     class_server = mrb_define_class_under(mrb, class, "Server", mrb->object_class);
     mrb_define_method(mrb, class_server, "error_fname=", ap_mrb_set_server_error_fname, ARGS_ANY());

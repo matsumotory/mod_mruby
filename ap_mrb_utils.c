@@ -48,6 +48,11 @@ mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
+{
+    return mrb_str_new(mrb, MODULE_VERSION, strlen(MODULE_VERSION));
+}
+
 
 mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
 {
