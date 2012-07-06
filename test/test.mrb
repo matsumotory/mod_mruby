@@ -1,0 +1,39 @@
+Apache.rputs("<b>Request Class Test</b><br>")
+r = Apache::Request.new()
+r.content_type = "text/html"
+Apache.rputs("filename = "+r.filename+"<br>")
+Apache.rputs("uri = "+r.uri+"<br>")
+Apache.rputs("---- request_rec changed ----<br>")
+r.filename = "/usr/local/apache2.4/htdocs/index.html"
+r.uri = "/index.html"
+Apache.rputs("filename = "+r.filename+"<br>")
+Apache.rputs("uri = "+r.uri+"<br>")
+Apache.rputs("<br>")
+
+Apache.rputs("<b>Apache Class Test</b><br>")
+Apache.sleep(3)
+Apache.rputs("sleep function: OK<br>")
+Apache.syslogger("warn", "mod_mruby warning syslogger test.")
+Apache.rputs("syslogger function: OK<br>")
+Apache.errlogger(4, "mod_mruby warning errlogger test.")
+Apache.rputs("errlogger function: OK<br>")
+Apache.rputs("OK status = "+Apache::OK.to_s+"<br>")
+Apache.rputs("DECLINED status = "+Apache::DECLINED.to_s+"<br>")
+Apache.rputs("HTTP_OK status = "+Apache::HTTP_OK.to_s+"<br>")
+Apache.rputs("HTTP_SERVICE_UNAVAILABLE status = "+Apache::HTTP_SERVICE_UNAVAILABLE.to_s+"<br>")
+Apache.rputs("<br>")
+
+Apache.rputs("<b>Server Class Test</b><br>")
+s = Apache::Server.new()
+Apache.rputs("document_root = "+ s.document_root + "<br>")
+Apache.rputs("error_fname = "+ s.error_fname + "<br>")
+Apache.rputs("<br>")
+
+Apache.rputs("<b>Headers_in Class Test</b><br>")
+h = Apache::Headers_in.new()
+Apache.rputs("Accept-Encoding = " + h["Accept-Encoding"] + "<br>")
+h["Accept-Encoding"] = "gzip"
+Apache.rputs("Accept-Encoding = " + h["Accept-Encoding"] + "<br>")
+Apache.rputs("<br>")
+
+Apache.return(Apache::OK)
