@@ -29,7 +29,7 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 
     /etc/init.d/httpd restart
 
 ### 6. Install Test
-* [Install Test Page](https://github.com/matsumoto-r/mod_mruby/wiki/Test)
+* [Install Test Page](https://github.com/matsumoto-r/mod_mruby/wiki/Install-Test-Page)
 
 ## Example
 * Selecting vhost area like mod_vhost_alias(hook on translatename)
