@@ -1,10 +1,12 @@
-TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server.c
+TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server.c ap_mrb_init.c ap_mrb_connection.c
 
 APXS=apxs
 
-INC=-I. -I../mruby/src -I../mruby/include -I/usr/include/json
+#INC=-I. -I../mruby/src -I../mruby/include -I/usr/include/json
+INC=-I. -I../mruby/src -I../mruby/include
 APACHE_ROOT=c:/progra~1/apache~1/apache2.2
-LIB=-lm ../mruby/lib/libmruby.a -llibapr-1 -llibaprutil-1 -llibhttpd -lws2_32 -ljson
+#LIB=-lm ../mruby/lib/libmruby.a -llibapr-1 -llibaprutil-1 -llibhttpd -lws2_32 -ljson
+LIB=-lm ../mruby/lib/libmruby.a -llibapr-1 -llibaprutil-1 -llibhttpd -lws2_32
 DEF=-DAPR_DECLARE_EXPORT
 
 all: mod_mruby.so

@@ -83,6 +83,31 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_server, "document_root", ap_mrb_get_server_document_root, ARGS_NONE());
     mrb_define_method(mrb, class_server, "loglevel=", ap_mrb_set_server_loglevel, ARGS_ANY());
     mrb_define_method(mrb, class_server, "loglevel", ap_mrb_get_server_loglevel, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "hostname", ap_mrb_get_server_hostname, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "path", ap_mrb_get_server_path, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "admin", ap_mrb_get_server_admin, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "scheme", ap_mrb_get_server_scheme, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "defn_name", ap_mrb_get_server_defn_name, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "is_virtual", ap_mrb_get_server_is_virtual, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "keep_alive_max", ap_mrb_get_server_keep_alive_max, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "keep_alive", ap_mrb_get_server_keep_alive, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "pathlen", ap_mrb_get_server_pathlen, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "limit_req_line", ap_mrb_get_server_limit_req_line, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "limit_req_fieldsize", ap_mrb_get_server_limit_req_fieldsize, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "limit_req_fields", ap_mrb_get_server_limit_req_fields, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "timeout", ap_mrb_get_server_timeout, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "keep_alive_timeout", ap_mrb_get_server_keep_alive_timeout, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "port", ap_mrb_get_server_port, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "defn_line_number", ap_mrb_get_server_defn_line_number, ARGS_NONE());
+
+    class_conn = mrb_define_class_under(mrb, class, "Connection", mrb->object_class);
+    mrb_define_method(mrb, class_conn, "remote_ip", ap_mrb_get_conn_remote_ip, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "remote_host", ap_mrb_get_conn_remote_host, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "remote_logname", ap_mrb_get_conn_remote_logname, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "local_ip", ap_mrb_get_conn_local_ip, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "local_host", ap_mrb_get_conn_local_host, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "keepalives", ap_mrb_get_conn_keepalives, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "data_in_input_filters", ap_mrb_get_conn_data_in_input_filters, ARGS_NONE());
 
     class_request = mrb_define_class_under(mrb, class, "Request", mrb->object_class);
     mrb_define_method(mrb, class_request, "Initialize", ap_mrb_init_request, ARGS_NONE());

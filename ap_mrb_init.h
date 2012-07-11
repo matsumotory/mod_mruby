@@ -7,12 +7,14 @@
 #include "mruby/class.h"
 #include "ap_mrb_request.h"
 #include "ap_mrb_server.h"
+#include "ap_mrb_connection.h"
 #include "ap_mrb_utils.h"
 #include "ap_mrb_string.h"
 
 struct RClass *class;
 struct RClass *class_request;
 struct RClass *class_server;
+struct RClass *class_conn;
 struct RClass *class_headers_in;
 struct RClass *class_headers_out;
 
