@@ -5,6 +5,7 @@
 #include "mruby/data.h"
 #include "mruby/variable.h"
 #include "mruby/class.h"
+/*
 #include "ap_mrb_request.h"
 #include "ap_mrb_server.h"
 #include "ap_mrb_connection.h"
@@ -17,5 +18,6 @@ struct RClass *class_server;
 struct RClass *class_conn;
 struct RClass *class_headers_in;
 struct RClass *class_headers_out;
+*/
 
 #endif

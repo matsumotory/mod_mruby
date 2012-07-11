@@ -37,6 +37,7 @@ const char *ap_mrb_string_check(apr_pool_t *p, const char *str)
     return str;
 }
 
+/*
 mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str)
 {
     str = mrb_class_new_instance(mrb, 0, NULL, class_request);
@@ -61,6 +62,7 @@ mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str)
 
     return str;
 }
+*/
 
 /*
 mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str)

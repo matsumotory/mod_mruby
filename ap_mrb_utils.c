@@ -25,6 +25,7 @@ CODE logpriority[] =
 };
 #endif
 
+int mod_mruby_return_code;
 
 int ap_mrb_get_status_code()
 {

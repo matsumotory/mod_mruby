@@ -13,7 +13,7 @@
 
 #define INVALID_PRIORITY    -1
 
-int mod_mruby_return_code;
+//int mod_mruby_return_code;
 
 typedef struct _code {
     char    *c_name;
