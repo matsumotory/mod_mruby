@@ -8,7 +8,7 @@
 # access to http://example.com/test.mrb
 #
 
-Apache.rputs("<b>Test Start.</b><br>")
+Apache.rputs("<font color=red><b>Test Start.</b></font><br>")
 Apache.rputs("<br>")
 Apache.rputs("<b>Request Class Test</b><br>")
 r = Apache::Request.new()
@@ -74,6 +74,6 @@ hoall.each_key do |key|
 end
 Apache.rputs("<br>")
 
-Apache.rputs("<b>Test Complete. Wellcome to mod_mruby world!!</b><br>")
+Apache.rputs("<font color=red><b>Test Complete. Wellcome to mod_mruby world!!</b></font><br>")
 
 Apache.return(Apache::OK)
