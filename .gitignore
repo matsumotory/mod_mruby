@@ -11,3 +11,8 @@
 *.lai
 *.la
 *.a
+
+# gtags
+GPATH
+GRTAGS
+GTAGS
