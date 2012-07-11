@@ -76,9 +76,13 @@ Apache.rputs("<br>")
 
 Apache.rputs("<b>Scoreboard Class Test</b><br>")
 wc = Apache::Scoreboard.new()
-Apache.rputs("scoreboard hash size = " + wc.status_by_ip.size.to_s + "<br>")
-wc.status_by_ip.each_key do |key|
-    Apache.rputs("scoreboard key = \"" + key + "\" val = \"" + wc.status_by_ip[key] + "\"<br>")
+Apache.rputs("scoreboard status hash size = " + wc.status.size.to_s + "<br>")
+wc.status.each_key do |key|
+    Apache.rputs("scoreboard key = \"" + key + "\" val = \"" + wc.status[key] + "\"<br>")
+end
+Apache.rputs("scoreboard counter hash size = " + wc.counter.size.to_s + "<br>")
+wc.counter.each_key do |key|
+    Apache.rputs("scoreboard key = \"" + key + "\" val = \"" + wc.counter[key].to_s + "\"<br>")
 end
 Apache.rputs("<br>")
 
