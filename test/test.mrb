@@ -16,7 +16,7 @@ r.content_type = "text/html"
 Apache.rputs("filename = "+r.filename+"<br>")
 Apache.rputs("uri = "+r.uri+"<br>")
 Apache.rputs("---- request_rec changed ----<br>")
-r.filename = "/usr/local/apache2.4/htdocs/index.html"
+r.filename = "/var/www/html/index.html"
 r.uri = "/index.html"
 Apache.rputs("filename = "+r.filename+"<br>")
 Apache.rputs("uri = "+r.uri+"<br>")
