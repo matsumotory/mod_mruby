@@ -89,7 +89,7 @@ mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
         return str;
     }
 
-    ap_log_error(APLOG_MARK, mrb_fixnum(argv[0]), 0, NULL, RSTRING_PTR(argv[1]));
+    ap_log_error(APLOG_MARK, mrb_fixnum(argv[0]), 0, NULL, "%s", RSTRING_PTR(argv[1]));
 
     return str;
 }
@@ -143,7 +143,7 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
     msg = RSTRING_PTR(argv[1]);
 
     openlog(NULL, LOG_PID, LOG_SYSLOG);
-    syslog(pri, msg);
+    syslog(pri, "%s", msg);
     closelog();
 #endif
 
