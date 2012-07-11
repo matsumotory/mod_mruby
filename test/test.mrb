@@ -74,6 +74,14 @@ hoall.each_key do |key|
 end
 Apache.rputs("<br>")
 
+Apache.rputs("<b>Scoreboard Class Test</b><br>")
+wc = Apache::Scoreboard.new()
+Apache.rputs("scoreboard hash size = " + wc.status_by_ip.size.to_s + "<br>")
+wc.status_by_ip.each_key do |key|
+    Apache.rputs("scoreboard key = \"" + key + "\" val = \"" + wc.status_by_ip[key] + "\"<br>")
+end
+Apache.rputs("<br>")
+
 Apache.rputs("<font color=red><b>Test Complete. Wellcome to mod_mruby world!!</b></font><br>")
 
 Apache.return(Apache::OK)

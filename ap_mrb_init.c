@@ -4,6 +4,7 @@
 #include "ap_mrb_connection.h"
 #include "ap_mrb_utils.h"
 #include "ap_mrb_string.h"
+#include "ap_mrb_scoreboard.h"
 
 struct RClass *class;
 struct RClass *class_request;
@@ -11,6 +12,7 @@ struct RClass *class_server;
 struct RClass *class_conn;
 struct RClass *class_headers_in;
 struct RClass *class_headers_out;
+struct RClass *class_scoreboard;
 
 int ap_mruby_class_init(mrb_state *mrb)
 {
@@ -111,6 +113,9 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_server, "keep_alive_timeout", ap_mrb_get_server_keep_alive_timeout, ARGS_NONE());
     mrb_define_method(mrb, class_server, "port", ap_mrb_get_server_port, ARGS_NONE());
     mrb_define_method(mrb, class_server, "defn_line_number", ap_mrb_get_server_defn_line_number, ARGS_NONE());
+
+    class_scoreboard = mrb_define_class_under(mrb, class, "Scoreboard", mrb->object_class);
+    mrb_define_method(mrb, class_scoreboard, "status_by_ip", ap_mrb_get_scoreboard_status, ARGS_NONE());
 
     class_conn = mrb_define_class_under(mrb, class, "Connection", mrb->object_class);
     mrb_define_method(mrb, class_conn, "remote_ip", ap_mrb_get_conn_remote_ip, ARGS_NONE());
