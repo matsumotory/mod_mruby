@@ -76,6 +76,10 @@ Apache.rputs("<br>")
 
 Apache.rputs("<b>Scoreboard Class Test</b><br>")
 wc = Apache::Scoreboard.new()
+Apache.rputs("child pid = " + wc.pid.to_s + "<br>")
+Apache.rputs("thread limit = " + wc.thread_limit.to_s + "<br>")
+Apache.rputs("server limit = " + wc.server_limit.to_s + "<br>")
+Apache.rputs("access counter = " + wc.access_counter(wc.pid).to_s + "<br>")
 Apache.rputs("scoreboard status hash size = " + wc.status.size.to_s + "<br>")
 wc.status.each_key do |key|
     Apache.rputs("scoreboard key = \"" + key + "\" val = \"" + wc.status[key] + "\"<br>")

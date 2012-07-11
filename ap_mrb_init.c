@@ -117,6 +117,10 @@ int ap_mruby_class_init(mrb_state *mrb)
     class_scoreboard = mrb_define_class_under(mrb, class, "Scoreboard", mrb->object_class);
     mrb_define_method(mrb, class_scoreboard, "status", ap_mrb_get_scoreboard_status, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "counter", ap_mrb_get_scoreboard_counter, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "pid", ap_mrb_get_scoreboard_pid, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "server_limit", ap_mrb_get_scoreboard_server_limit, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "thread_limit", ap_mrb_get_scoreboard_thread_limit, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "access_counter", ap_mrb_get_scoreboard_access_counter, ARGS_ANY());
 
     class_conn = mrb_define_class_under(mrb, class, "Connection", mrb->object_class);
     mrb_define_method(mrb, class_conn, "remote_ip", ap_mrb_get_conn_remote_ip, ARGS_NONE());

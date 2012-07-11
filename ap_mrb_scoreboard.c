@@ -3,8 +3,44 @@
 #include "mruby/hash.h"
 #include "scoreboard.h"
 #include "ap_mpm.h"
+#include <unistd.h>
 
 static int mruby_server_limit, mruby_thread_limit;
+
+mrb_value ap_mrb_get_scoreboard_pid(mrb_state *mrb, mrb_value str)
+{
+    return mrb_fixnum_value(getpid());
+}
+
+mrb_value ap_mrb_get_scoreboard_server_limit(mrb_state *mrb, mrb_value str)
+{
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
+    return mrb_fixnum_value(mruby_server_limit);
+}
+
+mrb_value ap_mrb_get_scoreboard_thread_limit(mrb_state *mrb, mrb_value str)
+{
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    return mrb_fixnum_value(mruby_thread_limit);
+}
+
+mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
+{
+    int i, j;
+    mrb_int pid;
+    mrb_get_args(mrb, "i", &pid);
+    worker_score *ws_record;
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
+    for (i = 0; i < mruby_server_limit; ++i) {
+        for (j = 0; j < mruby_thread_limit; ++j) {
+            ws_record = ap_get_scoreboard_worker(i, j);
+            if ((int)ws_record->pid == (int)pid)
+                return mrb_fixnum_value((int)ws_record->access_count);
+        }
+    }
+    return mrb_fixnum_value(-1);
+}
 
 mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
 {

@@ -10,6 +10,10 @@
 #include "mruby/variable.h"
 #include "ap_mrb_request.h"
 
+mrb_value ap_mrb_get_scoreboard_pid(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_scoreboard_server_limit(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_scoreboard_thread_limit(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str);
 
