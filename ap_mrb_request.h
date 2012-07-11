@@ -35,10 +35,12 @@ mrb_value ap_mrb_get_request_range(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_handler(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_request_content_encoding(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_set_request_readers_in(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_get_request_readers_in(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_set_request_readers_out(mrb_state *mrb, mrb_value str);
-mrb_value ap_mrb_get_request_readers_out(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str);
 
 mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str);

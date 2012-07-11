@@ -1,6 +1,8 @@
 #include "mod_mruby.h"
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
+#include "mruby/hash.h"
+//#include "apr_table.h"
 //#include "json.h"
 
 
@@ -381,7 +383,7 @@ mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
 }
 
 
-mrb_value ap_mrb_set_request_readers_in(mrb_state *mrb, mrb_value str)
+mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
 {
     mrb_value key, val;
 
@@ -391,7 +393,7 @@ mrb_value ap_mrb_set_request_readers_in(mrb_state *mrb, mrb_value str)
     return val;
 }
 
-mrb_value ap_mrb_get_request_readers_in(mrb_state *mrb, mrb_value str)
+mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
 {
     mrb_value key;
 
@@ -401,7 +403,20 @@ mrb_value ap_mrb_get_request_readers_in(mrb_state *mrb, mrb_value str)
     return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_set_request_readers_out(mrb_state *mrb, mrb_value str)
+mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, mrb_value str)
+{
+    int i;
+    mrb_value hash = mrb_hash_new(mrb);
+    request_rec *r = ap_mrb_get_request();
+    const apr_array_header_t *arr = apr_table_elts(r->headers_in);
+    apr_table_entry_t *elts = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, elts[i].key, strlen(elts[i].key)), mrb_str_new(mrb, elts[i].val, strlen(elts[i].val)));
+    }
+    return hash;
+}
+
+mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
 {
     mrb_value key, val;
 
@@ -411,7 +426,7 @@ mrb_value ap_mrb_set_request_readers_out(mrb_state *mrb, mrb_value str)
     return val;
 }
 
-mrb_value ap_mrb_get_request_readers_out(mrb_state *mrb, mrb_value str)
+mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
 {
     mrb_value key;
 
@@ -419,6 +434,19 @@ mrb_value ap_mrb_get_request_readers_out(mrb_state *mrb, mrb_value str)
     request_rec *r = ap_mrb_get_request();
     const char *val = apr_table_get(r->headers_out, RSTRING_PTR(key));
     return mrb_str_new(mrb, val, strlen(val));
+}
+
+mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str)
+{
+    int i;
+    mrb_value hash = mrb_hash_new(mrb);
+    request_rec *r = ap_mrb_get_request();
+    const apr_array_header_t *arr = apr_table_elts(r->headers_out);
+    apr_table_entry_t *elts = (apr_table_entry_t *)arr->elts;
+    for (i = 0; i < arr->nelts; i++) {
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, elts[i].key, strlen(elts[i].key)), mrb_str_new(mrb, elts[i].val, strlen(elts[i].val)));
+    }
+    return hash;
 }
 
 mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str)

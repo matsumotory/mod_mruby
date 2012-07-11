@@ -53,10 +53,25 @@ Apache.rputs("keepalives = "+ c.keepalives.to_s + "<br>")
 Apache.rputs("<br>")
 
 Apache.rputs("<b>Headers_in Class Test</b><br>")
-h = Apache::Headers_in.new()
-Apache.rputs("Accept-Encoding = " + h["Accept-Encoding"] + "<br>")
-h["Accept-Encoding"] = "gzip"
-Apache.rputs("Accept-Encoding = " + h["Accept-Encoding"] + "<br>")
+hi = Apache::Headers_in.new()
+Apache.rputs("Accept-Encoding = " + hi["Accept-Encoding"] + "<br>")
+hi["Accept-Encoding"] = "gzip"
+Apache.rputs("Accept-Encoding = " + hi["Accept-Encoding"] + "<br>")
+hiall = hi.headers_in_hash
+Apache.rputs("headers_in hash size = " + hiall.size.to_s + "<br>")
+hiall.each_key do |key|
+    Apache.rputs("headers_in key = \"" + key + "\" val = \"" + hiall[key] + "\"<br>")
+end
+Apache.rputs("<br>")
+
+Apache.rputs("<b>Headers_out Class Test</b><br>")
+ho = Apache::Headers_out.new()
+#ho["headers_out_test"] = "On"
+hoall = ho.headers_out_hash
+Apache.rputs("headers_out hash size = " + hoall.size.to_s + "<br>")
+hoall.each_key do |key|
+    Apache.rputs("headers_in key = \"" + key + "\" val = \"" + hoall[key] + "\"<br>")
+end
 Apache.rputs("<br>")
 
 Apache.rputs("<b>Test Complete. Wellcome to mod_mruby world!!</b><br>")

@@ -152,15 +152,17 @@ int ap_mruby_class_init(mrb_state *mrb)
 
     //class_headers_in = mrb_define_class(mrb, "headers_in", class_request);
     class_headers_in = mrb_define_class_under(mrb, class, "Headers_in", mrb->object_class);
-    mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_readers_in, ARGS_ANY());
-    mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_readers_in, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_headers_in, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_headers_in, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_in, "headers_in_hash", ap_mrb_get_request_headers_in_hash, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "[]=", ap_mrb_set_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "[]", ap_mrb_get_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_in=", ap_mrb_set_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_in", ap_mrb_get_request_readers_in, ARGS_ANY());
     class_headers_out = mrb_define_class_under(mrb, class, "Headers_out", mrb->object_class);
-    mrb_define_method(mrb, class_headers_out, "headers_out=", ap_mrb_set_request_readers_out, ARGS_ANY());
-    mrb_define_method(mrb, class_headers_out, "headers_out", ap_mrb_get_request_readers_out, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_out, "headers_out=", ap_mrb_set_request_headers_out, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_out, "headers_out", ap_mrb_get_request_headers_out, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_out, "headers_out_hash", ap_mrb_get_request_headers_out_hash, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_out=", ap_mrb_set_request_readers_out, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_out", ap_mrb_get_request_readers_out, ARGS_ANY());
 
