@@ -6,9 +6,11 @@
 //#include "json.h"
 
 
+/*
 static struct mrb_data_type request_rec_type = {
     "request_rec", 0,
 };
+*/
 
 
 request_rec *mrb_request_rec_state = NULL;
