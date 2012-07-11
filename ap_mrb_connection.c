@@ -22,7 +22,11 @@ mrb_value ap_mrb_set_server_error_fname(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_get_conn_remote_ip(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();
+#ifdef __APACHE24__
+    char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->client_ip));
+#else
     char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->remote_ip));
+#endif
     return mrb_str_new(mrb, val, strlen(val));
 }
 
