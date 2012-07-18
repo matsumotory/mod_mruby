@@ -34,7 +34,11 @@ mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
     for (i = 0; i < mruby_server_limit; ++i) {
         for (j = 0; j < mruby_thread_limit; ++j) {
+#ifdef __APACHE24__
+            ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
+#else
             ws_record = ap_get_scoreboard_worker(i, j);
+#endif
             if ((int)ws_record->pid == (int)pid)
                 return mrb_fixnum_value((int)ws_record->access_count);
         }
@@ -54,7 +58,11 @@ mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
 
     for (i = 0; i < mruby_server_limit; ++i) {
         for (j = 0; j < mruby_thread_limit; ++j) {
+#ifdef __APACHE24__
+            ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
+#else
             ws_record = ap_get_scoreboard_worker(i, j);
+#endif
 
             switch (ws_record->status) {
                 case SERVER_BUSY_READ:
@@ -129,7 +137,11 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
 
     for (i = 0; i < mruby_server_limit; ++i) {
         for (j = 0; j < mruby_thread_limit; ++j) {
+#ifdef __APACHE24__
+            ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
+#else
             ws_record = ap_get_scoreboard_worker(i, j);
+#endif
 
             switch (ws_record->status) {
                 case SERVER_BUSY_READ:
