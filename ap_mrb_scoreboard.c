@@ -5,7 +5,122 @@
 #include "ap_mpm.h"
 #include <unistd.h>
 
+#define KBYTE 1024
+#define MBYTE 1048576L
+#define GBYTE 1073741824L
+
+#ifdef __APACHE24__
+#define ap_get_scoreboard_worker ap_get_scoreboard_worker_from_indexes
+#endif
+
 static int mruby_server_limit, mruby_thread_limit;
+
+static apr_off_t sb_get_kbcount();
+static unsigned long sb_get_access_count();
+static apr_time_t sb_get_restart_time();
+static apr_interval_time_t sb_get_uptime();
+
+static apr_time_t sb_get_restart_time()
+{
+    if (!ap_extended_status)
+        return 0;
+    return ap_scoreboard_image->global->restart_time;
+}
+
+static apr_interval_time_t sb_get_uptime()
+{
+    apr_time_t nowtime;
+    apr_interval_time_t up_time;
+
+    if (!ap_extended_status)
+        return 0;
+
+    nowtime = apr_time_now();
+    up_time = (apr_uint32_t)apr_time_sec(nowtime - ap_scoreboard_image->global->restart_time);
+
+    return up_time;
+}
+
+static apr_off_t sb_get_kbcount()
+{
+    int i, j, res;
+    unsigned long lres;
+    apr_off_t bytes;
+    apr_off_t bcount, kbcount;
+
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
+
+    worker_score *ws_record;
+    process_score *ps_record;
+
+    bcount = 0;
+    kbcount = 0;
+
+   if (!ap_extended_status)
+        return kbcount;
+
+    for (i = 0; i < mruby_server_limit; ++i) {
+        ps_record = ap_get_scoreboard_process(i);
+        for (j = 0; j < mruby_thread_limit; ++j) {
+
+            ws_record = ap_get_scoreboard_worker(i, j);
+
+            res = ws_record->status;
+
+            lres = ws_record->access_count;
+            bytes = ws_record->bytes_served;
+
+            if (lres != 0 || (res != SERVER_READY && res != SERVER_DEAD)) {
+                bcount += bytes;
+
+                if (bcount >= KBYTE) {
+                    kbcount += (bcount >> 10);
+                    bcount = bcount & 0x3ff;
+                }
+            }
+        }
+    }
+    return kbcount;
+}
+
+static unsigned long sb_get_access_count()
+{
+    int i, j, res;
+    unsigned long count;
+    unsigned long lres;
+
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
+
+    worker_score *ws_record;
+    process_score *ps_record;
+
+    count = 0;
+
+   if (!ap_extended_status)
+        return count;
+
+    for (i = 0; i < mruby_server_limit; ++i) {
+        ps_record = ap_get_scoreboard_process(i);
+        for (j = 0; j < mruby_thread_limit; ++j) {
+
+            ws_record = ap_get_scoreboard_worker(i, j);
+
+            res = ws_record->status;
+            lres = ws_record->access_count;
+
+            if (lres != 0 || (res != SERVER_READY && res != SERVER_DEAD))
+                count += lres;
+        }
+    }
+    return count;
+}
+
+mrb_value ap_mrb_get_scoreboard_restart_time(mrb_state *mrb, mrb_value str)
+{
+    return mrb_float_value((mrb_float)sb_get_restart_time());
+}
 
 mrb_value ap_mrb_get_scoreboard_pid(mrb_state *mrb, mrb_value str)
 {
@@ -34,16 +149,29 @@ mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
     for (i = 0; i < mruby_server_limit; ++i) {
         for (j = 0; j < mruby_thread_limit; ++j) {
-#ifdef __APACHE24__
-            ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
-#else
+
             ws_record = ap_get_scoreboard_worker(i, j);
-#endif
+
             if ((int)ws_record->pid == (int)pid)
-                return mrb_fixnum_value((int)ws_record->access_count);
+                return mrb_fixnum_value((mrb_int)ws_record->access_count);
         }
     }
     return mrb_fixnum_value(-1);
+}
+
+mrb_value ap_mrb_get_scoreboard_uptime(mrb_state *mrb, mrb_value str)
+{
+    return mrb_float_value((mrb_float)sb_get_uptime());
+}
+
+mrb_value ap_mrb_get_scoreboard_total_kbyte(mrb_state *mrb, mrb_value str)
+{
+    return mrb_float_value((mrb_float)sb_get_kbcount());
+}
+
+mrb_value ap_mrb_get_scoreboard_total_access(mrb_state *mrb, mrb_value str)
+{
+    return mrb_float_value((mrb_float)sb_get_access_count());
 }
 
 mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
@@ -58,11 +186,8 @@ mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
 
     for (i = 0; i < mruby_server_limit; ++i) {
         for (j = 0; j < mruby_thread_limit; ++j) {
-#ifdef __APACHE24__
-            ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
-#else
+
             ws_record = ap_get_scoreboard_worker(i, j);
-#endif
 
             switch (ws_record->status) {
                 case SERVER_BUSY_READ:
@@ -137,11 +262,8 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
 
     for (i = 0; i < mruby_server_limit; ++i) {
         for (j = 0; j < mruby_thread_limit; ++j) {
-#ifdef __APACHE24__
-            ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
-#else
+
             ws_record = ap_get_scoreboard_worker(i, j);
-#endif
 
             switch (ws_record->status) {
                 case SERVER_BUSY_READ:
