@@ -125,6 +125,8 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_scoreboard, "total_access", ap_mrb_get_scoreboard_total_access, ARGS_ANY());
     mrb_define_method(mrb, class_scoreboard, "uptime", ap_mrb_get_scoreboard_uptime, ARGS_ANY());
     mrb_define_method(mrb, class_scoreboard, "restart_time", ap_mrb_get_scoreboard_restart_time, ARGS_ANY());
+    mrb_define_method(mrb, class_scoreboard, "idle_worker", ap_mrb_get_scoreboard_idle_worker, ARGS_ANY());
+    mrb_define_method(mrb, class_scoreboard, "busy_worker", ap_mrb_get_scoreboard_process_worker, ARGS_ANY());
 
     class_conn = mrb_define_class_under(mrb, class, "Connection", mrb->object_class);
     mrb_define_method(mrb, class_conn, "remote_ip", ap_mrb_get_conn_remote_ip, ARGS_NONE());

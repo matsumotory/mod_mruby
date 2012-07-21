@@ -19,6 +19,8 @@ static apr_off_t sb_get_kbcount();
 static unsigned long sb_get_access_count();
 static apr_time_t sb_get_restart_time();
 static apr_interval_time_t sb_get_uptime();
+static int sb_get_idle_worker();
+static int sb_get_process_worker();
 
 static apr_time_t sb_get_restart_time()
 {
@@ -39,6 +41,63 @@ static apr_interval_time_t sb_get_uptime()
     up_time = (apr_uint32_t)apr_time_sec(nowtime - ap_scoreboard_image->global->restart_time);
 
     return up_time;
+}
+
+static int sb_get_process_worker()
+{
+    int i, j, res;
+    worker_score *ws_record;
+    process_score *ps_record;
+
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
+
+    int process = 0;
+    if (!ap_extended_status)
+        return process;
+
+    for (i = 0; i < mruby_server_limit; ++i) {
+        ps_record = ap_get_scoreboard_process(i);
+        for (j = 0; j < mruby_thread_limit; ++j) {
+            ws_record = ap_get_scoreboard_worker(i, j);
+            res = ws_record->status;
+            if (!ps_record->quiescing && ps_record->pid) {
+                if (res != SERVER_DEAD && res != SERVER_STARTING && res != SERVER_IDLE_KILL)
+                    process++;
+            }
+        }
+    }
+
+    return process;
+}
+
+static int sb_get_idle_worker()
+{
+    int i, j, res;
+    unsigned long lres;
+    worker_score *ws_record;
+    process_score *ps_record;
+
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
+
+    int idle = 0;
+    if (!ap_extended_status)
+        return idle;
+
+    for (i = 0; i < mruby_server_limit; ++i) {
+        ps_record = ap_get_scoreboard_process(i);
+        for (j = 0; j < mruby_thread_limit; ++j) {
+            ws_record = ap_get_scoreboard_worker(i, j);
+            res = ws_record->status;
+            if (!ps_record->quiescing && ps_record->pid) {
+                if (res == SERVER_READY && ps_record->generation == ap_my_generation)
+                    idle++;
+            }
+        }
+    }
+
+    return idle;
 }
 
 static apr_off_t sb_get_kbcount()
@@ -115,6 +174,16 @@ static unsigned long sb_get_access_count()
         }
     }
     return count;
+}
+
+mrb_value ap_mrb_get_scoreboard_idle_worker(mrb_state *mrb, mrb_value str)
+{
+    return mrb_fixnum_value((mrb_int)sb_get_idle_worker());
+}
+
+mrb_value ap_mrb_get_scoreboard_process_worker(mrb_state *mrb, mrb_value str)
+{
+    return mrb_fixnum_value((mrb_int)sb_get_process_worker());
 }
 
 mrb_value ap_mrb_get_scoreboard_restart_time(mrb_state *mrb, mrb_value str)
