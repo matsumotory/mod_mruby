@@ -62,7 +62,9 @@ static int sb_get_process_worker()
             ws_record = ap_get_scoreboard_worker(i, j);
             res = ws_record->status;
             if (!ps_record->quiescing && ps_record->pid) {
-                if (res != SERVER_DEAD && res != SERVER_STARTING && res != SERVER_IDLE_KILL)
+                if (res == SERVER_READY && ps_record->generation == ap_my_generation)
+                    continue;
+                else if (res != SERVER_DEAD && res != SERVER_STARTING && res != SERVER_IDLE_KILL)
                     process++;
             }
         }
@@ -74,7 +76,6 @@ static int sb_get_process_worker()
 static int sb_get_idle_worker()
 {
     int i, j, res;
-    unsigned long lres;
     worker_score *ws_record;
     process_score *ps_record;
 
