@@ -4,7 +4,8 @@
 ##
 
 # target module source
-TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server.c ap_mrb_connection.c ap_mrb_init.c ap_mrb_scoreboard.c
+#TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server.c ap_mrb_connection.c ap_mrb_init.c ap_mrb_scoreboard.c
+TARGET=mod_mruby.c ap_mrb_*.c
 
 #   the used tools
 # use apache 2.2
