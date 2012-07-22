@@ -19,13 +19,13 @@ APACHECTL=/etc/init.d/httpd
 #   additional user defines, includes and libraries
 #INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include -I/usr/include/json
 #LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o -lm /usr/lib/libjson.la
-INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include
-LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o
+INC=-I. -I./vendors/src -I./vendors/include
+LIB=-lm ./vendors/lib/libmruby.a -lm ./vendors/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration
 CFLAGS = $(INC) $(LIB) $(WC)
 
 #   the default target
-all: mod_mruby.so
+all: libmruby.a mod_mruby.so
 
 #   compile the DSO file
 mod_mruby.so: $(TARGET)
@@ -38,7 +38,7 @@ install: all
 
 #   cleanup
 clean:
-	-rm -rf .libs *.o *.so *.lo *.la *.slo *.loT
+	-rm -rf .libs *.o *.so *.lo *.la *.slo *.loT tmp vendors
 
 #   reload the module by installing and restarting Apache
 reload: install restart
@@ -50,4 +50,16 @@ restart:
 	$(APACHECTL) restart
 stop:
 	$(APACHECTL) stop
+
+# libmruby.a
+tmp/mruby:
+	mkdir -p tmp/mruby vendors
+	cd tmp; git clone https://github.com/mruby/mruby.git
+
+libmruby.a: tmp/mruby
+	cd tmp/mruby && make
+	cp -r tmp/mruby/include vendors/
+	cp -r tmp/mruby/lib vendors/
+	cp -r tmp/mruby/bin vendors/
+	cp -r tmp/mruby/mrblib vendors/
 
