@@ -6,20 +6,16 @@ backends = [
 ]
  
 sb = Apache::Scoreboard.new()
-idle = sb.idle_worker
-busy = sb.busy_worker
-all = sb.process_limit * sb.worker_limit
+busyrate = sb.busy_worker / (sb.process_limit * sb.worker_limit)
 
-busylate = busy / all
-
-if busylate * 100 > 50
-    proxy_late = backends.length - 2
-else if busylate * 100 > 70
-    proxy_late = backends.length - 1
-else if busylate * 100 > 90
-    proxy_late = backends.length
+if busyrate * 100 > 50
+    proxy_rate = backends.length - 2
+else if busyrate * 100 > 70
+    proxy_rate = backends.length - 1
+else if busyrate * 100 > 90
+    proxy_rate = backends.length
 else
-    proxy_late = backends.length - 3
+    proxy_rate = backends.length - 3
 end
  
 r = Apache::Request.new()
