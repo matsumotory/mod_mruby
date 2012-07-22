@@ -17,7 +17,7 @@ class Worker
             false
         end
     end
-    def countcheck
+    def accesscheck
         accesspsec = @sb.total_access / @sb.uptime
         Apache.errlogger(4, "access per sec: " + accesspsec.to_s)
         if accesspsec > @mycount
@@ -32,7 +32,7 @@ end
 w = Worker.new(90, 1000)
 if w.busycheck
     Apache::return(Apache::HTTP_SERVICE_UNAVAILABLE)
-elsif w.countcheck
+elsif w.accesscheck
     Apache::return(Apache::HTTP_SERVICE_UNAVAILABLE)
 else
     Apache::return(Apache::DECLINED)
