@@ -49,6 +49,11 @@ static int sb_get_process_worker()
     worker_score *ws_record;
     process_score *ps_record;
 
+#ifdef __APACHE24__
+    ap_generation_t ap_my_generation;
+    ap_mpm_query(AP_MPMQ_GENERATION, &ap_my_generation);
+#endif
+
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
 
@@ -78,6 +83,11 @@ static int sb_get_idle_worker()
     int i, j, res;
     worker_score *ws_record;
     process_score *ps_record;
+
+#ifdef __APACHE24__
+    ap_generation_t ap_my_generation;
+    ap_mpm_query(AP_MPMQ_GENERATION, &ap_my_generation);
+#endif
 
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
