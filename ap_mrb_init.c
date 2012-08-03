@@ -12,6 +12,7 @@ struct RClass *class_server;
 struct RClass *class_conn;
 struct RClass *class_headers_in;
 struct RClass *class_headers_out;
+struct RClass *class_notes;
 struct RClass *class_scoreboard;
 
 int ap_mruby_class_init(mrb_state *mrb)
@@ -177,6 +178,10 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "handler", ap_mrb_get_request_handler, ARGS_NONE());
     mrb_define_method(mrb, class_request, "content_encoding=", ap_mrb_set_request_content_encoding, ARGS_ANY());
     mrb_define_method(mrb, class_request, "content_encoding", ap_mrb_get_request_content_encoding, ARGS_NONE());
+
+    class_notes = mrb_define_class_under(mrb, class, "Notes", mrb->object_class);
+    mrb_define_method(mrb, class_notes, "[]=", ap_mrb_set_request_notes, ARGS_ANY());
+    mrb_define_method(mrb, class_notes, "[]", ap_mrb_get_request_notes, ARGS_ANY());
 
     //class_headers_in = mrb_define_class(mrb, "headers_in", class_request);
     class_headers_in = mrb_define_class_under(mrb, class, "Headers_in", mrb->object_class);

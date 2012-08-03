@@ -52,6 +52,12 @@ Apache.rputs("local_ip = "+ c.local_ip + "<br>")
 Apache.rputs("keepalives = "+ c.keepalives.to_s + "<br>")
 Apache.rputs("<br>")
 
+Apache.rputs("<b>Notes Class Test</b><br>")
+n = Apache::Notes.new()
+n["memo"] = "hello"
+Apache.rputs("memo = " + n["memo"] + "<br>")
+Apache.rputs("<br>")
+
 Apache.rputs("<b>Headers_in Class Test</b><br>")
 hi = Apache::Headers_in.new()
 Apache.rputs("Accept-Encoding = " + hi["Accept-Encoding"] + "<br>")
