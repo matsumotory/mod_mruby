@@ -60,7 +60,7 @@ Apache.rputs("<br>")
 
 Apache.rputs("<b>Headers_in Class Test</b><br>")
 hi = Apache::Headers_in.new()
-Apache.rputs("Accept-Encoding = " + hi["Accept-Encoding"] + "<br>")
+Apache.rputs("Accept-Encoding = " + (hi["Accept-Encoding"].nil? ? "nil" : hi["Accept-Encoding"]) + "<br>")
 hi["Accept-Encoding"] = "gzip"
 Apache.rputs("Accept-Encoding = " + hi["Accept-Encoding"] + "<br>")
 hiall = hi.headers_in_hash
