@@ -28,13 +28,16 @@ CFLAGS = $(INC) $(LIB) $(WC)
 #   the default target
 all: libmruby.a mod_mruby.so
 
+#   build for iij extended lib
+extend: libmruby-ex.a mod_mruby.so
+
 #   compile the DSO file
 mod_mruby.so: $(TARGET)
 	$(APXS) -c $(DEF) $(CFLAGS) $(TARGET)
 
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
-install: all
+install:
 	$(APXS) -i -a -n 'mruby' .libs/mod_mruby.so
 
 #   cleanup
@@ -61,6 +64,19 @@ libmruby.a: tmp/mruby
 	cd tmp/mruby && make
 	cp -r tmp/mruby/include vendors/
 	cp -r tmp/mruby/lib vendors/
+	cp -r tmp/mruby/src vendors/
 	cp -r tmp/mruby/bin vendors/
 	cp -r tmp/mruby/mrblib vendors/
 
+# libmruby.a (+iij extended lib)
+tmp/mruby-ex:
+	mkdir -p tmp/mruby vendors
+	cd tmp; git clone git://github.com/iij/mruby.git
+
+libmruby-ex.a: tmp/mruby-ex
+	cd tmp/mruby && make
+	cp -r tmp/mruby/include vendors/
+	cp -r tmp/mruby/lib vendors/
+	cp -r tmp/mruby/src vendors/
+	cp -r tmp/mruby/bin vendors/
+	cp -r tmp/mruby/mrblib vendors/
