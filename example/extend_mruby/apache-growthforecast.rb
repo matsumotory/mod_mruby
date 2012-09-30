@@ -294,23 +294,22 @@ class HttpRequest
   end
 end
 
-host    = ""
+host    = "example.com"
 port    = "5125"
 
 service = "apache"
 section = "scoreboad"
 gragh   = "worker"
 
-http       = HttpRequest.new()
-score      = Apache::Scoreboard.new()
 headers_in = Apache::Headers_in.new()
 url        = sprintf("http://%s:%s/api/%s/%s/%s", host, port, service, section, gragh)
 
 if headers_in["X-PushStatus"]
-  Apache.rputs("X-PushStatus = " + headers_in["X-PushStatus"].to_s + "<br>")
+  http       = HttpRequest.new()
+  score      = Apache::Scoreboard.new()
+
   response = http.post(url, {
     :number => score.busy_worker,
     :color  => "#333399"
   })
-  Apache.rputs("response = " + response.body)
 end
