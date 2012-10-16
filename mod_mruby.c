@@ -925,6 +925,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         //mrb = mod_mruby_share_state;
 
         p = mrb_parse_file(mrb, mrb_file, NULL);
+        fclose(mrb_file);
         n = mrb_generate_code(mrb, p);
 
 #ifdef __MOD_MRUBY_SHARED_CACHE_TABLE__
@@ -1040,9 +1041,9 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
     mod_mruby_share_state = mrb_open();
     ap_mruby_class_init(mod_mruby_share_state);
 
-    struct mrb_parser_state* p;
 
     if (conf->mod_mruby_handler_code_native != NULL) {
+        struct mrb_parser_state* p;
         p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_handler_code_native, NULL);
         conf->mod_mruby_handler_code_native_n = mrb_generate_code(mod_mruby_share_state, p);
         mrb_pool_close(p->pool);
