@@ -17,6 +17,8 @@
 
 typedef struct {
 
+    int mod_mruby_handler_code_native_n;
+    const char *mod_mruby_handler_code_native;
     const char *mod_mruby_handler_code;
     const char *mod_mruby_post_read_request_first_code;
     const char *mod_mruby_post_read_request_middle_code;

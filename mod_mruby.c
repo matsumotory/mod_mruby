@@ -84,6 +84,8 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
     mruby_config_t *conf = 
         (mruby_config_t *) apr_pcalloc(p, sizeof (*conf));
 
+    conf->mod_mruby_handler_code_native_n           = -1;
+    conf->mod_mruby_handler_code_native             = NULL;
     conf->mod_mruby_handler_code                    = NULL;
     conf->mod_mruby_post_read_request_first_code    = NULL;
     conf->mod_mruby_post_read_request_middle_code   = NULL;
@@ -131,6 +133,21 @@ static const char *set_mod_mruby_handler(cmd_parms *cmd, void *mconfig, const ch
         return err;
 
     conf->mod_mruby_handler_code = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_handler_code(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_handler_code_native = apr_pstrdup(cmd->pool, arg);
 
     return NULL;
 }
@@ -1023,6 +1040,24 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
     mod_mruby_share_state = mrb_open();
     ap_mruby_class_init(mod_mruby_share_state);
 
+    struct mrb_parser_state* p;
+
+    if (conf->mod_mruby_handler_code_native != NULL) {
+        p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_handler_code_native, NULL);
+        conf->mod_mruby_handler_code_native_n = mrb_generate_code(mod_mruby_share_state, p);
+        mrb_pool_close(p->pool);
+        ap_log_perror(APLOG_MARK
+            , APLOG_NOTICE
+            , 0
+            , pool
+            , "%s NOTICE %s: native code compiled: code=(%s) n=%d"
+            , MODULE_NAME
+            , __func__
+            , conf->mod_mruby_handler_code_native
+            , conf->mod_mruby_handler_code_native_n
+        );
+    }
+ 
     if (conf->mruby_cache_table_size > 0) {
         for (i = 0; i < conf->mruby_cache_table_size; i++) {
             mod_mruby_cache_table->cache_code_slot[i].filename   = NULL;
@@ -1050,6 +1085,33 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
         , __func__
         , getpid()
     );
+}
+
+
+static int mod_mruby_handler_code(request_rec *r)
+{
+
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+
+    if (strcmp(r->handler, "mruby-native-script") != 0)
+        return DECLINED;
+
+    ap_mrb_push_request(r);
+    mrb_run(mod_mruby_share_state
+        , mrb_proc_new(mod_mruby_share_state, mod_mruby_share_state->irep[conf->mod_mruby_handler_code_native_n])
+        , mrb_top_self(mod_mruby_share_state)
+    );
+
+        ap_log_perror(APLOG_MARK
+            , APLOG_NOTICE
+            , 0
+            , r->pool
+            , "%s NOTICE %s: naitve code execed."
+            , MODULE_NAME
+            , __func__
+        );
+    
+    return OK;
 }
 
 
@@ -1374,6 +1436,7 @@ static void register_hooks(apr_pool_t *p)
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_child_init(mod_mruby_child_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_handler(mod_mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
+    ap_hook_handler(mod_mruby_handler_code, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_post_read_request(mod_mruby_post_read_request_first, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_post_read_request(mod_mruby_post_read_request_middle, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_post_read_request(mod_mruby_post_read_request_last, NULL, NULL, APR_HOOK_LAST);
@@ -1410,6 +1473,7 @@ static void register_hooks(apr_pool_t *p)
 static const command_rec mod_mruby_cmds[] = {
 
     AP_INIT_TAKE1("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
+    AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_code, NULL, RSRC_CONF | ACCESS_CONF, "hook code for handler phase."),
     AP_INIT_TAKE1("mrubyPostReadRequestFirst", set_mod_mruby_post_read_request_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request first phase."),
     AP_INIT_TAKE1("mrubyPostReadRequestMiddle", set_mod_mruby_post_read_request_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request middle phase."),
     AP_INIT_TAKE1("mrubyPostReadRequestLast", set_mod_mruby_post_read_request_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request last phase."),
