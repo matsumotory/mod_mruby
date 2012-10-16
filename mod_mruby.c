@@ -896,7 +896,11 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         }
     }
 
+    int ai = mrb_gc_arena_save(mrb);
+
     if (!cache_hit) {
+
+
         if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
             ap_log_error(APLOG_MARK
                 , APLOG_ERR
@@ -1011,6 +1015,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
 
     ap_mrb_set_status_code(OK);
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
+    mrb_gc_arena_restore(mrb, ai);
 
     ap_log_rerror(APLOG_MARK
         , APLOG_DEBUG

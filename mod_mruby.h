@@ -14,7 +14,6 @@
 #include "http_log.h"
 #include "ap_release.h"
 
-
 typedef struct {
 
     int mod_mruby_handler_code_native_n;
