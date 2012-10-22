@@ -1521,6 +1521,6 @@ module AP_MODULE_DECLARE_DATA mruby_module = {
     NULL,                      /* dir merger */
     mod_mruby_create_config,   /* server config */
     NULL,                      /* merge server config */
-    mod_mruby_cmds,                /* command apr_table_t */
+    mod_mruby_cmds,            /* command apr_table_t */
     register_hooks             /* register hooks */
 };

@@ -32,11 +32,13 @@ int ap_mrb_get_status_code()
     return mod_mruby_return_code;
 }
 
+
 int ap_mrb_set_status_code(int val)
 {
     mod_mruby_return_code = val;
     return 0;
 }
+
 
 mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
 {
@@ -49,16 +51,19 @@ mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+
 mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
 {
     return mrb_str_new(mrb, MODULE_VERSION, strlen(MODULE_VERSION));
 }
+
 
 mrb_value ap_mrb_get_apache_version(mrb_state *mrb, mrb_value str)
 {
     return mrb_str_new(mrb, AP_SERVER_BASEREVISION, strlen(AP_SERVER_BASEREVISION));
 }
 
+/*
 mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
 {
 
@@ -69,6 +74,7 @@ mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
 
     return str;
 }
+*/
 
 mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
 {
@@ -93,6 +99,7 @@ mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
 
     return str;
 }
+
 
 mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
 {   
@@ -148,5 +155,4 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
 #endif
 
     return str;
-
 }

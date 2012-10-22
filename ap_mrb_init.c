@@ -83,12 +83,12 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_const(mrb, class, "PROXYREQ_PROXY", mrb_fixnum_value(PROXYREQ_PROXY));
     mrb_define_const(mrb, class, "PROXYREQ_REVERSE", mrb_fixnum_value(PROXYREQ_REVERSE));
     mrb_define_const(mrb, class, "PROXYREQ_RESPONSE", mrb_fixnum_value(PROXYREQ_RESPONSE));
-    mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
+    //mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
     mrb_define_class_method(mrb, class, "return", ap_mrb_return, ARGS_ANY());
     mrb_define_class_method(mrb, class, "errlogger", ap_mrb_errlogger, ARGS_ANY());
     mrb_define_class_method(mrb, class, "syslogger", ap_mrb_syslogger, ARGS_ANY());
-    mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
+    //mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
     mrb_define_class_method(mrb, class, "mod_mruby_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
     mrb_define_class_method(mrb, class, "apache_version", ap_mrb_get_apache_version, ARGS_NONE());
 

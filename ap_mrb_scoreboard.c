@@ -403,4 +403,3 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
 
     return hash;
 }
-

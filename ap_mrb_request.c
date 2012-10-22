@@ -438,7 +438,11 @@ mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, mrb_value str)
     const apr_array_header_t *arr = apr_table_elts(r->headers_in);
     apr_table_entry_t *elts = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
-        mrb_hash_set(mrb, hash, mrb_str_new(mrb, elts[i].key, strlen(elts[i].key)), mrb_str_new(mrb, elts[i].val, strlen(elts[i].val)));
+        mrb_hash_set(mrb
+            , hash
+            , mrb_str_new(mrb, elts[i].key, strlen(elts[i].key))
+            , mrb_str_new(mrb, elts[i].val, strlen(elts[i].val))
+        );
     }
     return hash;
 }
@@ -471,7 +475,11 @@ mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str)
     const apr_array_header_t *arr = apr_table_elts(r->headers_out);
     apr_table_entry_t *elts = (apr_table_entry_t *)arr->elts;
     for (i = 0; i < arr->nelts; i++) {
-        mrb_hash_set(mrb, hash, mrb_str_new(mrb, elts[i].key, strlen(elts[i].key)), mrb_str_new(mrb, elts[i].val, strlen(elts[i].val)));
+        mrb_hash_set(mrb
+            , hash
+            , mrb_str_new(mrb, elts[i].key, strlen(elts[i].key))
+            , mrb_str_new(mrb, elts[i].val, strlen(elts[i].val))
+        );
     }
     return hash;
 }
