@@ -56,8 +56,8 @@ stop:
 
 # libmruby.a
 tmp/mruby:
-	mkdir -p tmp/mruby vendors
-	cd tmp; git clone https://github.com/mruby/mruby.git
+	mkdir -p tmp vendors
+	cd tmp; git clone git://github.com/mruby/mruby.git
 
 libmruby.a: tmp/mruby
 	cd tmp/mruby && make
@@ -69,7 +69,7 @@ libmruby.a: tmp/mruby
 
 # libmruby.a (+iij extended lib)
 tmp/mruby-ex:
-	mkdir -p tmp/mruby vendors
+	mkdir -p tmp vendors
 	cd tmp; git clone git://github.com/iij/mruby.git
 
 libmruby-ex.a: tmp/mruby-ex
