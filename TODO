@@ -1,15 +1,1 @@
-cache_table fix.
-
-add expire time on cache_table.
-
-add stat check on cache_table.
-
-discuss cache_table on shared memory.
-
-ap_mruby_run fix.
-
-change function pointer
-
-implement extended library which was written by IIJ to mod_mruby.
-
 implement bucket and bridgage.
