@@ -85,6 +85,9 @@ wc = Apache::Scoreboard.new()
 Apache.rputs("child pid = " + wc.pid.to_s + "<br>")
 Apache.rputs("thread limit = " + wc.thread_limit.to_s + "<br>")
 Apache.rputs("server limit = " + wc.server_limit.to_s + "<br>")
+if wc.restart_time == 0
+  Apache.rputs("<font color=red><b>Cannot get below values of scoreboard because of ExtendedStatus Off.</b></font><br>")
+end
 Apache.rputs("total kbyte = " + wc.total_kbyte.to_s + "<br>")
 Apache.rputs("total access = " + wc.total_access.to_s + "<br>")
 Apache.rputs("restart time = " + wc.restart_time.to_s + "<br>")
