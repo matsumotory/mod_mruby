@@ -10,10 +10,12 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 
 
 ### 2. Compile
 * using mruby/murby
+
     make
 
 
 * using iij/mruby
+
     make extend
 
 
