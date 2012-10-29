@@ -33,7 +33,6 @@
 #include "http_log.h"
 #include "http_protocol.h"
 #include "http_request.h"
-#include "util_script.h"
 
 #include "apr_global_mutex.h"
 #ifndef _WIN32

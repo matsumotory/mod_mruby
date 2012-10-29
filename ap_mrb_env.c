@@ -1,5 +1,6 @@
 #include "ap_mrb_env.h"
 #include "mruby/hash.h"
+#include "util_script.h"
 
 mrb_value ap_mrb_init_env(mrb_state *mrb, mrb_value self)
 {
