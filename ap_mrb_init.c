@@ -186,6 +186,7 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_notes, "[]", ap_mrb_get_request_notes, ARGS_ANY());
 
     class_env = mrb_define_class_under(mrb, class, "Env", mrb->object_class);
+    mrb_define_method(mrb, class_env, "initialize", ap_mrb_init_env, ARGS_NONE());
     mrb_define_method(mrb, class_env, "[]=", ap_mrb_set_env, ARGS_ANY());
     mrb_define_method(mrb, class_env, "[]", ap_mrb_get_env, ARGS_ANY());
     mrb_define_method(mrb, class_env, "env_hash", ap_mrb_get_env_hash, ARGS_NONE());

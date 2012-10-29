@@ -824,9 +824,6 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     FILE *mrb_file;
     int cache_hit = 0;
 
-    ap_add_common_vars(r);
-    ap_add_cgi_vars(r);
-
     cache_table_t *cache_table_data;
 #ifdef __MOD_MRUBY_SHARED_CACHE_TABLE__
     cache_table_data = shm_table_data_base;

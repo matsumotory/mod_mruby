@@ -1,6 +1,17 @@
 #include "ap_mrb_env.h"
 #include "mruby/hash.h"
 
+mrb_value ap_mrb_init_env(mrb_state *mrb, mrb_value self)
+{
+    request_rec *r = ap_mrb_get_request();
+    ap_add_common_vars(r);
+    ap_add_cgi_vars(r);
+    ap_mrb_push_request(r);
+
+    return self;
+}
+
+
 mrb_value ap_mrb_set_env(mrb_state *mrb, mrb_value str)
 {
     mrb_value key, val;
