@@ -8,7 +8,7 @@ mrb_value ap_mrb_set_env(mrb_state *mrb, mrb_value str)
     request_rec *r = ap_mrb_get_request();
     apr_table_t *e = r->subprocess_env;
     //putenv(apr_psprintf(r->pool, "%s=%s", RSTRING_PTR(key), RSTRING_PTR(val)));
-    apr_table_addn(e, RSTRING_PTR(key), RSTRING_PTR(val));
+    apr_table_setn(e, RSTRING_PTR(key), RSTRING_PTR(val));
     return val;
 }
 
