@@ -58,6 +58,13 @@ n["memo"] = "hello"
 Apache.rputs("memo = " + n["memo"] + "<br>")
 Apache.rputs("<br>")
 
+Apache.rputs("<b>Env Class Test</b><br>")
+e = Apache::Env.new()
+e["AUTHOR"] = "MATSUMOTO Ryosuke"
+Apache.rputs("AUTHOR = " + e["AUTHOR"] + "<br>")
+Apache.rputs("LANG = " + (e["LANG"].nil? ? "nil" : e["LANG"]) + "<br>")
+Apache.rputs("<br>")
+
 Apache.rputs("<b>Headers_in Class Test</b><br>")
 hi = Apache::Headers_in.new()
 Apache.rputs("Accept-Encoding = " + (hi["Accept-Encoding"].nil? ? "nil" : hi["Accept-Encoding"]) + "<br>")

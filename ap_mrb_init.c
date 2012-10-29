@@ -4,6 +4,7 @@
 #include "ap_mrb_connection.h"
 #include "ap_mrb_utils.h"
 #include "ap_mrb_string.h"
+#include "ap_mrb_env.h"
 #include "ap_mrb_scoreboard.h"
 
 struct RClass *class;
@@ -12,6 +13,7 @@ struct RClass *class_server;
 struct RClass *class_conn;
 struct RClass *class_headers_in;
 struct RClass *class_headers_out;
+struct RClass *class_env;
 struct RClass *class_notes;
 struct RClass *class_scoreboard;
 
@@ -83,7 +85,7 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_const(mrb, class, "PROXYREQ_PROXY", mrb_fixnum_value(PROXYREQ_PROXY));
     mrb_define_const(mrb, class, "PROXYREQ_REVERSE", mrb_fixnum_value(PROXYREQ_REVERSE));
     mrb_define_const(mrb, class, "PROXYREQ_RESPONSE", mrb_fixnum_value(PROXYREQ_RESPONSE));
-    //mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
+    mrb_define_class_method(mrb, class, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class, "rputs", ap_mrb_rputs, ARGS_ANY());
     mrb_define_class_method(mrb, class, "return", ap_mrb_return, ARGS_ANY());
     mrb_define_class_method(mrb, class, "errlogger", ap_mrb_errlogger, ARGS_ANY());
@@ -183,19 +185,26 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_notes, "[]=", ap_mrb_set_request_notes, ARGS_ANY());
     mrb_define_method(mrb, class_notes, "[]", ap_mrb_get_request_notes, ARGS_ANY());
 
+    class_env = mrb_define_class_under(mrb, class, "Env", mrb->object_class);
+    mrb_define_method(mrb, class_env, "[]=", ap_mrb_set_env, ARGS_ANY());
+    mrb_define_method(mrb, class_env, "[]", ap_mrb_get_env, ARGS_ANY());
+
     //class_headers_in = mrb_define_class(mrb, "headers_in", class_request);
     class_headers_in = mrb_define_class_under(mrb, class, "Headers_in", mrb->object_class);
     mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "headers_in_hash", ap_mrb_get_request_headers_in_hash, ARGS_ANY());
+
     //mrb_define_method(mrb, class_request, "[]=", ap_mrb_set_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "[]", ap_mrb_get_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_in=", ap_mrb_set_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_in", ap_mrb_get_request_readers_in, ARGS_ANY());
+
     class_headers_out = mrb_define_class_under(mrb, class, "Headers_out", mrb->object_class);
     mrb_define_method(mrb, class_headers_out, "headers_out=", ap_mrb_set_request_headers_out, ARGS_ANY());
     mrb_define_method(mrb, class_headers_out, "headers_out", ap_mrb_get_request_headers_out, ARGS_ANY());
     mrb_define_method(mrb, class_headers_out, "headers_out_hash", ap_mrb_get_request_headers_out_hash, ARGS_ANY());
+
     //mrb_define_method(mrb, class_request, "headers_out=", ap_mrb_set_request_readers_out, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_out", ap_mrb_get_request_readers_out, ARGS_ANY());
 
