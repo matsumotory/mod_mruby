@@ -16,3 +16,7 @@
 GPATH
 GRTAGS
 GTAGS
+
+# dir for compiling
+tmp
+vendors
