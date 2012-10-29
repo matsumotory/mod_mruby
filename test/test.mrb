@@ -62,7 +62,7 @@ Apache.rputs("<b>Env Class Test</b><br>")
 e = Apache::Env.new()
 e["AUTHOR"] = "MATSUMOTO Ryosuke"
 Apache.rputs("AUTHOR = " + e["AUTHOR"] + "<br>")
-Apache.rputs("LANG = " + (e["LANG"].nil? ? "nil" : e["LANG"]) + "<br>")
+Apache.rputs("REMOTE_ADDR = " + (e["REMOTE_ADDR"].nil? ? "nil" : e["REMOTE_ADDR"]) + "<br>")
 Apache.rputs("<br>")
 
 Apache.rputs("<b>Headers_in Class Test</b><br>")
