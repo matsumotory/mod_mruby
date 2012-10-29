@@ -33,6 +33,7 @@
 #include "http_log.h"
 #include "http_protocol.h"
 #include "http_request.h"
+#include "util_script.h"
 
 #include "apr_global_mutex.h"
 #ifndef _WIN32
@@ -822,6 +823,9 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     struct stat st;
     FILE *mrb_file;
     int cache_hit = 0;
+
+    ap_add_common_vars(r);
+    ap_add_cgi_vars(r);
 
     cache_table_t *cache_table_data;
 #ifdef __MOD_MRUBY_SHARED_CACHE_TABLE__

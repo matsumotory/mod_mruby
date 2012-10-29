@@ -188,6 +188,7 @@ int ap_mruby_class_init(mrb_state *mrb)
     class_env = mrb_define_class_under(mrb, class, "Env", mrb->object_class);
     mrb_define_method(mrb, class_env, "[]=", ap_mrb_set_env, ARGS_ANY());
     mrb_define_method(mrb, class_env, "[]", ap_mrb_get_env, ARGS_ANY());
+    mrb_define_method(mrb, class_env, "env_hash", ap_mrb_get_env_hash, ARGS_NONE());
 
     //class_headers_in = mrb_define_class(mrb, "headers_in", class_request);
     class_headers_in = mrb_define_class_under(mrb, class, "Headers_in", mrb->object_class);

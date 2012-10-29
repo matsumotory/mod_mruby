@@ -61,8 +61,14 @@ Apache.rputs("<br>")
 Apache.rputs("<b>Env Class Test</b><br>")
 e = Apache::Env.new()
 e["AUTHOR"] = "MATSUMOTO Ryosuke"
+e["AUTHOR"] = "matsumoto_r"
 Apache.rputs("AUTHOR = " + e["AUTHOR"] + "<br>")
 Apache.rputs("REMOTE_ADDR = " + (e["REMOTE_ADDR"].nil? ? "nil" : e["REMOTE_ADDR"]) + "<br>")
+eall = e.env_hash
+Apache.rputs("env hash size = " + eall.size.to_s + "<br>")
+eall.each_key do |key|
+    Apache.rputs("env key = \"" + key + "\" val = \"" + eall[key] + "\"<br>")
+end
 Apache.rputs("<br>")
 
 Apache.rputs("<b>Headers_in Class Test</b><br>")
