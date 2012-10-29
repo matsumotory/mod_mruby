@@ -4,21 +4,13 @@
 ##
 
 # target module source
-#TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server.c ap_mrb_connection.c ap_mrb_init.c ap_mrb_scoreboard.c
 TARGET=mod_mruby.c ap_mrb_*.c
 
 #   the used tools
-# use apache 2.2
 APXS=/usr/sbin/apxs
 APACHECTL=/etc/init.d/httpd
 
-# use apache 2.4
-#APXS=/usr/local/apache2.4/bin/apxs
-#APACHECTL=/usr/local/apache2.4/bin/apachectl
-
 #   additional user defines, includes and libraries
-#INC=-I. -I/usr/local/src/mruby/src -I/usr/local/src/mruby/include -I/usr/include/json
-#LIB=-lm /usr/local/src/mruby/lib/libmruby.a -lm /usr/local/src/mruby/mrblib/mrblib.o -lm /usr/lib/libjson.la
 INC=-I. -I./vendors/src -I./vendors/include
 LIB=-lm ./vendors/lib/libmruby.a -lm ./vendors/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration
