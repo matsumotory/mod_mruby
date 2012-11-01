@@ -52,7 +52,7 @@ tmp/mruby:
 	cd tmp; git clone git://github.com/mruby/mruby.git
 
 libmruby.a: tmp/mruby
-	cd tmp/mruby && make
+	cd tmp/mruby && make CFLAGS="-O3 -fPIC"
 	cp -r tmp/mruby/include vendors/
 	cp -r tmp/mruby/lib vendors/
 	cp -r tmp/mruby/src vendors/
@@ -65,7 +65,7 @@ tmp/mruby-ex:
 	cd tmp; git clone git://github.com/iij/mruby.git
 
 libmruby-ex.a: tmp/mruby-ex
-	cd tmp/mruby && make
+	cd tmp/mruby && make CFLAGS="-O3 -fPIC"
 	cp -r tmp/mruby/include vendors/
 	cp -r tmp/mruby/lib vendors/
 	cp -r tmp/mruby/src vendors/
