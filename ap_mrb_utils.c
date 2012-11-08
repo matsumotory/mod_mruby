@@ -62,6 +62,28 @@ void ap_mrb_raise_file_error(mrb_state *mrb, mrb_value obj, request_rec *r, cons
    }
 }
 
+void ap_mrb_raise_error(mrb_state *mrb, mrb_value obj, request_rec *r)
+{
+   struct RString *str;
+   char *err_out;
+
+   obj = mrb_funcall(mrb, obj, "inspect", 0);
+
+   if (mrb_type(obj) == MRB_TT_STRING) {
+       str = mrb_str_ptr(obj);
+       err_out = str->ptr;
+       ap_log_rerror(APLOG_MARK
+           , APLOG_ERR
+           , 0
+           , r
+           , "%s ERROR %s: mrb_run failed. error: %s"
+           , MODULE_NAME
+           , __func__
+           , err_out
+       );
+   }
+}
+
 mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
 {
 
