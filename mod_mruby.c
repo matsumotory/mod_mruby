@@ -1017,6 +1017,9 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
     mrb_gc_arena_restore(mrb, ai);
 
+    if (mrb->exc)
+        ap_mrb_raise_file_error(mrb, mrb_obj_value(mrb->exc), r, mruby_code_file);
+
     ap_log_rerror(APLOG_MARK
         , APLOG_DEBUG
         , 0

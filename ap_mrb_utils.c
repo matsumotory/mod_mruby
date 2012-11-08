@@ -39,6 +39,28 @@ int ap_mrb_set_status_code(int val)
     return 0;
 }
 
+void ap_mrb_raise_file_error(mrb_state *mrb, mrb_value obj, request_rec *r, const char *file)
+{
+   struct RString *str;
+   char *err_out;
+
+   obj = mrb_funcall(mrb, obj, "inspect", 0);
+
+   if (mrb_type(obj) == MRB_TT_STRING) {
+       str = mrb_str_ptr(obj);
+       err_out = str->ptr;
+       ap_log_rerror(APLOG_MARK
+           , APLOG_ERR
+           , 0
+           , r
+           , "%s ERROR %s: mrb_run failed. file: %s error: %s"
+           , MODULE_NAME
+           , __func__
+           , file
+           , err_out
+       );
+   }
+}
 
 mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
 {
@@ -50,7 +72,6 @@ mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
 
     return self;
 }
-
 
 mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
 {

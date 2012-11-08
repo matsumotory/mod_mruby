@@ -22,6 +22,7 @@ typedef struct _code {
 
 int ap_mrb_get_status_code();
 int ap_mrb_set_status_code(int val);
+void ap_mrb_raise_file_error(mrb_state *mrb, mrb_value obj, request_rec *r, const char *file);
 mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self);
 mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_get_apache_version(mrb_state *mrb, mrb_value str);
