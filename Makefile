@@ -12,7 +12,7 @@ APACHECTL=/etc/init.d/httpd
 
 #   additional user defines, includes and libraries
 INC=-I. -I./vendors/src -I./vendors/include
-LIB=-lm ./vendors/lib/libmruby.a -lm ./vendors/mrblib/mrblib.o
+LIB=-lm ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration
 CFLAGS = $(INC) $(LIB) $(WC)
 
