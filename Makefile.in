@@ -7,11 +7,11 @@
 TARGET=mod_mruby.c ap_mrb_*.c
 
 #   the used tools
-APXS=/usr/sbin/apxs
-APACHECTL=/usr/sbin/apachectl
+APXS=@APXS_PATH@
+APACHECTL=@APACHECTL_PATH@
 
 #   additional user defines, includes and libraries
-DEFS=
+DEFS=@VERSION_DEF@
 INC=-I. -I./vendors/src -I./vendors/include
 LIB=-lm ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration
