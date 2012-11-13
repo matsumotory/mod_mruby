@@ -6,9 +6,14 @@
 # target module source
 TARGET=mod_mruby.c ap_mrb_*.c
 
-#   the used tools
+#   the used tools for Apache 2.2
 APXS=/usr/sbin/apxs
 APACHECTL=/etc/init.d/httpd
+
+#   the used tools and define for Apache 2.4
+#$APXS=/usr/local/apache243/bin/apxs
+#APACHECTL=/usr/local/apache243/bin/apachectl
+#DEF=-D__APACHE24__
 
 #   additional user defines, includes and libraries
 INC=-I. -I./vendors/src -I./vendors/include
