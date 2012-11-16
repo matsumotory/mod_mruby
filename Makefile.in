@@ -14,7 +14,7 @@ APACHECTL=@APACHECTL_PATH@
 DEFS=@VERSION_DEF@
 INC=-I. -I./vendors/src -I./vendors/include
 LIB=-lm ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
-WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration
+WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-s
 CFLAGS = $(INC) $(LIB) $(WC)
 
 #   the default target
