@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT SET_MAKE CPP EGREP LIBOBJS APXS_PATH APACHECTL_PATH VERSION_DEF LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT SET_MAKE CPP EGREP LIBOBJS APXS_PATH APXS2_PATH APACHECTL_PATH APACHE2CTL_PATH VERSION_DEF LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3380,10 +3380,56 @@ echo "${ECHO_T}no" >&6
 fi
 
 if test "$APXS_PATH" = no; then
-    { { echo "$as_me:$LINENO: error: apxs not found." >&5
-echo "$as_me: error: apxs not found." >&2;}
-   { (exit 1); exit 1; }; }
+    # Extract the first word of "apxs2", so it can be a program name with args.
+set dummy apxs2; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_APXS2_PATH+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $APXS2_PATH in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APXS2_PATH="$APXS2_PATH" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APXS2_PATH="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_APXS2_PATH" && ac_cv_path_APXS2_PATH="no"
+  ;;
+esac
 fi
+APXS2_PATH=$ac_cv_path_APXS2_PATH
+
+if test -n "$APXS2_PATH"; then
+  echo "$as_me:$LINENO: result: $APXS2_PATH" >&5
+echo "${ECHO_T}$APXS2_PATH" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+    if test "$APXS2_PATH" = no; then
+        { { echo "$as_me:$LINENO: error: apxs2 not found." >&5
+echo "$as_me: error: apxs2 not found." >&2;}
+   { (exit 1); exit 1; }; }
+    else
+        APXS_PATH=$APXS2_PATH
+    fi
+fi
+
 # Extract the first word of "apachectl", so it can be a program name with args.
 set dummy apachectl; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
@@ -3426,9 +3472,54 @@ echo "${ECHO_T}no" >&6
 fi
 
 if test "$APACHECTL_PATH" = no; then
-    { { echo "$as_me:$LINENO: error: apachectl not found." >&5
-echo "$as_me: error: apachectl not found." >&2;}
+    # Extract the first word of "apache2ctl", so it can be a program name with args.
+set dummy apache2ctl; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_APACHE2CTL_PATH+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $APACHE2CTL_PATH in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APACHE2CTL_PATH="$APACHE2CTL_PATH" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APACHE2CTL_PATH="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  test -z "$ac_cv_path_APACHE2CTL_PATH" && ac_cv_path_APACHE2CTL_PATH="no"
+  ;;
+esac
+fi
+APACHE2CTL_PATH=$ac_cv_path_APACHE2CTL_PATH
+
+if test -n "$APACHE2CTL_PATH"; then
+  echo "$as_me:$LINENO: result: $APACHE2CTL_PATH" >&5
+echo "${ECHO_T}$APACHE2CTL_PATH" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+    if test "$APACHE2CTL_PATH" = no; then
+        { { echo "$as_me:$LINENO: error: apache2ctl not found." >&5
+echo "$as_me: error: apache2ctl not found." >&2;}
    { (exit 1); exit 1; }; }
+    else
+        APACHECTL_PATH=$APACHE2CTL_PATH
+    fi
 fi
 
 APACHE_VERSION=`$APACHECTL_PATH -v | awk "/Server version/ {print $ 3}"`
@@ -4093,7 +4184,9 @@ s,@CPP@,$CPP,;t t
 s,@EGREP@,$EGREP,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@APXS_PATH@,$APXS_PATH,;t t
+s,@APXS2_PATH@,$APXS2_PATH,;t t
 s,@APACHECTL_PATH@,$APACHECTL_PATH,;t t
+s,@APACHE2CTL_PATH@,$APACHE2CTL_PATH,;t t
 s,@VERSION_DEF@,$VERSION_DEF,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 CEOF

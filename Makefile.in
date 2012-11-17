@@ -35,7 +35,7 @@ install:
 
 #   cleanup
 clean:
-	-rm -rf .libs *.o *.so *.lo *.la *.slo *.loT tmp vendors config.log config.status
+	-rm -rf .libs *.o *.so *.lo *.la *.slo *.loT tmp vendors config.log config.status autom4te.cache
 
 #   reload the module by installing and restarting Apache
 reload: install restart

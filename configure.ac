@@ -29,12 +29,25 @@ AC_CHECK_FUNCS([memset putenv strtol])
 AC_PATH_PROG(APXS_PATH, apxs, no,
     /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
 if test "$APXS_PATH" = no; then
-    AC_MSG_ERROR([apxs not found.])
+    AC_PATH_PROG(APXS2_PATH, apxs2, no,
+        /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
+    if test "$APXS2_PATH" = no; then
+        AC_MSG_ERROR([apxs2 not found.])
+    else
+        APXS_PATH=$APXS2_PATH
+    fi
 fi
+
 AC_PATH_PROG(APACHECTL_PATH, apachectl, no,
     /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
 if test "$APACHECTL_PATH" = no; then
-    AC_MSG_ERROR([apachectl not found.])
+    AC_PATH_PROG(APACHE2CTL_PATH, apache2ctl, no,
+        /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
+    if test "$APACHE2CTL_PATH" = no; then
+        AC_MSG_ERROR([apache2ctl not found.])
+    else
+        APACHECTL_PATH=$APACHE2CTL_PATH
+    fi
 fi
 
 APACHE_VERSION=`$APACHECTL_PATH -v | awk "/Server version/ {print $ 3}"`
