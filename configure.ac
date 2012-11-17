@@ -26,12 +26,12 @@ AC_FUNC_STAT
 AC_CHECK_FUNCS([memset putenv strtol])
 
 # Checks for apache tools.
-AC_PATH_PROG(APXS_PATH, apxs2 apxs, no,
+AC_PATH_PROGS(APXS_PATH, apxs2 apxs, no,
     /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
 if test "$APXS_PATH" = no; then
     AC_MSG_ERROR([apxs not found.])
 fi
-AC_PATH_PROG(APACHECTL_PATH, apache2ctl apachectl, no,
+AC_PATH_PROGS(APACHECTL_PATH, apache2ctl apachectl, no,
     /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
 if test "$APACHECTL_PATH" = no; then
     AC_MSG_ERROR([apachectl not found.])
