@@ -13,9 +13,9 @@ APACHECTL=@APACHECTL_PATH@
 #   additional user defines, includes and libraries
 DEFS=@VERSION_DEF@
 INC=-I. -I./vendors/src -I./vendors/include
-LIB=-lm ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
+LIB=-lm -lcrypto ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-s
-WL=-Wl,-lm
+WL=-Wl,-lm,-lcrypto
 CFLAGS = $(INC) $(LIB) $(WC) $(WL)
 
 #   the default target
