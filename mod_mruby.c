@@ -56,6 +56,7 @@
 */
 
 #include "ap_mrb_request.h"
+#include "ap_mrb_authnprovider.h"
 #include "ap_mrb_utils.h"
 
 mrb_state *mod_mruby_share_state = NULL;
@@ -78,6 +79,16 @@ int ap_mruby_class_init(mrb_state *mrb);
 
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s);
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status);
+
+static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
+{
+    mruby_dir_config_t *dir_conf = 
+        (mruby_dir_config_t *) apr_pcalloc(p, sizeof (*dir_conf));
+    dir_conf->mod_mruby_authn_check_password_code   = NULL;
+    dir_conf->mod_mruby_authn_get_realm_hash_code   = NULL;
+
+    return dir_conf;
+}
 
 static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
 {
@@ -1440,6 +1451,39 @@ static int mod_mruby_log_transaction_last(request_rec *r)
 }
 
 
+static authn_status mod_mruby_authn_check_password(request_rec *r, const char *user, const char *password)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
+    if (dir_conf->mod_mruby_authn_check_password_code == NULL)
+        return AUTH_GENERAL_ERROR;
+    ap_mrb_push_request(r);
+    ap_mrb_init_authnprovider_basic(r, user, password);
+    return ap_mruby_run(mod_mruby_share_state, r, conf, dir_conf->mod_mruby_authn_check_password_code, OK);
+}
+
+
+static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *user, const char *realm, char **rethash)
+{
+    authn_status ret;
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
+    if (dir_conf->mod_mruby_authn_get_realm_hash_code == NULL)
+        return AUTH_GENERAL_ERROR;
+    ap_mrb_push_request(r);
+    ap_mrb_init_authnprovider_digest(r, user, realm);
+    ret = ap_mruby_run(mod_mruby_share_state, r, conf, dir_conf->mod_mruby_authn_get_realm_hash_code, OK);
+    *rethash = ap_mrb_get_authnprovider_digest_rethash();
+    return ret;
+}
+
+
+static const authn_provider authn_mruby_provider = {
+    &mod_mruby_authn_check_password,
+    &mod_mruby_authn_get_realm_hash
+};
+
+
 static void register_hooks(apr_pool_t *p)
 {
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
@@ -1476,6 +1520,8 @@ static void register_hooks(apr_pool_t *p)
     ap_hook_log_transaction(mod_mruby_log_transaction_first, NULL, NULL, APR_HOOK_FIRST);
     ap_hook_log_transaction(mod_mruby_log_transaction_middle, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_log_transaction(mod_mruby_log_transaction_last, NULL, NULL, APR_HOOK_LAST);
+
+    ap_register_provider(p, AUTHN_PROVIDER_GROUP, "mruby", "0", &authn_mruby_provider);
 }
 
 
@@ -1514,13 +1560,19 @@ static const command_rec mod_mruby_cmds[] = {
     AP_INIT_TAKE1("mrubyLogTransactionMiddle", set_mod_mruby_log_transaction_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction middle phase."),
     AP_INIT_TAKE1("mrubyLogTransactionLast", set_mod_mruby_log_transaction_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction last phase."),
     AP_INIT_TAKE1("mrubyCacheSize", set_mod_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
+    AP_INIT_TAKE1("mrubyAuthnCheckPassword", ap_set_string_slot,
+                  (void *)APR_OFFSETOF(mruby_dir_config_t, mod_mruby_authn_check_password_code),
+                  OR_AUTHCFG, "hook for authn basic."),
+    AP_INIT_TAKE1("mrubyAuthnGetRealmHash", ap_set_string_slot,
+                  (void *)APR_OFFSETOF(mruby_dir_config_t, mod_mruby_authn_get_realm_hash_code),
+                  OR_AUTHCFG, "hook for authn digest."),
     {NULL}
 };
 
 
 module AP_MODULE_DECLARE_DATA mruby_module = {
     STANDARD20_MODULE_STUFF,
-    NULL,                      /* dir config creater */
+    mod_mruby_create_dir_config,    /* dir config creater */
     NULL,                      /* dir merger */
     mod_mruby_create_config,   /* server config */
     NULL,                      /* merge server config */

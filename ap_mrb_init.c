@@ -6,6 +6,7 @@
 #include "ap_mrb_string.h"
 #include "ap_mrb_env.h"
 #include "ap_mrb_scoreboard.h"
+#include "ap_mrb_authnprovider.h"
 
 struct RClass *class;
 struct RClass *class_request;
@@ -16,6 +17,7 @@ struct RClass *class_headers_out;
 struct RClass *class_env;
 struct RClass *class_notes;
 struct RClass *class_scoreboard;
+struct RClass *class_authnprovider;
 
 int ap_mruby_class_init(mrb_state *mrb)
 {
@@ -225,6 +227,17 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "no_cache", ap_mrb_get_request_no_cache, ARGS_NONE());
     mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, ARGS_NONE());
 
+    class_authnprovider = mrb_define_class_under(mrb, class, "AuthnProvider", mrb->object_class);
+    mrb_define_const(mrb, class_authnprovider, "AUTH_DENIED", mrb_fixnum_value(AUTH_DENIED));
+    mrb_define_const(mrb, class_authnprovider, "AUTH_GRANTED", mrb_fixnum_value(AUTH_GRANTED));
+    mrb_define_const(mrb, class_authnprovider, "AUTH_USER_FOUND", mrb_fixnum_value(AUTH_USER_FOUND));
+    mrb_define_const(mrb, class_authnprovider, "AUTH_USER_NOT_FOUND", mrb_fixnum_value(AUTH_USER_NOT_FOUND));
+    mrb_define_const(mrb, class_authnprovider, "AUTH_GENERAL_ERROR", mrb_fixnum_value(AUTH_GENERAL_ERROR));
+    mrb_define_method(mrb, class_authnprovider, "user", ap_mrb_get_authnprovider_user, ARGS_NONE());
+    mrb_define_method(mrb, class_authnprovider, "password", ap_mrb_get_authnprovider_password, ARGS_NONE());
+    mrb_define_method(mrb, class_authnprovider, "realm", ap_mrb_get_authnprovider_realm, ARGS_NONE());
+    mrb_define_method(mrb, class_authnprovider, "rethash", ap_mrb_get_authnprovider_rethash, ARGS_NONE());
+    mrb_define_method(mrb, class_authnprovider, "rethash=", ap_mrb_set_authnprovider_rethash, ARGS_ANY());
 
     return OK;
 }
