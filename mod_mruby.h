@@ -16,6 +16,13 @@
 
 typedef struct {
 
+    const char *mod_mruby_authn_check_password_code;
+    const char *mod_mruby_authn_get_realm_hash_code;
+
+} mruby_dir_config_t;
+
+typedef struct {
+
     int mod_mruby_handler_code_native_n;
     const char *mod_mruby_handler_code_native;
     const char *mod_mruby_handler_code;
