@@ -833,6 +833,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     struct stat st;
     FILE *mrb_file;
     int cache_hit = 0;
+    int ai = 0;
 
     cache_table_t *cache_table_data;
 #ifdef __MOD_MRUBY_SHARED_CACHE_TABLE__
@@ -907,7 +908,6 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         }
     }
 
-    int ai = mrb_gc_arena_save(mrb);
 
     if (!cache_hit) {
 
@@ -922,6 +922,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
                 , __func__
                 , mruby_code_file
             );
+            return DECLINED;
         }
 
        ap_log_rerror(APLOG_MARK
@@ -939,6 +940,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         //ap_mruby_class_init(mod_mruby_share_state);
         //mrb = mod_mruby_share_state;
 
+        ai = mrb_gc_arena_save(mrb);
         p = mrb_parse_file(mrb, mrb_file, NULL);
         fclose(mrb_file);
         n = mrb_generate_code(mrb, p);
