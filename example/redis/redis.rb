@@ -1,0 +1,18 @@
+r = Apache::Request.new()
+r.content_type = "text/html"
+
+a       = Apache
+host    = "127.0.0.1"
+port    = 6379
+
+a.rputs("> redis connect " + host + ":" + port.to_s + "<br>")
+redis = Apache::Redis.new(host, port)
+
+key     = "hoge"
+val     = "aaaaaaaaaaaaaa"
+
+a.rputs("> redis set " + key + " " + val + "<br>")
+redis.set(key, val)
+
+a.rputs("> redis get " + key + "<br>")
+Apache.rputs(key + ": " + redis.get(key))
