@@ -16,7 +16,7 @@ AC_CHECK_LIB([m], [main])
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([string.h unistd.h])
+AC_CHECK_HEADERS([string.h unistd.h hiredis/hiredis.h],,[AC_MSG_ERROR(not found.)])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

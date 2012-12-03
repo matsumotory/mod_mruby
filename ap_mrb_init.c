@@ -13,6 +13,7 @@
 #include "ap_mrb_env.h"
 #include "ap_mrb_scoreboard.h"
 #include "ap_mrb_authnprovider.h"
+#include "ap_mrb_redis.h"
 
 struct RClass *class;
 struct RClass *class_request;
@@ -24,6 +25,7 @@ struct RClass *class_env;
 struct RClass *class_notes;
 struct RClass *class_scoreboard;
 struct RClass *class_authnprovider;
+struct RClass *class_redis;
 
 int ap_mruby_class_init(mrb_state *mrb)
 {
@@ -244,6 +246,11 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_authnprovider, "realm", ap_mrb_get_authnprovider_realm, ARGS_NONE());
     mrb_define_method(mrb, class_authnprovider, "rethash", ap_mrb_get_authnprovider_rethash, ARGS_NONE());
     mrb_define_method(mrb, class_authnprovider, "rethash=", ap_mrb_set_authnprovider_rethash, ARGS_ANY());
+
+    class_redis = mrb_define_class_under(mrb, class, "Redis", mrb->object_class);
+    mrb_define_method(mrb, class_redis, "initialize", ap_mrb_redis_connect, ARGS_ANY());
+    mrb_define_method(mrb, class_redis, "get", ap_mrb_redis_get, ARGS_ANY());
+    mrb_define_method(mrb, class_redis, "set", ap_mrb_redis_set, ARGS_ANY());
 
     return OK;
 }

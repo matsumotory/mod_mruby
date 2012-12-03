@@ -2826,7 +2826,8 @@ done
 
 
 
-for ac_header in string.h unistd.h
+
+for ac_header in string.h unistd.h hiredis/hiredis.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -2971,6 +2972,10 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 #define `echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
 
+else
+  { { echo "$as_me:$LINENO: error: not found." >&5
+echo "$as_me: error: not found." >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
 done
