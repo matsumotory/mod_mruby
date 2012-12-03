@@ -15,4 +15,13 @@ a.rputs("> redis set " + key + " " + val + "<br>")
 redis.set(key, val)
 
 a.rputs("> redis get " + key + "<br>")
-Apache.rputs(key + ": " + redis.get(key))
+a.rputs(key + ": " + redis.get(key) + "<br><br>")
+
+key     = "hoge"
+val     = "bbbbbbbbbbbbbb"
+
+a.rputs("> redis set " + key + " " + val + "<br>")
+redis.set(key, val)
+
+a.rputs("> redis get " + key + "<br>")
+a.rputs(key + ": " + redis.get(key))
