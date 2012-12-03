@@ -1,4 +1,10 @@
 /*
+// mod_mruby.c - mod_mruby core module
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
+/*
 // -------------------------------------------------------------------
 // mod_mruby
 //      This is a mruby module for Apache HTTP Server.

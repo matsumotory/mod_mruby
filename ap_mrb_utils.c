@@ -1,3 +1,9 @@
+/*
+// ap_mrb_utils.c - to proveid mod_mruby utils
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
 #include "mod_mruby.h"
 #include "ap_mrb_utils.h"
 

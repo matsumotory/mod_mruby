@@ -1,3 +1,9 @@
+/*
+// ap_mrb_string.c - to provide string methods
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
 #include "ap_mrb_string.h"
 
 mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)

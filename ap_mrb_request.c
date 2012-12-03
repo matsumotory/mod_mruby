@@ -1,3 +1,9 @@
+/*
+// ap_mrb_request.c - to provide request api
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
 #include "mod_mruby.h"
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"

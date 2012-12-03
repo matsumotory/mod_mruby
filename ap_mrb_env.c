@@ -1,3 +1,9 @@
+/*
+// ap_mrb_env.c - to provide env methods
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
 #include "ap_mrb_env.h"
 #include "mruby/hash.h"
 #include "util_script.h"

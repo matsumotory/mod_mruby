@@ -1,3 +1,9 @@
+/*
+// ap_mrb_connection.c - to provide connection api
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
 #include "mod_mruby.h"
 #include "ap_mrb_server.h"
 //#include "json.h"
