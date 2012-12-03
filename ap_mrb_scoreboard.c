@@ -1,3 +1,9 @@
+/*
+// ap_mrb_scoreboard.c - to provide scoreboard methods
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
 #include "mod_mruby.h"
 #include "ap_mrb_scoreboard.h"
 #include "mruby/hash.h"

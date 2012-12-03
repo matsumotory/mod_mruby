@@ -1,3 +1,9 @@
+/*
+// ap_mrb_init.c - mod_mruby init phase
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
 #include "ap_mrb_server.h"

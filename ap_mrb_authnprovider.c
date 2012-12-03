@@ -1,3 +1,9 @@
+/*
+// ap_mrb_authprovider.c - to provide auth provider
+//
+// See Copyright Notice in mod_mruby.h
+*/
+
 #include "ap_mrb_authnprovider.h"
 #include "mruby/string.h"
 #include "apr_strings.h"
