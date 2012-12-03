@@ -249,8 +249,9 @@ int ap_mruby_class_init(mrb_state *mrb)
 
     class_redis = mrb_define_class_under(mrb, class, "Redis", mrb->object_class);
     mrb_define_method(mrb, class_redis, "initialize", ap_mrb_redis_connect, ARGS_ANY());
-    mrb_define_method(mrb, class_redis, "get", ap_mrb_redis_get, ARGS_ANY());
     mrb_define_method(mrb, class_redis, "set", ap_mrb_redis_set, ARGS_ANY());
+    mrb_define_method(mrb, class_redis, "get", ap_mrb_redis_get, ARGS_ANY());
+    //mrb_define_method(mrb, class_redis, "mget", ap_mrb_redis_mget, ARGS_ANY());
 
     return OK;
 }

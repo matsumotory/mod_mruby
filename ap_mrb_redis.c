@@ -10,6 +10,7 @@
 #include <string.h>
 #include <time.h>
 #include "ap_mrb_redis.h"
+#include "mruby/array.h"
 
 mrb_value ap_mrb_redis_connect(mrb_state *mrb, mrb_value self)
 {
@@ -87,3 +88,61 @@ mrb_value ap_mrb_redis_get(mrb_state *mrb, mrb_value self)
     }
 }
 
+/*
+mrb_value ap_mrb_redis_mget(mrb_state *mrb, mrb_value self)
+{
+    long int i;
+    mrb_value key, array;
+    redisContext *rc;
+    mrb_value context;
+    char **val;
+    request_rec *r = ap_mrb_get_request();
+
+    mrb_get_args(mrb, "o", &key);
+
+    context = mrb_iv_get(mrb, self, mrb_intern(mrb, "redis_c"));
+    Data_Get_Struct(mrb, context, NULL, rc);
+
+    redisReply *rs;
+    //rs = redisCommand(rc,"mget %s", RSTRING_PTR(key));
+    rs = redisCommand(rc,"keys *");
+    val = apr_pcalloc(r->pool, sizeof(char **));
+    if (rs->type == REDIS_REPLY_ARRAY ) {
+        for(i = 0; i < rs->elements; i++){
+            array = mrb_ary_new(mrb);
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: key=(%s) redis array result: %d) %s"
+            , MODULE_NAME
+            , __func__
+            , RSTRING_PTR(key)
+            , i
+            , rs->element[i]->str
+        );
+            //mrb_ary_push(mrb, array, mrb_str_new2(mrb, rs->element[i]->str));
+            val[i] = apr_pstrdup(r->pool, rs->element[i]->str);
+            mrb_ary_set(mrb, array, i, mrb_str_new2(mrb, val[i]));
+        }
+        for (i = 0; i < rs->elements; i++){
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: key=(%s) redis array val: %d) %s"
+            , MODULE_NAME
+            , __func__
+            , RSTRING_PTR(key)
+            , i
+            , val[i]
+        );
+            
+        }
+        freeReplyObject(rs);
+        return array;
+    } else {
+        return mrb_nil_value();
+    }
+}
+*/
