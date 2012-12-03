@@ -87,32 +87,3 @@ mrb_value ap_mrb_redis_get(mrb_state *mrb, mrb_value self)
     }
 }
 
-
-/*
-
-int main(void) {
-
-        char *hostname = "hoge1.example.com";
-        char *id = "123";
-
-        redisContext *c = redisConnect("127.0.0.1", 6379);
-        if (c->err) {
-                printf("Connect NG: %s\n", c->errstr);
-        }else{
-                printf("Connect OK  \n");
-        }
-
-        redisReply *reply_set;
-        reply_set = redisCommand(c,"set host:%s:id %s",hostname,id);
-        freeReplyObject(reply_set);
-
-        redisReply *reply_host;
-        reply_host = redisCommand(c,"get host:%s:id",hostname);
-        if (reply_host->type == REDIS_REPLY_STRING) {
-            printf("hostid of %s is %s\n", hostname,reply_host->str);
-        }
-        freeReplyObject(reply_host);
-
-        return 1;
-}
-*/
