@@ -9,7 +9,7 @@ a.rputs("> redis connect " + host + ":" + port.to_s + "<br>")
 redis = Apache::Redis.new(host, port)
 
 key     = "hoge"
-val     = "aaaaaaaaaaaaaa"
+val     = "100"
 
 a.rputs("> redis set " + key + " " + val + "<br>")
 redis.set(key, val)
