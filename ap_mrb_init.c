@@ -14,7 +14,6 @@
 #include "ap_mrb_env.h"
 #include "ap_mrb_scoreboard.h"
 #include "ap_mrb_authnprovider.h"
-//#include "ap_mrb_redis.h"
 
 struct RClass *class;
 struct RClass *class_request;
@@ -26,12 +25,11 @@ struct RClass *class_env;
 struct RClass *class_notes;
 struct RClass *class_scoreboard;
 struct RClass *class_authnprovider;
-//struct RClass *class_redis;
 
-// add extended class init functions
-void mrb_init_redis(mrb_state *mrb, struct RClass *class_core);
+// add extended class init functions like ap_mruby_redis_init() in lib/redis/redis.c
+void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core);
 
-// add extended class
+// init phase for extended calss like lib/redis/redis.c
 void ap_mruby_ext_calss_init(mrb_state *mrb, struct RClass *class_core)
 {
 #ifdef ENABLE_REDIS
