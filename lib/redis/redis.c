@@ -13,6 +13,9 @@
 #include "mruby/array.h"
 
 #ifdef ENABLE_REDIS
+
+// Add init function to ap_mruby_ext_calss_init() in ap_mrb_init.c
+// and prototype to ap_mrb_init.c
 void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core)
 {
     struct RClass *class_redis;
