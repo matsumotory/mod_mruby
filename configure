@@ -841,6 +841,12 @@ if test -n "$ac_init_help"; then
    esac
   cat <<\_ACEOF
 
+Optional Packages:
+  --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
+  --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-apxs=FILE        pathname to the Apache apxs tool [apxs]
+  --with-apachectl=FILE   pathname to the Apache apachectl tool [apachectl]
+
 Some influential environment variables:
   CC          C compiler command
   CFLAGS      C compiler flags
@@ -3343,7 +3349,14 @@ done
 
 
 # Checks for apache tools.
-for ac_prog in apxs2 apxs
+
+# Check whether --with-apxs or --without-apxs was given.
+if test "${with_apxs+set}" = set; then
+  withval="$with_apxs"
+  APXS_PATH="$with_apxs"
+fi;
+if test -z "${APXS_PATH}"; then
+    for ac_prog in apxs2 apxs
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3389,13 +3402,21 @@ fi
 done
 test -n "$APXS_PATH" || APXS_PATH="no"
 
+fi
 if test "$APXS_PATH" = no; then
     { { echo "$as_me:$LINENO: error: apxs2 and apsx not found." >&5
 echo "$as_me: error: apxs2 and apsx not found." >&2;}
    { (exit 1); exit 1; }; }
 fi
 
-for ac_prog in apache2ctl apachectl
+
+# Check whether --with-apachectl or --without-apachectl was given.
+if test "${with_apachectl+set}" = set; then
+  withval="$with_apachectl"
+  APACHECTL_PATH="$with_apachectl"
+fi;
+if test -z "${APACHECTL_PATH}"; then
+    for ac_prog in apache2ctl apachectl
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3441,6 +3462,7 @@ fi
 done
 test -n "$APACHECTL_PATH" || APACHECTL_PATH="no"
 
+fi
 if test "$APACHECTL_PATH" = no; then
     { { echo "$as_me:$LINENO: error: apache2ctl and apachectl not found." >&5
 echo "$as_me: error: apache2ctl and apachectl not found." >&2;}
