@@ -26,14 +26,24 @@ AC_FUNC_STAT
 AC_CHECK_FUNCS([memset putenv strtol])
 
 # Checks for apache tools.
-AC_PATH_PROGS(APXS_PATH, apxs2 apxs, no,
-    /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
+AC_ARG_WITH(apxs, AC_HELP_STRING([--with-apxs=FILE],
+    [pathname to the Apache apxs tool [[apxs]]]),
+    [APXS_PATH="$with_apxs"])
+if test -z "${APXS_PATH}"; then
+    AC_PATH_PROGS(APXS_PATH, apxs2 apxs, no,
+        /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
+fi
 if test "$APXS_PATH" = no; then
     AC_MSG_ERROR([apxs2 and apsx not found.])
 fi
 
-AC_PATH_PROGS(APACHECTL_PATH, apache2ctl apachectl, no,
-    /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
+AC_ARG_WITH(apachectl, AC_HELP_STRING([--with-apachectl=FILE],
+    [pathname to the Apache apachectl tool [[apachectl]]]),
+    [APACHECTL_PATH="$with_apachectl"])
+if test -z "${APACHECTL_PATH}"; then
+    AC_PATH_PROGS(APACHECTL_PATH, apache2ctl apachectl, no,
+        /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
+fi
 if test "$APACHECTL_PATH" = no; then
     AC_MSG_ERROR([apache2ctl and apachectl not found.])
 fi
