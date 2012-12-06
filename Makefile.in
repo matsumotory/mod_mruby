@@ -4,7 +4,7 @@
 ##
 
 # target module source
-TARGET=mod_mruby.c ap_mrb_*.c
+TARGET=mod_mruby.c ap_mrb_*.c lib/*/*.c
 
 #   the used tools
 APXS=@APXS_PATH@
