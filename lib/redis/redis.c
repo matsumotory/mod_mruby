@@ -12,7 +12,7 @@
 #include "redis.h"
 #include "mruby/array.h"
 
-
+#ifdef ENABLE_REDIS
 void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core)
 {
     struct RClass *class_redis;
@@ -157,3 +157,4 @@ mrb_value ap_mrb_redis_mget(mrb_state *mrb, mrb_value self)
     }
 }
 */
+#endif

@@ -4,6 +4,7 @@
 // See Copyright Notice in mod_mruby.h
 */
 
+#include "mod_mruby.h"
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
 #include "ap_mrb_server.h"
@@ -30,10 +31,12 @@ struct RClass *class_authnprovider;
 // add extended class init functions
 void mrb_init_redis(mrb_state *mrb, struct RClass *class_core);
 
+// add extended class
 void ap_mruby_ext_calss_init(mrb_state *mrb, struct RClass *class_core)
 {
-    // add extended class
+#ifdef ENABLE_REDIS
     ap_mruby_redis_init(mrb, class_core);
+#endif
 }
 
 int ap_mruby_class_init(mrb_state *mrb)

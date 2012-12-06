@@ -35,6 +35,11 @@
 #define ON                 1
 #define OFF                0
 
+/* define ENABLE_XXXX from DISABLE_XXX */
+#ifndef DISABLE_REDIS
+#define ENABLE_REDIS
+#endif
+
 #include "mruby.h"
 #include "mruby/string.h"
 #include "http_request.h"
