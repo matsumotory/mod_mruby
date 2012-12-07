@@ -163,3 +163,31 @@ mrb_value ap_mrb_get_server_defn_line_number(mrb_state *mrb, mrb_value str)
     request_rec *r = ap_mrb_get_request();
     return mrb_fixnum_value(r->server->defn_line_number);
 }
+
+void ap_mruby_server_init(mrb_state *mrb, struct RClass *class_core)
+{
+    struct RClass *class_server;
+
+    class_server = mrb_define_class_under(mrb, class_core, "Server", mrb->object_class);
+    mrb_define_method(mrb, class_server, "error_fname=", ap_mrb_set_server_error_fname, ARGS_ANY());
+    mrb_define_method(mrb, class_server, "error_fname", ap_mrb_get_server_error_fname, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "document_root", ap_mrb_get_server_document_root, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "loglevel=", ap_mrb_set_server_loglevel, ARGS_ANY());
+    mrb_define_method(mrb, class_server, "loglevel", ap_mrb_get_server_loglevel, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "hostname", ap_mrb_get_server_hostname, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "path", ap_mrb_get_server_path, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "admin", ap_mrb_get_server_admin, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "scheme", ap_mrb_get_server_scheme, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "defn_name", ap_mrb_get_server_defn_name, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "is_virtual", ap_mrb_get_server_is_virtual, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "keep_alive_max", ap_mrb_get_server_keep_alive_max, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "keep_alive", ap_mrb_get_server_keep_alive, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "pathlen", ap_mrb_get_server_pathlen, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "limit_req_line", ap_mrb_get_server_limit_req_line, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "limit_req_fieldsize", ap_mrb_get_server_limit_req_fieldsize, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "limit_req_fields", ap_mrb_get_server_limit_req_fields, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "timeout", ap_mrb_get_server_timeout, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "keep_alive_timeout", ap_mrb_get_server_keep_alive_timeout, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "port", ap_mrb_get_server_port, ARGS_NONE());
+    mrb_define_method(mrb, class_server, "defn_line_number", ap_mrb_get_server_defn_line_number, ARGS_NONE());
+}

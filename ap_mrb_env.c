@@ -64,3 +64,14 @@ mrb_value ap_mrb_get_env_hash(mrb_state *mrb, mrb_value str)
     }
     return hash;
 }
+
+void ap_mruby_env_init(mrb_state *mrb, struct RClass *class_core)
+{
+    struct RClass *class_env;
+
+    class_env = mrb_define_class_under(mrb, class_core, "Env", mrb->object_class);
+    mrb_define_method(mrb, class_env, "initialize", ap_mrb_init_env, ARGS_NONE());
+    mrb_define_method(mrb, class_env, "[]=", ap_mrb_set_env, ARGS_ANY());
+    mrb_define_method(mrb, class_env, "[]", ap_mrb_get_env, ARGS_ANY());
+    mrb_define_method(mrb, class_env, "env_hash", ap_mrb_get_env_hash, ARGS_NONE());
+}

@@ -10,6 +10,9 @@
 #endif
 #include "mruby.h"
 
+#include "http_protocol.h"
+#include "mruby/string.h"
+
 
 #define INVALID_PRIORITY    -1
 
@@ -30,5 +33,6 @@ mrb_value ap_mrb_get_apache_version(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str);
 mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str);
+mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str);
 
 #endif

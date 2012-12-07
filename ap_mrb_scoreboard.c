@@ -409,3 +409,22 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
 
     return hash;
 }
+
+void ap_mruby_scoreboard_init(mrb_state *mrb, struct RClass *class_core)
+{
+    struct RClass *class_scoreboard;
+
+    class_scoreboard = mrb_define_class_under(mrb, class_core, "Scoreboard", mrb->object_class);
+    mrb_define_method(mrb, class_scoreboard, "status", ap_mrb_get_scoreboard_status, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "counter", ap_mrb_get_scoreboard_counter, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "pid", ap_mrb_get_scoreboard_pid, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "server_limit", ap_mrb_get_scoreboard_server_limit, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "thread_limit", ap_mrb_get_scoreboard_thread_limit, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "access_counter", ap_mrb_get_scoreboard_access_counter, ARGS_ANY());
+    mrb_define_method(mrb, class_scoreboard, "total_kbyte", ap_mrb_get_scoreboard_total_kbyte, ARGS_ANY());
+    mrb_define_method(mrb, class_scoreboard, "total_access", ap_mrb_get_scoreboard_total_access, ARGS_ANY());
+    mrb_define_method(mrb, class_scoreboard, "uptime", ap_mrb_get_scoreboard_uptime, ARGS_ANY());
+    mrb_define_method(mrb, class_scoreboard, "restart_time", ap_mrb_get_scoreboard_restart_time, ARGS_ANY());
+    mrb_define_method(mrb, class_scoreboard, "idle_worker", ap_mrb_get_scoreboard_idle_worker, ARGS_ANY());
+    mrb_define_method(mrb, class_scoreboard, "busy_worker", ap_mrb_get_scoreboard_process_worker, ARGS_ANY());
+}

@@ -6,6 +6,7 @@
 
 #include "mod_mruby.h"
 #include "ap_mrb_utils.h"
+#include "ap_mrb_request.h"
 
 #ifndef _WIN32
 #define SUPPORT_SYSLOG
@@ -202,4 +203,95 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
 #endif
 
     return str;
+}
+
+mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
+{
+    mrb_value msg;
+
+    mrb_get_args(mrb, "o", &msg);
+    if (mrb_type(msg) == MRB_TT_STRING) {
+        ap_rputs(RSTRING_PTR(msg), ap_mrb_get_request());
+    } else {
+        ap_rputs("not string", ap_mrb_get_request());
+    }
+
+    return str;
+}
+
+void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
+{
+
+    mrb_define_const(mrb, class_core, "OK", mrb_fixnum_value(OK));
+    mrb_define_const(mrb, class_core, "DECLINED", mrb_fixnum_value(DECLINED));
+    mrb_define_const(mrb, class_core, "HTTP_SERVICE_UNAVAILABLE", mrb_fixnum_value(HTTP_SERVICE_UNAVAILABLE));
+    mrb_define_const(mrb, class_core, "HTTP_CONTINUE", mrb_fixnum_value(HTTP_CONTINUE));
+    mrb_define_const(mrb, class_core, "HTTP_SWITCHING_PROTOCOLS", mrb_fixnum_value(HTTP_SWITCHING_PROTOCOLS));
+    mrb_define_const(mrb, class_core, "HTTP_PROCESSING", mrb_fixnum_value(HTTP_PROCESSING));
+    mrb_define_const(mrb, class_core, "HTTP_OK", mrb_fixnum_value(HTTP_OK));
+    mrb_define_const(mrb, class_core, "HTTP_CREATED", mrb_fixnum_value(HTTP_CREATED));
+    mrb_define_const(mrb, class_core, "HTTP_ACCEPTED", mrb_fixnum_value(HTTP_ACCEPTED));
+    mrb_define_const(mrb, class_core, "HTTP_NON_AUTHORITATIVE", mrb_fixnum_value(HTTP_NON_AUTHORITATIVE));
+    mrb_define_const(mrb, class_core, "HTTP_NO_CONTENT", mrb_fixnum_value(HTTP_NO_CONTENT));
+    mrb_define_const(mrb, class_core, "HTTP_RESET_CONTENT", mrb_fixnum_value(HTTP_RESET_CONTENT));
+    mrb_define_const(mrb, class_core, "HTTP_PARTIAL_CONTENT", mrb_fixnum_value(HTTP_PARTIAL_CONTENT));
+    mrb_define_const(mrb, class_core, "HTTP_MULTI_STATUS", mrb_fixnum_value(HTTP_MULTI_STATUS));
+    mrb_define_const(mrb, class_core, "HTTP_MULTIPLE_CHOICES", mrb_fixnum_value(HTTP_MULTIPLE_CHOICES));
+    mrb_define_const(mrb, class_core, "HTTP_MOVED_PERMANENTLY", mrb_fixnum_value(HTTP_MOVED_PERMANENTLY));
+    mrb_define_const(mrb, class_core, "HTTP_MOVED_TEMPORARILY", mrb_fixnum_value(HTTP_MOVED_TEMPORARILY));
+    mrb_define_const(mrb, class_core, "HTTP_SEE_OTHER", mrb_fixnum_value(HTTP_SEE_OTHER));
+    mrb_define_const(mrb, class_core, "HTTP_NOT_MODIFIED", mrb_fixnum_value(HTTP_NOT_MODIFIED));
+    mrb_define_const(mrb, class_core, "HTTP_USE_PROXY", mrb_fixnum_value(HTTP_USE_PROXY));
+    mrb_define_const(mrb, class_core, "HTTP_TEMPORARY_REDIRECT", mrb_fixnum_value(HTTP_TEMPORARY_REDIRECT));
+    mrb_define_const(mrb, class_core, "HTTP_BAD_REQUEST", mrb_fixnum_value(HTTP_BAD_REQUEST));
+    mrb_define_const(mrb, class_core, "HTTP_UNAUTHORIZED", mrb_fixnum_value(HTTP_UNAUTHORIZED));
+    mrb_define_const(mrb, class_core, "HTTP_PAYMENT_REQUIRED", mrb_fixnum_value(HTTP_PAYMENT_REQUIRED));
+    mrb_define_const(mrb, class_core, "HTTP_FORBIDDEN", mrb_fixnum_value(HTTP_FORBIDDEN));
+    mrb_define_const(mrb, class_core, "HTTP_NOT_FOUND", mrb_fixnum_value(HTTP_NOT_FOUND));
+    mrb_define_const(mrb, class_core, "HTTP_METHOD_NOT_ALLOWED", mrb_fixnum_value(HTTP_METHOD_NOT_ALLOWED));
+    mrb_define_const(mrb, class_core, "HTTP_NOT_ACCEPTABLE", mrb_fixnum_value(HTTP_NOT_ACCEPTABLE));
+    mrb_define_const(mrb, class_core, "HTTP_PROXY_AUTHENTICATION_REQUIRED", mrb_fixnum_value(HTTP_PROXY_AUTHENTICATION_REQUIRED));
+    mrb_define_const(mrb, class_core, "HTTP_REQUEST_TIME_OUT", mrb_fixnum_value(HTTP_REQUEST_TIME_OUT));
+    mrb_define_const(mrb, class_core, "HTTP_CONFLICT", mrb_fixnum_value(HTTP_CONFLICT));
+    mrb_define_const(mrb, class_core, "HTTP_GONE", mrb_fixnum_value(HTTP_GONE));
+    mrb_define_const(mrb, class_core, "HTTP_LENGTH_REQUIRED", mrb_fixnum_value(HTTP_LENGTH_REQUIRED));
+    mrb_define_const(mrb, class_core, "HTTP_PRECONDITION_FAILED", mrb_fixnum_value(HTTP_PRECONDITION_FAILED));
+    mrb_define_const(mrb, class_core, "HTTP_REQUEST_ENTITY_TOO_LARGE", mrb_fixnum_value(HTTP_REQUEST_ENTITY_TOO_LARGE));
+    mrb_define_const(mrb, class_core, "HTTP_REQUEST_URI_TOO_LARGE", mrb_fixnum_value(HTTP_REQUEST_URI_TOO_LARGE));
+    mrb_define_const(mrb, class_core, "HTTP_UNSUPPORTED_MEDIA_TYPE", mrb_fixnum_value(HTTP_UNSUPPORTED_MEDIA_TYPE));
+    mrb_define_const(mrb, class_core, "HTTP_RANGE_NOT_SATISFIABLE", mrb_fixnum_value(HTTP_RANGE_NOT_SATISFIABLE));
+    mrb_define_const(mrb, class_core, "HTTP_EXPECTATION_FAILED", mrb_fixnum_value(HTTP_EXPECTATION_FAILED));
+    mrb_define_const(mrb, class_core, "HTTP_UNPROCESSABLE_ENTITY", mrb_fixnum_value(HTTP_UNPROCESSABLE_ENTITY));
+    mrb_define_const(mrb, class_core, "HTTP_LOCKED", mrb_fixnum_value(HTTP_LOCKED));
+    mrb_define_const(mrb, class_core, "HTTP_NOT_EXTENDED", mrb_fixnum_value(HTTP_NOT_EXTENDED));
+    mrb_define_const(mrb, class_core, "DOCUMENT_FOLLOWS", mrb_fixnum_value(HTTP_OK));
+    mrb_define_const(mrb, class_core, "PARTIAL_CONTENT", mrb_fixnum_value(HTTP_PARTIAL_CONTENT));
+    mrb_define_const(mrb, class_core, "MULTIPLE_CHOICES", mrb_fixnum_value(HTTP_MULTIPLE_CHOICES));
+    mrb_define_const(mrb, class_core, "MOVED", mrb_fixnum_value(HTTP_MOVED_PERMANENTLY));
+    mrb_define_const(mrb, class_core, "REDIRECT", mrb_fixnum_value(HTTP_MOVED_TEMPORARILY));
+    mrb_define_const(mrb, class_core, "USE_LOCAL_COPY", mrb_fixnum_value(HTTP_NOT_MODIFIED));
+    mrb_define_const(mrb, class_core, "BAD_REQUEST", mrb_fixnum_value(HTTP_BAD_REQUEST));
+    mrb_define_const(mrb, class_core, "AUTH_REQUIRED", mrb_fixnum_value(HTTP_UNAUTHORIZED));
+    mrb_define_const(mrb, class_core, "FORBIDDEN", mrb_fixnum_value(HTTP_FORBIDDEN));
+    mrb_define_const(mrb, class_core, "NOT_FOUND", mrb_fixnum_value(HTTP_NOT_FOUND));
+    mrb_define_const(mrb, class_core, "METHOD_NOT_ALLOWED", mrb_fixnum_value(HTTP_METHOD_NOT_ALLOWED));
+    mrb_define_const(mrb, class_core, "NOT_ACCEPTABLE", mrb_fixnum_value(HTTP_NOT_ACCEPTABLE));
+    mrb_define_const(mrb, class_core, "LENGTH_REQUIRED", mrb_fixnum_value(HTTP_LENGTH_REQUIRED));
+    mrb_define_const(mrb, class_core, "PRECONDITION_FAILED", mrb_fixnum_value(HTTP_PRECONDITION_FAILED));
+    mrb_define_const(mrb, class_core, "SERVER_ERROR", mrb_fixnum_value(HTTP_INTERNAL_SERVER_ERROR));
+    mrb_define_const(mrb, class_core, "NOT_IMPLEMENTED", mrb_fixnum_value(HTTP_NOT_IMPLEMENTED));
+    mrb_define_const(mrb, class_core, "BAD_GATEWAY", mrb_fixnum_value(HTTP_BAD_GATEWAY));
+    mrb_define_const(mrb, class_core, "VARIANT_ALSO_VARIES", mrb_fixnum_value(HTTP_VARIANT_ALSO_VARIES));
+    mrb_define_const(mrb, class_core, "PROXYREQ_NONE", mrb_fixnum_value(PROXYREQ_NONE));
+    mrb_define_const(mrb, class_core, "PROXYREQ_PROXY", mrb_fixnum_value(PROXYREQ_PROXY));
+    mrb_define_const(mrb, class_core, "PROXYREQ_REVERSE", mrb_fixnum_value(PROXYREQ_REVERSE));
+    mrb_define_const(mrb, class_core, "PROXYREQ_RESPONSE", mrb_fixnum_value(PROXYREQ_RESPONSE));
+    mrb_define_class_method(mrb, class_core, "sleep", ap_mrb_sleep, ARGS_ANY());
+    mrb_define_class_method(mrb, class_core, "rputs", ap_mrb_rputs, ARGS_ANY());
+    mrb_define_class_method(mrb, class_core, "return", ap_mrb_return, ARGS_ANY());
+    mrb_define_class_method(mrb, class_core, "errlogger", ap_mrb_errlogger, ARGS_ANY());
+    mrb_define_class_method(mrb, class_core, "syslogger", ap_mrb_syslogger, ARGS_ANY());
+    //mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
+    mrb_define_class_method(mrb, class_core, "mod_mruby_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
+    mrb_define_class_method(mrb, class_core, "apache_version", ap_mrb_get_apache_version, ARGS_NONE());
 }

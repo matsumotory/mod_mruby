@@ -103,3 +103,16 @@ mrb_value ap_mrb_get_conn_data_in_input_filters(mrb_state *mrb, mrb_value str)
     return mrb_fixnum_value(r->connection->data_in_input_filters);
 }
 
+void ap_mruby_conn_init(mrb_state *mrb, struct RClass *class_core)
+{
+    struct RClass *class_conn;
+
+    class_conn = mrb_define_class_under(mrb, class_core, "Connection", mrb->object_class);
+    mrb_define_method(mrb, class_conn, "remote_ip", ap_mrb_get_conn_remote_ip, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "remote_host", ap_mrb_get_conn_remote_host, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "remote_logname", ap_mrb_get_conn_remote_logname, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "local_ip", ap_mrb_get_conn_local_ip, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "local_host", ap_mrb_get_conn_local_host, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "keepalives", ap_mrb_get_conn_keepalives, ARGS_NONE());
+    mrb_define_method(mrb, class_conn, "data_in_input_filters", ap_mrb_get_conn_data_in_input_filters, ARGS_NONE());
+}

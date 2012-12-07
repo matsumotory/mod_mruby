@@ -10,23 +10,31 @@
 #include "ap_mrb_server.h"
 #include "ap_mrb_connection.h"
 #include "ap_mrb_utils.h"
-#include "ap_mrb_string.h"
+//#include "ap_mrb_string.h"
 #include "ap_mrb_env.h"
 #include "ap_mrb_scoreboard.h"
 #include "ap_mrb_authnprovider.h"
 
-struct RClass *class;
-struct RClass *class_request;
-struct RClass *class_server;
-struct RClass *class_conn;
-struct RClass *class_headers_in;
-struct RClass *class_headers_out;
-struct RClass *class_env;
-struct RClass *class_notes;
-struct RClass *class_scoreboard;
-struct RClass *class_authnprovider;
+//struct RClass *class_request;
+//struct RClass *class_server;
+//struct RClass *class_conn;
+//struct RClass *class_headers_in;
+//struct RClass *class_headers_out;
+//struct RClass *class_env;
+//struct RClass *class_notes;
+//struct RClass *class_scoreboard;
+//struct RClass *class_authnprovider;
 
 #define DONE mrb_gc_arena_restore(mrb, 0);
+
+// base class init functions
+void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core);
+void ap_mruby_server_init(mrb_state *mrb, struct RClass *class_core);
+void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core);
+void ap_mruby_conn_init(mrb_state *mrb, struct RClass *class_core);
+void ap_mruby_scoreboard_init(mrb_state *mrb, struct RClass *class_core);
+void ap_mruby_env_init(mrb_state *mrb, struct RClass *class_core);
+void ap_mruby_authnprovider_init(mrb_state *mrb, struct RClass *class_core);
 
 // add extended class init functions like ap_mruby_redis_init() in lib/redis/redis.c
 void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core);
@@ -36,19 +44,19 @@ void ap_mruby_hello_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_ext_calss_init(mrb_state *mrb, struct RClass *class_core)
 {
 #ifdef ENABLE_REDIS
-    ap_mruby_redis_init(mrb, class_core);
-    DONE;
+    ap_mruby_redis_init(mrb, class_core); DONE;
 #endif
 #ifdef ENABLE_HELLO
-    ap_mruby_hello_init(mrb, class_core);
-    DONE;
+    ap_mruby_hello_init(mrb, class_core); DONE;
 #endif
 }
 
 int ap_mruby_class_init(mrb_state *mrb)
 {
+    struct RClass *class = mrb_define_module(mrb, "Apache");
 
-    class = mrb_define_module(mrb, "Apache");
+    ap_mruby_core_init(mrb, class); DONE;
+/*
     mrb_define_const(mrb, class, "OK", mrb_fixnum_value(OK));
     mrb_define_const(mrb, class, "DECLINED", mrb_fixnum_value(DECLINED));
     mrb_define_const(mrb, class, "HTTP_SERVICE_UNAVAILABLE", mrb_fixnum_value(HTTP_SERVICE_UNAVAILABLE));
@@ -121,8 +129,9 @@ int ap_mruby_class_init(mrb_state *mrb)
     //mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
     mrb_define_class_method(mrb, class, "mod_mruby_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
     mrb_define_class_method(mrb, class, "apache_version", ap_mrb_get_apache_version, ARGS_NONE());
-    DONE;
+*/
 
+/*
     class_server = mrb_define_class_under(mrb, class, "Server", mrb->object_class);
     mrb_define_method(mrb, class_server, "error_fname=", ap_mrb_set_server_error_fname, ARGS_ANY());
     mrb_define_method(mrb, class_server, "error_fname", ap_mrb_get_server_error_fname, ARGS_NONE());
@@ -145,8 +154,10 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_server, "keep_alive_timeout", ap_mrb_get_server_keep_alive_timeout, ARGS_NONE());
     mrb_define_method(mrb, class_server, "port", ap_mrb_get_server_port, ARGS_NONE());
     mrb_define_method(mrb, class_server, "defn_line_number", ap_mrb_get_server_defn_line_number, ARGS_NONE());
-    DONE;
+*/
+    ap_mruby_server_init(mrb, class); DONE;
 
+/*
     class_scoreboard = mrb_define_class_under(mrb, class, "Scoreboard", mrb->object_class);
     mrb_define_method(mrb, class_scoreboard, "status", ap_mrb_get_scoreboard_status, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "counter", ap_mrb_get_scoreboard_counter, ARGS_NONE());
@@ -160,8 +171,10 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_scoreboard, "restart_time", ap_mrb_get_scoreboard_restart_time, ARGS_ANY());
     mrb_define_method(mrb, class_scoreboard, "idle_worker", ap_mrb_get_scoreboard_idle_worker, ARGS_ANY());
     mrb_define_method(mrb, class_scoreboard, "busy_worker", ap_mrb_get_scoreboard_process_worker, ARGS_ANY());
-    DONE;
+*/
+    ap_mruby_scoreboard_init(mrb, class); DONE;
 
+/*
     class_conn = mrb_define_class_under(mrb, class, "Connection", mrb->object_class);
     mrb_define_method(mrb, class_conn, "remote_ip", ap_mrb_get_conn_remote_ip, ARGS_NONE());
     mrb_define_method(mrb, class_conn, "remote_host", ap_mrb_get_conn_remote_host, ARGS_NONE());
@@ -170,8 +183,10 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_conn, "local_host", ap_mrb_get_conn_local_host, ARGS_NONE());
     mrb_define_method(mrb, class_conn, "keepalives", ap_mrb_get_conn_keepalives, ARGS_NONE());
     mrb_define_method(mrb, class_conn, "data_in_input_filters", ap_mrb_get_conn_data_in_input_filters, ARGS_NONE());
-    DONE;
+*/
+    ap_mruby_conn_init(mrb, class); DONE;
 
+/*
     class_request = mrb_define_class_under(mrb, class, "Request", mrb->object_class);
     //mrb_define_method(mrb, class_request, "Initialize", ap_mrb_init_request, ARGS_NONE());
     //mrb_define_method(mrb, class_request, "request_rec_json", ap_mrb_get_request_rec_json, ARGS_NONE());
@@ -226,41 +241,51 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_request, "eos_sent", ap_mrb_get_request_eos_sent, ARGS_NONE());
     mrb_define_method(mrb, class_request, "no_cache", ap_mrb_get_request_no_cache, ARGS_NONE());
     mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, ARGS_NONE());
-    DONE;
+*/
+    ap_mruby_request_init(mrb, class); DONE;
 
+/*
     class_notes = mrb_define_class_under(mrb, class, "Notes", mrb->object_class);
     mrb_define_method(mrb, class_notes, "[]=", ap_mrb_set_request_notes, ARGS_ANY());
     mrb_define_method(mrb, class_notes, "[]", ap_mrb_get_request_notes, ARGS_ANY());
-    DONE;
+*/
+    //ap_mruby_notes_init(mrb, class); DONE;
 
+/*
     class_env = mrb_define_class_under(mrb, class, "Env", mrb->object_class);
     mrb_define_method(mrb, class_env, "initialize", ap_mrb_init_env, ARGS_NONE());
     mrb_define_method(mrb, class_env, "[]=", ap_mrb_set_env, ARGS_ANY());
     mrb_define_method(mrb, class_env, "[]", ap_mrb_get_env, ARGS_ANY());
     mrb_define_method(mrb, class_env, "env_hash", ap_mrb_get_env_hash, ARGS_NONE());
-    DONE;
+*/
+    ap_mruby_env_init(mrb, class); DONE;
 
+/*
     //class_headers_in = mrb_define_class(mrb, "headers_in", class_request);
     class_headers_in = mrb_define_class_under(mrb, class, "Headers_in", mrb->object_class);
     mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "headers_in_hash", ap_mrb_get_request_headers_in_hash, ARGS_ANY());
-    DONE;
+*/
+    //ap_mruby_headers_in_init(mrb, class); DONE;
 
     //mrb_define_method(mrb, class_request, "[]=", ap_mrb_set_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "[]", ap_mrb_get_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_in=", ap_mrb_set_request_readers_in, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_in", ap_mrb_get_request_readers_in, ARGS_ANY());
 
+/*
     class_headers_out = mrb_define_class_under(mrb, class, "Headers_out", mrb->object_class);
     mrb_define_method(mrb, class_headers_out, "headers_out=", ap_mrb_set_request_headers_out, ARGS_ANY());
     mrb_define_method(mrb, class_headers_out, "headers_out", ap_mrb_get_request_headers_out, ARGS_ANY());
     mrb_define_method(mrb, class_headers_out, "headers_out_hash", ap_mrb_get_request_headers_out_hash, ARGS_ANY());
-    DONE;
+*/
+    //ap_mruby_headers_out_init(mrb, class); DONE;
 
     //mrb_define_method(mrb, class_request, "headers_out=", ap_mrb_set_request_readers_out, ARGS_ANY());
     //mrb_define_method(mrb, class_request, "headers_out", ap_mrb_get_request_readers_out, ARGS_ANY());
 
+/*
     class_authnprovider = mrb_define_class_under(mrb, class, "AuthnProvider", mrb->object_class);
     mrb_define_const(mrb, class_authnprovider, "AUTH_DENIED", mrb_fixnum_value(AUTH_DENIED));
     mrb_define_const(mrb, class_authnprovider, "AUTH_GRANTED", mrb_fixnum_value(AUTH_GRANTED));
@@ -272,7 +297,8 @@ int ap_mruby_class_init(mrb_state *mrb)
     mrb_define_method(mrb, class_authnprovider, "realm", ap_mrb_get_authnprovider_realm, ARGS_NONE());
     mrb_define_method(mrb, class_authnprovider, "rethash", ap_mrb_get_authnprovider_rethash, ARGS_NONE());
     mrb_define_method(mrb, class_authnprovider, "rethash=", ap_mrb_set_authnprovider_rethash, ARGS_ANY());
-    DONE;
+*/
+    ap_mruby_authnprovider_init(mrb, class); DONE;
 
 //    class_redis = mrb_define_class_under(mrb, class, "Redis", mrb->object_class);
 //    mrb_define_method(mrb, class_redis, "initialize", ap_mrb_redis_connect, ARGS_ANY());
