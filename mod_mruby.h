@@ -29,7 +29,7 @@
 #define MOD_MRUBY_H
 
 #define MODULE_NAME        "mod_mruby"
-#define MODULE_VERSION     "0.5.1"
+#define MODULE_VERSION     "0.6.1"
 #define UNSET              -1
 #define SET                1
 #define ON                 1
@@ -38,6 +38,9 @@
 /* define ENABLE_XXXX from DISABLE_XXX */
 #ifndef DISABLE_REDIS
 #define ENABLE_REDIS
+#endif
+#ifndef DISABLE_HELLO
+#define ENABLE_HELLO
 #endif
 
 #include "mruby.h"
