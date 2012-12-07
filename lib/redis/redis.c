@@ -14,18 +14,6 @@
 
 #ifdef ENABLE_REDIS
 
-// Add init function to ap_mruby_ext_calss_init() in ap_mrb_init.c
-// and prototype to ap_mrb_init.c
-void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core)
-{
-    struct RClass *class_redis;
-
-    class_redis = mrb_define_class_under(mrb, class_core, "Redis", mrb->object_class);
-    mrb_define_method(mrb, class_redis, "initialize", ap_mrb_redis_connect, ARGS_ANY());
-    mrb_define_method(mrb, class_redis, "set", ap_mrb_redis_set, ARGS_ANY());
-    mrb_define_method(mrb, class_redis, "get", ap_mrb_redis_get, ARGS_ANY());
-}
-
 mrb_value ap_mrb_redis_connect(mrb_state *mrb, mrb_value self)
 {
     mrb_value host, port;
@@ -160,4 +148,17 @@ mrb_value ap_mrb_redis_mget(mrb_state *mrb, mrb_value self)
     }
 }
 */
+
+// Add init function to ap_mruby_ext_calss_init() in ap_mrb_init.c
+// and prototype to ap_mrb_init.c
+void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core)
+{
+    struct RClass *class_redis;
+
+    class_redis = mrb_define_class_under(mrb, class_core, "Redis", mrb->object_class);
+    mrb_define_method(mrb, class_redis, "initialize", ap_mrb_redis_connect, ARGS_ANY());
+    mrb_define_method(mrb, class_redis, "set", ap_mrb_redis_set, ARGS_ANY());
+    mrb_define_method(mrb, class_redis, "get", ap_mrb_redis_get, ARGS_ANY());
+}
+
 #endif
