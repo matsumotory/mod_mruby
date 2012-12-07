@@ -51,16 +51,8 @@
 
 #include <unistd.h>
 #include <sys/stat.h>
-#include "mod_mruby.h"
-/*
-#include "ap_mrb_utils.h"
-#include "ap_mrb_string.h"
-#include "ap_mrb_request.h"
-#include "ap_mrb_server.h"
-#include "ap_mrb_connection.h"
-#include "ap_mrb_init.h"
-*/
 
+#include "mod_mruby.h"
 #include "ap_mrb_request.h"
 #include "ap_mrb_authnprovider.h"
 #include "ap_mrb_utils.h"
