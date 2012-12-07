@@ -11,7 +11,7 @@ APXS=@APXS_PATH@
 APACHECTL=@APACHECTL_PATH@
 
 #   additional user defines, includes and libraries
-DEFS=@VERSION_DEF@
+DEFS=@DEFS@
 INC=-I. -I./vendors/src -I./vendors/include
 LIB=-lm -lcrypto -lhiredis ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-s

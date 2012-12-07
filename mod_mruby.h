@@ -35,13 +35,19 @@
 #define ON                 1
 #define OFF                0
 
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
 /* define ENABLE_XXXX from DISABLE_XXX */
+/*
 #ifndef DISABLE_REDIS
 #define ENABLE_REDIS
 #endif
 #ifndef DISABLE_HELLO
 #define ENABLE_HELLO
 #endif
+*/
 
 #include "mruby.h"
 #include "mruby/string.h"
