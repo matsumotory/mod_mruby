@@ -4,7 +4,7 @@
 ##
 
 # target module source
-TARGET=mod_mruby.c ap_mrb_*.c lib/*/*.c
+TARGET=mod_mruby.c ap_mrb_*.c @FEATURE_TARGETS@
 
 #   the used tools
 APXS=@APXS_PATH@
@@ -13,10 +13,10 @@ APACHECTL=@APACHECTL_PATH@
 #   additional user defines, includes and libraries
 DEFS=@DEFS@
 INC=-I. -I./vendors/src -I./vendors/include
-LIB=-lm -lcrypto -lhiredis ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
+LIB=@LIBS@ ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-s
-WL=-Wl,-lm,-lcrypto,-lhiredis
-CFLAGS = $(INC) $(LIB) $(WC) $(WL)
+LDFLAGS=@LDFLAGS@
+CFLAGS = $(INC) $(LIB) $(WC) 
 
 #   the default target
 all: libmruby.a mod_mruby.so
@@ -26,7 +26,7 @@ extend: libmruby-ex.a mod_mruby.so
 
 #   compile the DSO file
 mod_mruby.so: $(TARGET)
-	$(APXS) -c $(DEFS) $(CFLAGS) $(TARGET)
+	$(APXS) -c $(DEFS) $(CFLAGS) $(LDFLAGS) $(TARGET)
 
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
