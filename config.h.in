@@ -12,6 +12,12 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have the `crypto' library (-lcrypto). */
+#undef HAVE_LIBCRYPTO
+
+/* Define to 1 if you have the `hiredis' library (-lhiredis). */
+#undef HAVE_LIBHIREDIS
+
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
