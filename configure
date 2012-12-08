@@ -842,6 +842,7 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-redis          redis feature (default is no)
   --enable-hello          hello feature (default is no)
+  --enable-load           load feature (default is no)
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -3545,6 +3546,7 @@ _ACEOF
     ;;
 esac
 
+# support redis
 # Check whether --enable-redis or --disable-redis was given.
 if test "${enable_redis+set}" = set; then
   enableval="$enable_redis"
@@ -3788,6 +3790,7 @@ _ACEOF
 fi
 
 
+# support hello
 # Check whether --enable-hello or --disable-hello was given.
 if test "${enable_hello+set}" = set; then
   enableval="$enable_hello"
@@ -3804,6 +3807,28 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
      FEATURE_TARGETS="lib/hello/*.c ${FEATURE_TARGETS}"
+
+
+fi
+
+
+# support load
+# Check whether --enable-load or --disable-load was given.
+if test "${enable_load+set}" = set; then
+  enableval="$enable_load"
+
+else
+  enable_load=no
+
+fi;
+
+if test "x$enable_load" != xno; then
+
+cat >>confdefs.h <<\_ACEOF
+#define ENABLE_LOAD 1
+_ACEOF
+
+     FEATURE_TARGETS="lib/load/*.c ${FEATURE_TARGETS}"
 
 
 fi

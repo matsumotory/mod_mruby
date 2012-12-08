@@ -62,6 +62,7 @@ case $APACHE_VERSION in
     ;;
 esac
 
+# support redis
 AC_ARG_ENABLE([redis],
     [AS_HELP_STRING([--enable-redis],
         [redis feature (default is no)])],
@@ -77,6 +78,7 @@ AS_IF([test "x$enable_redis" != xno],
     ]
 )
 
+# support hello
 AC_ARG_ENABLE([hello],
     [AS_HELP_STRING([--enable-hello],
         [hello feature (default is no)])],
@@ -87,6 +89,20 @@ AC_ARG_ENABLE([hello],
 AS_IF([test "x$enable_hello" != xno],
     [AC_DEFINE([ENABLE_HELLO], [1], [hello support])
      FEATURE_TARGETS="lib/hello/*.c ${FEATURE_TARGETS}"
+    ]
+)
+
+# support load
+AC_ARG_ENABLE([load],
+    [AS_HELP_STRING([--enable-load],
+        [load feature (default is no)])],
+    [],
+    [enable_load=no] 
+)
+
+AS_IF([test "x$enable_load" != xno],
+    [AC_DEFINE([ENABLE_LOAD], [1], [getloadavg support])
+     FEATURE_TARGETS="lib/load/*.c ${FEATURE_TARGETS}"
     ]
 )
 

@@ -3,6 +3,9 @@
 /* hello support */
 #undef ENABLE_HELLO
 
+/* getloadavg support */
+#undef ENABLE_LOAD
+
 /* redis support */
 #undef ENABLE_REDIS
 

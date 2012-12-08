@@ -20,6 +20,7 @@ void ap_mruby_authnprovider_init(mrb_state *mrb, struct RClass *class_core);
 // add extended class init functions like ap_mruby_redis_init() in lib/redis/redis.c
 void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_hello_init(mrb_state *mrb, struct RClass *class_core);
+void ap_mruby_load_init(mrb_state *mrb, struct RClass *class_core);
 
 // init phase for extended calss like lib/redis/redis.c
 void ap_mruby_ext_class_init(mrb_state *mrb, struct RClass *class_core)
@@ -29,6 +30,9 @@ void ap_mruby_ext_class_init(mrb_state *mrb, struct RClass *class_core)
 #endif
 #ifdef ENABLE_HELLO
     ap_mruby_hello_init(mrb, class_core); DONE;
+#endif
+#ifdef ENABLE_LOAD
+    ap_mruby_load_init(mrb, class_core); DONE;
 #endif
 }
 
