@@ -16,13 +16,11 @@ INC=-I. -I./vendors/src -I./vendors/include
 LIB=@LIBS@ ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-s
 LDFLAGS=@LDFLAGS@
-CFLAGS = $(INC) $(LIB) $(WC) 
+CFLAGS=$(INC) $(LIB) $(WC)
+MRUBY_REPOS=@MRUBY_REPOS@
 
 #   the default target
 all: libmruby.a mod_mruby.so
-
-#   build for iij extended lib
-extend: libmruby-ex.a mod_mruby.so
 
 #   compile the DSO file
 mod_mruby.so: $(TARGET)
@@ -52,22 +50,9 @@ stop:
 # libmruby.a
 tmp/mruby:
 	mkdir -p tmp vendors
-	cd tmp; git clone git://github.com/mruby/mruby.git
+	cd tmp; git clone "$(MRUBY_REPOS)"
 
 libmruby.a: tmp/mruby
-	cd tmp/mruby && make CFLAGS="-O3 -fPIC"
-	cp -r tmp/mruby/include vendors/
-	cp -r tmp/mruby/lib vendors/
-	cp -r tmp/mruby/src vendors/
-	cp -r tmp/mruby/bin vendors/
-	cp -r tmp/mruby/mrblib vendors/
-
-# libmruby.a (+iij extended lib)
-tmp/mruby-ex:
-	mkdir -p tmp vendors
-	cd tmp; git clone git://github.com/iij/mruby.git
-
-libmruby-ex.a: tmp/mruby-ex
 	cd tmp/mruby && make CFLAGS="-O3 -fPIC"
 	cp -r tmp/mruby/include vendors/
 	cp -r tmp/mruby/lib vendors/
