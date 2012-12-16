@@ -25,9 +25,9 @@ void ap_mruby_load_init(mrb_state *mrb, struct RClass *class_core);
 // init phase for extended calss like lib/redis/redis.c
 void ap_mruby_ext_class_init(mrb_state *mrb, struct RClass *class_core)
 {
-#ifdef ENABLE_REDIS
-    ap_mruby_redis_init(mrb, class_core); DONE;
-#endif
+//#ifdef ENABLE_REDIS
+//    ap_mruby_redis_init(mrb, class_core); DONE;
+//#endif
 #ifdef ENABLE_HELLO
     ap_mruby_hello_init(mrb, class_core); DONE;
 #endif
