@@ -1035,12 +1035,23 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         , APLOG_DEBUG
         , 0
         , r
-        , "%s DEBUG %s: return mruby code(%d): %s"
+        , "%s DEBUG %s: n=%d return mruby code(%d): %s"
         , MODULE_NAME
         , __func__
+        , n
         , ap_mrb_get_status_code()
         , mruby_code_file
     );
+
+    mrb->irep_len = n;
+
+    if (!(mrb->irep[n]->flags & MRB_ISEQ_NO_FREE))
+      mrb_free(mrb, mrb->irep[n]->iseq);
+
+    mrb_free(mrb, mrb->irep[n]->pool);
+    mrb_free(mrb, mrb->irep[n]->syms);
+    mrb_free(mrb, mrb->irep[n]->lines);
+    mrb_free(mrb, mrb->irep[n]);
 
     return ap_mrb_get_status_code();
 }
