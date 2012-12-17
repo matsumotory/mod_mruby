@@ -57,7 +57,7 @@ tmp/mruby:
 	cd tmp; git clone "$(MRUBY_REPOS)"
 
 libmruby.a: tmp/mruby
-	cd tmp/mruby && make CFLAGS="-O3 -fPIC"
+	cd tmp/mruby && rake CFLAGS="-O3 -fPIC"
 	cp -r tmp/mruby/include vendors/
 	cp -r tmp/mruby/lib vendors/
 	cp -r tmp/mruby/src vendors/
