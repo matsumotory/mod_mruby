@@ -823,6 +823,19 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     return OK;
 }
 
+static void ap_mruby_irep_clean(mrb_state *mrb, int n)
+{
+    mrb->irep_len = n;
+
+    if (!(mrb->irep[n]->flags & MRB_ISEQ_NO_FREE))
+      mrb_free(mrb, mrb->irep[n]->iseq);
+
+    mrb_free(mrb, mrb->irep[n]->pool);
+    mrb_free(mrb, mrb->irep[n]->syms);
+    mrb_free(mrb, mrb->irep[n]->lines);
+    mrb_free(mrb, mrb->irep[n]);
+}
+
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
 {
 
@@ -841,6 +854,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     cache_table_data = mod_mruby_cache_table;
 #endif
 
+/*
     if (conf->mruby_cache_table_size > 0) {
         for(i = 0; i < conf->mruby_cache_table_size; i++) {
                 ap_log_rerror(APLOG_MARK
@@ -905,10 +919,9 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
             }
         }
     }
-
+*/
 
     if (!cache_hit) {
-
 
         if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
             ap_log_error(APLOG_MARK
@@ -943,6 +956,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         fclose(mrb_file);
         n = mrb_generate_code(mrb, p);
 
+/*
 #ifdef __MOD_MRUBY_SHARED_CACHE_TABLE__
     // mod_mruby_mutex lock
         if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
@@ -958,6 +972,8 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
             return OK;
         }
 #endif
+*/
+/*
         if (conf->mruby_cache_table_size > 0) {
             if (stat(mruby_code_file, &st) == -1) {
                 ap_log_rerror(APLOG_MARK
@@ -1011,6 +1027,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
             return OK;
         }
 #endif
+*/
         mrb_pool_close(p->pool);
     }
 
@@ -1043,19 +1060,10 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         , mruby_code_file
     );
 
-    mrb->irep_len = n;
-
-    if (!(mrb->irep[n]->flags & MRB_ISEQ_NO_FREE))
-      mrb_free(mrb, mrb->irep[n]->iseq);
-
-    mrb_free(mrb, mrb->irep[n]->pool);
-    mrb_free(mrb, mrb->irep[n]->syms);
-    mrb_free(mrb, mrb->irep[n]->lines);
-    mrb_free(mrb, mrb->irep[n]);
+    ap_mruby_irep_clean(mrb, n);
 
     return ap_mrb_get_status_code();
 }
-
 
 static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 {
