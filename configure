@@ -595,6 +595,7 @@ ac_subst_vars='LTLIBOBJS
 FEATURE_TARGETS
 APACHECTL_PATH
 APXS_PATH
+RAKE_PATH
 MRUBY_REPOS
 LIBOBJS
 EGREP
@@ -3630,9 +3631,61 @@ iij|extend)     # iij/mruby
 esac
 $as_echo "--with-mruby: $MRUBY_REPOS will be used."
 
-if test "$APXS_PATH" = no; then
-    as_fn_error $? "apxs2 and apsx not found." "$LINENO" 5
+# Checks for rake or ruby
+for ac_prog in rake1.9.1 rake ruby1.9.1 ruby
+do
+  # Extract the first word of "$ac_prog", so it can be a program name with args.
+set dummy $ac_prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_RAKE_PATH+set}" = set; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $RAKE_PATH in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_RAKE_PATH="$RAKE_PATH" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/usr/bin:/usr/local/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_RAKE_PATH="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  ;;
+esac
 fi
+RAKE_PATH=$ac_cv_path_RAKE_PATH
+if test -n "$RAKE_PATH"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RAKE_PATH" >&5
+$as_echo "$RAKE_PATH" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+  test -n "$RAKE_PATH" && break
+done
+test -n "$RAKE_PATH" || RAKE_PATH="no"
+
+case $(basename "$RAKE_PATH") in
+ruby*)
+        RAKE_PATH="$RAKE_PATH ./minirake" ;;
+no)
+        as_fn_error $? "rake and ruby not found." "$LINENO" 5 ;;
+esac
+
 
 # Checks for apache tools.
 
