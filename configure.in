@@ -49,10 +49,6 @@ iij|extend)     # iij/mruby
 esac
 AS_ECHO(["--with-mruby: [$MRUBY_REPOS] will be used."])
 
-if test "$APXS_PATH" = no; then
-    AC_MSG_ERROR([apxs2 and apsx not found.])
-fi
-
 # Checks for apache tools.
 AC_ARG_WITH(apxs, AC_HELP_STRING([--with-apxs=FILE],
     [pathname to the Apache apxs tool [[apxs]]]),
