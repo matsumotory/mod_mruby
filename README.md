@@ -9,6 +9,14 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 
     git clone git://github.com/matsumoto-r/mod_mruby.git
 
 ### 2. Compile
+* mruby/mruby build
+
+        cd mod_mruby
+        git clone git://github.com/mruby/mruby.git
+        cd mruby
+        make
+        cd ..
+
 * configure
 
         ./configure
@@ -17,11 +25,6 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 
 * using mruby/murby
 
         make
-
-
-* using iij/mruby
-
-        make extend
 
 
 ### 3. Install
