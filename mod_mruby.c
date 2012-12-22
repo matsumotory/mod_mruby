@@ -839,9 +839,10 @@ static void ap_mruby_irep_clean(mrb_state *mrb, int n)
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
 {
 
-    int i, n;
+    //int i, n;
+    int n;
     struct mrb_parser_state* p;
-    struct stat st;
+    //struct stat st;
     FILE *mrb_file;
     int cache_hit = 0;
     int ai = 0;

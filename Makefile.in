@@ -11,17 +11,32 @@ APXS=@APXS_PATH@
 APACHECTL=@APACHECTL_PATH@
 
 #   additional user defines, includes and libraries
+MRUBY_ROOT=@MRUBY_ROOT@
 DEFS=@DEFS@
-INC=-I. -I./vendors/src -I./vendors/include
-LIB=@LIBS@ ./vendors/lib/libmruby.a ./vendors/mrblib/mrblib.o
+INC=-I. -I$(MRUBY_ROOT)/src -I$(MRUBY_ROOT)/include
+LIB=@LIBS@ $(MRUBY_ROOT)/lib/libmruby.a $(MRUBY_ROOT)//mrblib/mrblib.o
 WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-s
-LDFLAGS=@LDFLAGS@
-CFLAGS=$(INC) $(LIB) $(WC)
 MRUBY_REPOS=@MRUBY_REPOS@
 RAKE_PATH=@RAKE_PATH@
+ENABLE_GEMS=@ENABLE_GEMS@
+
+#   suport mrbgems
+ifeq ($(ENABLE_GEMS),false)
+  GEM_ARCHIVE_FILES =
+else
+  MAKEFILE_GEM_LIST := $(MRUBY_ROOT)/mrbgems/g/MakefileGemList
+  ifeq ($(wildcard $(MAKEFILE_GEM_LIST)),)
+    GEM_ARCHIVE_FILES =
+  else
+    include $(MAKEFILE_GEM_LIST)
+  endif
+endif
+
+LDFLAGS=@LDFLAGS@
+CFLAGS=$(INC) $(LIB) $(GEM_ARCHIVE_FILES) $(WC)
 
 #   the default target
-all: libmruby.a mod_mruby.so
+all: mod_mruby.so
 
 #   compile the DSO file
 mod_mruby.so: $(TARGET)
@@ -52,15 +67,15 @@ restart:
 stop:
 	$(APACHECTL) stop
 
-# libmruby.a
-tmp/mruby:
-	mkdir -p tmp vendors
-	cd tmp; git clone "$(MRUBY_REPOS)"
-
-libmruby.a: tmp/mruby
-	cd tmp/mruby && $(RAKE_PATH) CFLAGS="-O3 -fPIC"
-	cp -r tmp/mruby/include vendors/
-	cp -r tmp/mruby/lib vendors/
-	cp -r tmp/mruby/src vendors/
-	cp -r tmp/mruby/bin vendors/
-	cp -r tmp/mruby/mrblib vendors/
+## libmruby.a
+#tmp/mruby:
+#	mkdir -p tmp vendors
+#	cd tmp; git clone "$(MRUBY_REPOS)"
+#
+#libmruby.a: tmp/mruby
+#	cd tmp/mruby && $(RAKE_PATH) CFLAGS="-O3 -fPIC" ENABLE_GEMS=$(ENABLE_GEMS)
+#	cp -r tmp/mruby/include vendors/
+#	cp -r tmp/mruby/lib vendors/
+#	cp -r tmp/mruby/src vendors/
+#	cp -r tmp/mruby/bin vendors/
+#	cp -r tmp/mruby/mrblib vendors/

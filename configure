@@ -593,6 +593,8 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 FEATURE_TARGETS
+ENABLE_GEMS
+MRUBY_ROOT
 APACHECTL_PATH
 APXS_PATH
 RAKE_PATH
@@ -653,7 +655,8 @@ enable_option_checking
 with_mruby
 with_apxs
 with_apachectl
-enable_redis
+with_mruby_root
+enable_mrbgems
 enable_hello
 enable_load
 '
@@ -1275,7 +1278,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
-  --enable-redis          redis feature (default is no)
+  --enable-mrbgems        mrbgems feature (default is no)
   --enable-hello          hello feature (default is no)
   --enable-load           load feature (default is no)
 
@@ -1287,6 +1290,7 @@ Optional Packages:
                           (default is mruby)
   --with-apxs=FILE        pathname to the Apache apxs tool [[apxs]]
   --with-apachectl=FILE   pathname to the Apache apachectl tool [[apachectl]]
+  --with-mruby-root=DIR   pathname to mruby_root [[mruby_root]]
 
 Some influential environment variables:
   CC          C compiler command
@@ -3821,77 +3825,52 @@ $as_echo "#define __APACHE24__ 1" >>confdefs.h
     ;;
 esac
 
-# support redis
-# Check whether --enable-redis was given.
-if test "${enable_redis+set}" = set; then :
-  enableval=$enable_redis; for ac_header in hiredis/hiredis.h
-do :
-  ac_fn_c_check_header_mongrel "$LINENO" "hiredis/hiredis.h" "ac_cv_header_hiredis_hiredis_h" "$ac_includes_default"
-if test "x$ac_cv_header_hiredis_hiredis_h" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_HIREDIS_HIREDIS_H 1
-_ACEOF
+# mruby root
+MRUBY_ROOT=./mruby
 
+# Check whether --with-mruby_root was given.
+if test "${with_mruby_root+set}" = set; then :
+  withval=$with_mruby_root; MRUBY_ROOT="$with_mruby_root"
+fi
+
+
+
+# support mrbgems
+ENABLE_GEMS=false
+# Check whether --enable-mrbgems was given.
+if test "${enable_mrbgems+set}" = set; then :
+  enableval=$enable_mrbgems;
 else
-  as_fn_error $? "not found the header file for redis." "$LINENO" 5
-fi
-
-done
-
-     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lhiredis" >&5
-$as_echo_n "checking for main in -lhiredis... " >&6; }
-if test "${ac_cv_lib_hiredis_main+set}" = set; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lhiredis  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_hiredis_main=yes
-else
-  ac_cv_lib_hiredis_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_hiredis_main" >&5
-$as_echo "$ac_cv_lib_hiredis_main" >&6; }
-if test "x$ac_cv_lib_hiredis_main" = x""yes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBHIREDIS 1
-_ACEOF
-
-  LIBS="-lhiredis $LIBS"
+  enable_mrbgems=no
 
 fi
 
 
-else
-  enable_redis=no
+if test "x$enable_mrbgems" != xno; then :
 
-fi
+$as_echo "#define ENABLE_GEMS 1" >>confdefs.h
 
-
-if test "x$enable_redis" != xno; then :
-
-$as_echo "#define ENABLE_REDIS 1" >>confdefs.h
-
-     FEATURE_TARGETS="lib/redis/*.c ${FEATURE_TARGETS}"
+        ENABLE_GEMS=true
 
 
 fi
+
+
+## support redis
+#AC_ARG_ENABLE([redis],
+#    [AS_HELP_STRING([--enable-redis],
+#        [redis feature (default is no)])],
+#    [AC_CHECK_HEADERS([hiredis/hiredis.h],,[AC_MSG_ERROR(not found the header file for redis.)])
+#     AC_CHECK_LIB([hiredis], [main])
+#    ],
+#    [enable_redis=no]
+#)
+#
+#AS_IF([test "x$enable_redis" != xno],
+#    [AC_DEFINE([ENABLE_REDIS], [1], [redis support])
+#     FEATURE_TARGETS="lib/redis/*.c ${FEATURE_TARGETS}"
+#    ]
+#)
 
 # support hello
 # Check whether --enable-hello was given.
