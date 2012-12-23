@@ -67,7 +67,7 @@ module AP_MODULE_DECLARE_DATA mruby_module;
 apr_shm_t *shm;
 cache_table_t *shm_table_data_base = NULL;
 
-// grobal mutex 
+// global mutex 
 apr_global_mutex_t *mod_mruby_mutex;
 #else
 cache_table_t *mod_mruby_cache_table = NULL;
