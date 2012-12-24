@@ -25,4 +25,4 @@ mruby-growthforecast
 mruby-zabbix
 EOF
 
-rake ENABLE_GEMS='true' LIBS='-luv -lpthread -ldl -lrt -lhiredis -lm'
+rake ENABLE_GEMS='true'
