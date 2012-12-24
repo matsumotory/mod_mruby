@@ -82,3 +82,9 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 
 
 ## Data Structure
 * [Data Structure Page](https://github.com/matsumoto-r/mod_mruby/wiki/Data-Structure)
+
+# License
+under the MIT License:
+
+* http://www.opensource.org/licenses/mit-license.php
+
