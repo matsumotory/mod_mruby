@@ -12,6 +12,7 @@ git clone git://github.com/matsumoto-r/mruby-simplehttp.git
 git clone git://github.com/matsumoto-r/mruby-httprequest.git
 git clone git://github.com/matsumoto-r/mruby-growthforecast.git
 git clone git://github.com/matsumoto-r/mruby-zabbix.git
+git clone git://github.com/matsumoto-r/mruby-random.git
 cd -
 
 cd mruby
@@ -25,6 +26,7 @@ mruby-simplehttp
 mruby-httprequest
 mruby-growthforecast
 mruby-zabbix
+mruby-random
 EOF
 
 rake ENABLE_GEMS='true'
