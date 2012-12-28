@@ -20,3 +20,6 @@ GTAGS
 # dir for compiling
 tmp
 vendors
+
+mruby
+Makefile
