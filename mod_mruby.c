@@ -1086,6 +1086,7 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
         p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_handler_code_native, NULL);
         conf->mod_mruby_handler_code_native_n = mrb_generate_code(mod_mruby_share_state, p);
         mrb_pool_close(p->pool);
+/*
         ap_log_perror(APLOG_MARK
             , APLOG_NOTICE
             , 0
@@ -1096,6 +1097,7 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
             , conf->mod_mruby_handler_code_native
             , conf->mod_mruby_handler_code_native_n
         );
+*/
     }
  
     if (conf->mruby_cache_table_size > 0) {
@@ -1137,11 +1139,14 @@ static int mod_mruby_handler_code(request_rec *r)
         return DECLINED;
 
     ap_mrb_push_request(r);
+    int ai = mrb_gc_arena_save(mod_mruby_share_state);
     mrb_run(mod_mruby_share_state
         , mrb_proc_new(mod_mruby_share_state, mod_mruby_share_state->irep[conf->mod_mruby_handler_code_native_n])
         , mrb_top_self(mod_mruby_share_state)
     );
+    mrb_gc_arena_restore(mod_mruby_share_state, ai);
 
+/*
         ap_log_perror(APLOG_MARK
             , APLOG_NOTICE
             , 0
@@ -1150,6 +1155,7 @@ static int mod_mruby_handler_code(request_rec *r)
             , MODULE_NAME
             , __func__
         );
+*/
     
     return OK;
 }
