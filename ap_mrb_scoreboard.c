@@ -19,6 +19,16 @@
 #define ap_get_scoreboard_worker ap_get_scoreboard_worker_from_indexes
 #endif
 
+#if !defined(__APACHE24__) && defined(_WIN32)
+/*
+ * libhttpd.dll does not export following variables.
+ * This won't work correctly, but working well for other functional.
+ */
+int ap_extended_status = 0;
+ap_generation_t volatile ap_my_generation = 0;
+scoreboard *ap_scoreboard_image = NULL;
+#endif
+
 static int mruby_server_limit, mruby_thread_limit;
 
 static apr_off_t sb_get_kbcount();
