@@ -1,21 +1,31 @@
-TARGET=mod_mruby.c ap_mrb_request.c ap_mrb_string.c ap_mrb_utils.c ap_mrb_server.c ap_mrb_init.c ap_mrb_connection.c
+SOURCE = \
+	ap_mrb_authnprovider.c \
+	ap_mrb_connection.c \
+	ap_mrb_env.c \
+	ap_mrb_init.c \
+	ap_mrb_request.c \
+	ap_mrb_scoreboard.c \
+	ap_mrb_server.c \
+	ap_mrb_utils.c \
+	mod_mruby.c
 
 APXS=apxs
 
-#INC=-I. -I../mruby/src -I../mruby/include -I/usr/include/json
-INC=-I. -I../mruby/src -I../mruby/include
+INC=-I. -Imruby/include
 APACHE_ROOT=c:/progra~1/apache~1/apache2.2
-#LIB=-lm ../mruby/lib/libmruby.a -llibapr-1 -llibaprutil-1 -llibhttpd -lws2_32 -ljson
-LIB=-lm ../mruby/lib/libmruby.a -llibapr-1 -llibaprutil-1 -llibhttpd -lws2_32
-DEF=-DAPR_DECLARE_EXPORT
+LIB=-lm mruby/build/host/lib/libmruby.a -llibapr-1 -llibaprutil-1 -llibhttpd -lws2_32
+DEF=-DAP_DECLARE_EXPORT -DAPR_DECLARE_EXPORT
 
 all: mod_mruby.so
 
-mod_mruby.so: $(TARGET)
-	$(APXS) -c $(DEF) $(INC) $(TARGET) $(LIB)
+mod_mruby.so: $(SOURCE) mruby/build/host/lib/libmruby.a
+	$(APXS) -o mod_mruby.so -c $(DEF) $(INC) $(SOURCE) -static-libgcc $(LIB)
+
+mruby/build/host/lib/libmruby.a:
+	(cd mruby && rake)
 
 install: all
-	$(APXS) -i -a -n "mruby" .libs/mod_mruby.so
+	$(APXS) -i -a -n "mruby" mod_mruby.so
 
 clean:
 	-rm -rf .libs *.o *.so *.lo *.la *.slo *.loT

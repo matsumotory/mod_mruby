@@ -33,6 +33,7 @@
 
 #include "apr_strings.h"
 #include "ap_config.h"
+#include "ap_provider.h"
 #include "httpd.h"
 #include "http_config.h"
 #include "http_core.h"
