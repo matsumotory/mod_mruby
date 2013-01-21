@@ -852,6 +852,18 @@ static int mod_mruby_handler_code(request_rec *r)
     if (strcmp(r->handler, "mruby-native-script") != 0)
         return DECLINED;
 
+    // mutex lock
+    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: mod_mruby_mutex lock failed"
+            , MODULE_NAME
+            , __func__
+        );
+        return OK;
+    }
     ap_mrb_push_request(r);
     int ai = mrb_gc_arena_save(mod_mruby_share_state);
     mrb_run(mod_mruby_share_state
@@ -859,17 +871,28 @@ static int mod_mruby_handler_code(request_rec *r)
         , mrb_top_self(mod_mruby_share_state)
     );
     mrb_gc_arena_restore(mod_mruby_share_state, ai);
-
-/*
-        ap_log_perror(APLOG_MARK
-            , APLOG_NOTICE
+    //ap_mruby_irep_clean(mod_mruby_share_state, conf->mod_mruby_handler_code_native_n);
+    // mutex unlock
+    if (apr_global_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
             , 0
-            , r->pool
-            , "%s NOTICE %s: naitve code execed."
+            , NULL
+            , "%s ERROR %s: mod_mruby_mutex unlock failed"
             , MODULE_NAME
             , __func__
         );
-*/
+        return OK;
+    }
+
+    ap_log_perror(APLOG_MARK
+        , APLOG_DEBUG
+        , 0
+        , r->pool
+        , "%s NOTICE %s: naitve code execed."
+        , MODULE_NAME
+        , __func__
+    );
     
     return OK;
 }
