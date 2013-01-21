@@ -59,16 +59,11 @@
 #include "ap_mrb_utils.h"
 
 mrb_state *mod_mruby_share_state = NULL;
+apr_global_mutex_t *mod_mruby_mutex;
 
 module AP_MODULE_DECLARE_DATA mruby_module;
 
-apr_global_mutex_t *mod_mruby_mutex;
-
-// global mutex 
-apr_global_mutex_t *mod_mruby_mutex;
-
 int ap_mruby_class_init(mrb_state *mrb);
-
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s);
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status);
 
