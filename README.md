@@ -12,9 +12,10 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 
 * mruby/mruby build
 
         cd mod_mruby
-        git clone git://github.com/mruby/mruby.git
+        git submodule init
+        git submodule update
         cd mruby
-        make
+        rake
         cd ..
 
 * configure
@@ -30,22 +31,25 @@ Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 
 ### 3. Install
     make install
 
-### 4. Settings
+### 4. Test Settings
 * Add to /usr/local/apache/conf/httpd.conf
 
         LoadModule mruby_module modules/mod_mruby.so
-        # remove comment out if you use .mrb as Web contens
-        # AddHandler mruby-script .mrb
+        AddHandler mruby-script .mrb
 
-    * hook mrb-script on ap_hook_translateName Middle phase
+    * if hook mrb-script on ap_hook_translateName Middle phase
 
              mrubyTranslateNameMiddle /path/to/file.mrb
+
+* test.mrb copy
+        
+        cp -p test/test.mrb $(APACHE_ROOT)htdocs/.
 
 ### 5. Apache Restart
     /etc/init.d/httpd restart
 
-### 6. Install Test
-* [Install Test Page](https://github.com/matsumoto-r/mod_mruby/wiki/Install-Test-Page)
+### 6. Access URL by Browser
+    curl http://127.0.0.1/test.mrb
 
 ## Example
 * Selecting vhost area like mod_vhost_alias(hook on translatename)
