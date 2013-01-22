@@ -51,6 +51,8 @@
 
 #include "mruby.h"
 #include "mruby/string.h"
+
+#undef HAVE_UNISTD_H
 #include "http_request.h"
 #include "http_log.h"
 #include "ap_release.h"

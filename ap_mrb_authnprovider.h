@@ -2,6 +2,8 @@
 #define AP_MRB_AUTHNPROVIDER_H
 
 #include "mruby.h"
+
+#undef HAVE_UNISTD_H
 #include "http_request.h"
 #include "mod_auth.h"
 
