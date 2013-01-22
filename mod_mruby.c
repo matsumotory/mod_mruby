@@ -613,7 +613,7 @@ static const char *set_mod_mruby_cache_table_size(cmd_parms *cmd, void *mconfig,
     int table_size = strtol(arg, (char **) NULL, 10);
     conf->mruby_cache_table_size = table_size;
     ap_log_perror(APLOG_MARK
-        , APLOG_NOTICE
+        , APLOG_DEBUG
         , 0
         , cmd->pool
         , "%s %s: mod_mruby cache table enabled. table size %d."
@@ -662,7 +662,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
 
     if(apr_global_mutex_child_init(&mod_mruby_mutex, NULL, p)) {
         ap_log_error(APLOG_MARK
-            , APLOG_ERR        
+            , APLOG_DEBUG        
             , 0                
             , NULL             
             , "%s ERROR %s: global mutex attached."
@@ -672,7 +672,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     }
 
     ap_log_perror(APLOG_MARK
-        , APLOG_NOTICE
+        , APLOG_INFO
         , 0                
         , p
         , "%s %s: main process / thread (pid=%d) initialized."
@@ -833,7 +833,7 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
     }
  
     ap_log_perror(APLOG_MARK
-        , APLOG_NOTICE
+        , APLOG_INFO
         , 0
         , pool
         , "%s %s: child process (pid=%d) initialized."
