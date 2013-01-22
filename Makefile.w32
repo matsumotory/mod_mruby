@@ -9,10 +9,9 @@ SOURCE = \
 	ap_mrb_utils.c \
 	mod_mruby.c
 
-APXS=apxs
-
 INC=-I. -Imruby/include
 APACHE_ROOT=c:/progra~1/apache~1/apache2.2
+APXS=perl "$(APACHE_ROOT)/bin/apxs"
 LIB=-lm mruby/build/host/lib/libmruby.a -llibapr-1 -llibaprutil-1 -llibhttpd -lws2_32
 DEF=-DAP_DECLARE_EXPORT -DAPR_DECLARE_EXPORT
 
