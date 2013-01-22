@@ -21,27 +21,26 @@ RAKE_PATH=@RAKE_PATH@
 ENABLE_GEMS=@ENABLE_GEMS@
 
 #   suport mrbgems
-ifeq ($(ENABLE_GEMS),false)
-  GEM_ARCHIVE_FILES =
+MRUBY_MAK_FILE := $(MRUBY_ROOT)/build/host/lib/libmruby.flags.mak
+ifeq ($(wildcard $(MRUBY_MAK_FILE)),)
+  MRUBY_CFLAGS =
+  MRUBY_LDFLAGS =
+  MRUBY_LIBS =
 else
-  MAKEFILE_GEM_LIST := $(MRUBY_ROOT)/mrbgems/g/MakefileGemList
-  ifeq ($(wildcard $(MAKEFILE_GEM_LIST)),)
-    GEM_ARCHIVE_FILES =
-  else
-    include $(MAKEFILE_GEM_LIST)
-  endif
+  include $(MRUBY_MAK_FILE)
 endif
 
 APXS_LDFLAGS=@LDFLAGS@
-CFLAGS=$(INC) $(GEM_CFLAGS_LIST)
-LDFLAGS=$(LIB) $(GEM_LDFLAGS_LIST) $(GEM_ARCHIVE_FILES) $(GEM_LIBS_LIST)
+CFLAGS=$(INC)
+LDFLAGS=$(MRUBY_LDFLAGS)
+LIBS=$(LIB) $(MRUBY_LIBS)
 
 #   the default target
 all: mod_mruby.so
 
 #   compile the DSO file
 mod_mruby.so: $(TARGET)
-	$(APXS) -c $(DEFS) $(CFLAGS) $(LDFLAGS) $(WC) $(APXS_LDFLAGS) $(TARGET)
+	$(APXS) -c $(DEFS) $(CFLAGS) $(LDFLAGS) $(LIBS) $(WC) $(APXS_LDFLAGS) $(TARGET)
 
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
