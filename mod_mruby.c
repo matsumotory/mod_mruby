@@ -628,7 +628,7 @@ static const char *set_mod_mruby_cache_table_size(cmd_parms *cmd, void *mconfig,
 
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
 {
-    void *data;
+    void *data = NULL;
     const char *userdata_key = "mruby_init";
 
     apr_status_t status = apr_global_mutex_create(&mod_mruby_mutex, NULL, APR_LOCK_DEFAULT, p);
@@ -681,10 +681,10 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         , getpid()
     );  
 
-    apr_pool_userdata_get(&data, userdata_key, s->process->pool);
+    apr_pool_userdata_get(&data, userdata_key, p);
 
     if (!data)
-        apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null, s->process->pool);
+        apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null, p);
 
     ap_log_perror(APLOG_MARK
         , APLOG_NOTICE
@@ -802,6 +802,12 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     return ap_mrb_get_status_code();
 }
 
+static apr_status_t mod_mruby_hook_term(void *data)
+{
+    mrb_close(mod_mruby_share_state);
+    return APR_SUCCESS;
+}
+
 static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 {
 
@@ -831,6 +837,8 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
         );
 */
     }
+
+    apr_pool_cleanup_register(pool, NULL, mod_mruby_hook_term, apr_pool_cleanup_null);
  
     ap_log_perror(APLOG_MARK
         , APLOG_INFO
