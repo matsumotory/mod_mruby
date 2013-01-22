@@ -29,7 +29,7 @@
 #define MOD_MRUBY_H
 
 #define MODULE_NAME        "mod_mruby"
-#define MODULE_VERSION     "0.6.1"
+#define MODULE_VERSION     "0.8.9"
 #define UNSET              -1
 #define SET                1
 #define ON                 1
