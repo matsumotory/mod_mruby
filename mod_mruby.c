@@ -44,6 +44,9 @@
 #include "apr_global_mutex.h"
 #ifdef AP_NEED_SET_MUTEX_PERMS
 #include "unixd.h"
+#if (AP_SERVER_MINORVERSION_NUMBER > 2)
+#define unixd_set_global_mutex_perms ap_unixd_set_global_mutex_perms
+#endif
 #endif
 
 #include <mruby.h>
@@ -646,7 +649,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     }   
 
 #ifdef AP_NEED_SET_MUTEX_PERMS
-    status = ap_unixd_set_global_mutex_perms(mod_mruby_mutex);
+    status = unixd_set_global_mutex_perms(mod_mruby_mutex);
     if(status != APR_SUCCESS){
         ap_log_error(APLOG_MARK
             , APLOG_ERR        
@@ -721,7 +724,6 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     struct mrb_parser_state* p;
     //struct stat st;
     FILE *mrb_file;
-    int cache_hit = 0;
     int ai = 0;
 
     if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
@@ -811,7 +813,6 @@ static apr_status_t mod_mruby_hook_term(void *data)
 static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 {
 
-    int i;
     mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
 
     mod_mruby_share_state = mrb_open();
