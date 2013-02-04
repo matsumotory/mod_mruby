@@ -1,27 +1,66 @@
-r = Apache::Request.new()
-r.content_type = "text/html"
+a = Apache::Request.new()
+a.content_type = "text/html"
 
-a       = Apache
 host    = "127.0.0.1"
 port    = 6379
-
-a.rputs("> redis connect " + host + ":" + port.to_s + "<br>")
-redis = Apache::Redis.new(host, port)
-
 key     = "hoge"
-val     = "100"
 
-a.rputs("> redis set " + key + " " + val + "<br>")
-redis.set(key, val)
+Apache.rputs "> redis connect #{host}: #{port.to_s}<br>"
+r = Redis.new host, port
 
-a.rputs("> redis get " + key + "<br>")
-a.rputs(key + ": " + redis.get(key) + "<br><br>")
+Apache.rputs "> redis set #{key} 200<br>"
+r.set key, "200"
 
-key     = "hoge"
-val     = "bbbbbbbbbbbbbb"
+Apache.rputs "> redis get #{key}<br>"
+Apache.rputs "#{key}: #{r[key]}<br>"
 
-a.rputs("> redis set " + key + " " + val + "<br>")
-redis.set(key, val)
+Apache.rputs "> redis set #{key} fuga<br>"
+r[key] =  "fuga"
 
-a.rputs("> redis get " + key + "<br>")
-a.rputs(key + ": " + redis.get(key))
+Apache.rputs "> redis get #{key}<br>"
+Apache.rputs "#{key}: #{r.get key}<br>"
+
+Apache.rputs "> redis del #{key}<br>"
+r.del key
+
+if r[key].nil?
+    Apache.rputs "del success!<br>"
+end
+
+Apache.rputs "> redis incr #{key}<br>"
+Apache.rputs "#{key} incr: #{r.incr(key)}<br>"
+Apache.rputs "#{key} incr: #{r.incr(key)}<br>"
+Apache.rputs "#{key} incr: #{r.incr(key)}<br>"
+Apache.rputs "#{key} incr: #{r.incr(key)}<br>"
+
+Apache.rputs "> redis decr #{key}<br>"
+Apache.rputs "#{key} decr: #{r.decr(key)}<br>"
+Apache.rputs "#{key} decr: #{r.decr(key)}<br>"
+Apache.rputs "#{key} decr: #{r.decr(key)}<br>"
+Apache.rputs "#{key} decr: #{r.decr(key)}<br>"
+
+Apache.rputs "> redis lpush logs error<br>"
+r.lpush "logs", "error1"
+r.lpush "logs", "error2"
+r.lpush "logs", "error3"
+
+Apache.rputs "> redis lrange 0 -1<br>"
+Apache.rputs r.lrange "logs", 0, -1 + "<br>"
+
+Apache.rputs "> redis ltrim 1 -1<br>"
+r.ltrim "logs", 1, -1
+
+Apache.rputs "> redis lrange 0 -1<br>"
+Apache.rputs r.lrange "logs", 0, -1
+
+Apache.rputs "> redis del logs<br>"
+r.del "logs"
+
+if r["logs"].nil?
+    Apache.rputs "del success!<br>"
+end
+
+Apache.rputs "> redis publish :one hello<br>"
+r.publish "one", "hello"
+
+r.close

@@ -56,10 +56,10 @@ void ap_mrb_raise_file_error(mrb_state *mrb, mrb_value obj, request_rec *r, cons
    if (mrb_type(obj) == MRB_TT_STRING) {
        str = mrb_str_ptr(obj);
        err_out = str->ptr;
-       ap_log_rerror(APLOG_MARK
+       ap_log_error(APLOG_MARK
            , APLOG_ERR
            , 0
-           , r
+           , NULL 
            , "%s ERROR %s: mrb_run failed. file: %s error: %s"
            , MODULE_NAME
            , __func__
@@ -79,10 +79,10 @@ void ap_mrb_raise_error(mrb_state *mrb, mrb_value obj, request_rec *r)
    if (mrb_type(obj) == MRB_TT_STRING) {
        str = mrb_str_ptr(obj);
        err_out = str->ptr;
-       ap_log_rerror(APLOG_MARK
+       ap_log_error(APLOG_MARK
            , APLOG_ERR
            , 0
-           , r
+           , NULL
            , "%s ERROR %s: mrb_run failed. error: %s"
            , MODULE_NAME
            , __func__
