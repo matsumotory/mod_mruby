@@ -5,6 +5,7 @@ mod_mruby - to provide an alternative to mod_lua.
 Apache modules can be implemeted by mruby scripts on Apache HTTP Server 2.2/2.4 installed mod_mruby.
 
 Supported MPM: worker prefork event
+Supported OS: Linux FreeBSD Windows and so on.
 
 ## How to use
 ### 1. Download
