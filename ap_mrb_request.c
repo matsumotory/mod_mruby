@@ -347,6 +347,15 @@ mrb_value ap_mrb_set_request_status_line(mrb_state *mrb, mrb_value str)
     return val;
 }
 
+mrb_value ap_mrb_set_request_status(mrb_state *mrb, mrb_value str)
+{
+    mrb_value val;
+    request_rec *r = ap_mrb_get_request();
+    mrb_get_args(mrb, "o", &val);
+    r->status = mrb_fixnum(val);
+    return val;
+}
+
 mrb_value ap_mrb_set_request_method(mrb_state *mrb, mrb_value str)
 {
     mrb_value val;
@@ -673,6 +682,7 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_request, "proxyreq", ap_mrb_get_request_proxyreq, ARGS_NONE());
     mrb_define_method(mrb, class_request, "header_only", ap_mrb_get_request_header_only, ARGS_NONE());
     mrb_define_method(mrb, class_request, "proto_num", ap_mrb_get_request_proto_num, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "status=", ap_mrb_set_request_status, ARGS_ANY());
     mrb_define_method(mrb, class_request, "status", ap_mrb_get_request_status, ARGS_NONE());
     mrb_define_method(mrb, class_request, "method_number", ap_mrb_get_request_method_number, ARGS_NONE());
     mrb_define_method(mrb, class_request, "chunked", ap_mrb_get_request_chunked, ARGS_NONE());
