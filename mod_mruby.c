@@ -41,6 +41,9 @@
 #include "http_protocol.h"
 #include "http_request.h"
 
+#include "apr_thread_proc.h"
+
+/*
 #include "apr_global_mutex.h"
 #ifdef AP_NEED_SET_MUTEX_PERMS
 #include "unixd.h"
@@ -48,6 +51,7 @@
 #define unixd_set_global_mutex_perms ap_unixd_set_global_mutex_perms
 #endif
 #endif
+*/
 
 #include <mruby.h>
 #include <mruby/proc.h>
@@ -62,7 +66,8 @@
 #include "ap_mrb_utils.h"
 
 mrb_state *mod_mruby_share_state = NULL;
-apr_global_mutex_t *mod_mruby_mutex;
+//apr_global_mutex_t *mod_mruby_mutex;
+apr_thread_mutex_t *mod_mruby_mutex;
 
 module AP_MODULE_DECLARE_DATA mruby_module;
 
@@ -634,6 +639,21 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     void *data = NULL;
     const char *userdata_key = "mruby_init";
 
+    apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex, APR_THREAD_MUTEX_DEFAULT, p);
+    if(status != APR_SUCCESS){
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR        
+            , 0                
+            , NULL             
+            , "%s ERROR %s: Error creating thread mutex."
+            , MODULE_NAME
+            , __func__
+        );
+
+        return status;
+    }   
+
+/*
     apr_status_t status = apr_global_mutex_create(&mod_mruby_mutex, NULL, APR_LOCK_DEFAULT, p);
     if(status != APR_SUCCESS){
         ap_log_error(APLOG_MARK
@@ -673,6 +693,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
             , __func__
         );
     }
+*/
 
     ap_log_perror(APLOG_MARK
         , APLOG_INFO
@@ -789,7 +810,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     ap_mruby_irep_clean(mrb, n);
 
     // mutex unlock
-    if (apr_global_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
+    if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -862,7 +883,7 @@ static int mod_mruby_handler_code(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -882,7 +903,7 @@ static int mod_mruby_handler_code(request_rec *r)
     mrb_gc_arena_restore(mod_mruby_share_state, ai);
     //ap_mruby_irep_clean(mod_mruby_share_state, conf->mod_mruby_handler_code_native_n);
     // mutex unlock
-    if (apr_global_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
+    if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -918,7 +939,7 @@ static int mod_mruby_handler(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -940,7 +961,7 @@ static int mod_mruby_post_read_request_first(request_rec *r)
     if (conf->mod_mruby_post_read_request_first_code == NULL)
         return DECLINED;
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -963,7 +984,7 @@ static int mod_mruby_post_read_request_middle(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -986,7 +1007,7 @@ static int mod_mruby_post_read_request_last(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1009,7 +1030,7 @@ static int mod_mruby_quick_handler_first(request_rec *r, int lookup)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1032,7 +1053,7 @@ static int mod_mruby_quick_handler_middle(request_rec *r, int lookup)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1055,7 +1076,7 @@ static int mod_mruby_quick_handler_last(request_rec *r, int lookup)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1078,7 +1099,7 @@ static int mod_mruby_translate_name_first(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1101,7 +1122,7 @@ static int mod_mruby_translate_name_middle(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1124,7 +1145,7 @@ static int mod_mruby_translate_name_last(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1147,7 +1168,7 @@ static int mod_mruby_map_to_storage_first(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1170,7 +1191,7 @@ static int mod_mruby_map_to_storage_middle(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1193,7 +1214,7 @@ static int mod_mruby_map_to_storage_last(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1216,7 +1237,7 @@ static int mod_mruby_access_checker_first(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1239,7 +1260,7 @@ static int mod_mruby_access_checker_middle(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1262,7 +1283,7 @@ static int mod_mruby_access_checker_last(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1285,7 +1306,7 @@ static int mod_mruby_check_user_id_first(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1308,7 +1329,7 @@ static int mod_mruby_check_user_id_middle(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1331,7 +1352,7 @@ static int mod_mruby_check_user_id_last(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1354,7 +1375,7 @@ static int mod_mruby_auth_checker_first(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1377,7 +1398,7 @@ static int mod_mruby_auth_checker_middle(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1400,7 +1421,7 @@ static int mod_mruby_auth_checker_last(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1423,7 +1444,7 @@ static int mod_mruby_fixups_first(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1446,7 +1467,7 @@ static int mod_mruby_fixups_middle(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1469,7 +1490,7 @@ static int mod_mruby_fixups_last(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1492,7 +1513,7 @@ static void mod_mruby_insert_filter_first(request_rec *r)
         return;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1514,7 +1535,7 @@ static void mod_mruby_insert_filter_middle(request_rec *r)
         return;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1536,7 +1557,7 @@ static void mod_mruby_insert_filter_last(request_rec *r)
         return;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1558,7 +1579,7 @@ static int mod_mruby_log_transaction_first(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1581,7 +1602,7 @@ static int mod_mruby_log_transaction_middle(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1604,7 +1625,7 @@ static int mod_mruby_log_transaction_last(request_rec *r)
         return DECLINED;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1628,7 +1649,7 @@ static authn_status mod_mruby_authn_check_password(request_rec *r, const char *u
         return AUTH_GENERAL_ERROR;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
@@ -1654,7 +1675,7 @@ static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *u
         return AUTH_GENERAL_ERROR;
 
     // mutex lock
-    if (apr_global_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
