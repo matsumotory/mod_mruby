@@ -13,20 +13,18 @@ Supported OS: Linux FreeBSD Windows and so on.
     git clone git://github.com/matsumoto-r/mod_mruby.git
 
 ### 2. Auto Build
-* auto all build(include 2 and 3 steps)
-
     cd mod_mruby
     sh build.sh
 
 ### 3. Test Settings
 * Add to httpd.conf
 
-    LoadModule mruby_module modules/mod_mruby.so
-    AddHandler mruby-script .rb
+        LoadModule mruby_module modules/mod_mruby.so
+        AddHandler mruby-script .rb
 
-* test.mrb copy   
+* test.rb copy   
 
-    cp -p test/test.rb $(APACHE_DOCMENT_ROOT)/.
+        cp -p test/test.rb $(APACHE_DOCMENT_ROOT)/.
 
 ### 4. Apache Restart
     service httpd restart
