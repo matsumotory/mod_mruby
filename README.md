@@ -12,7 +12,29 @@ Supported OS: Linux FreeBSD Windows and so on.
 ### 1. Download
     git clone git://github.com/matsumoto-r/mod_mruby.git
 
-### 2. Compile
+### 2. Auto Build
+* auto all build(include 2 and 3 steps)
+
+    cd mod_mruby
+    sh build.sh
+
+### 3. Test Settings
+* Add to httpd.conf
+
+    LoadModule mruby_module modules/mod_mruby.so
+    AddHandler mruby-script .rb
+
+* test.mrb copy   
+
+    cp -p test/test.rb $(APACHE_DOCMENT_ROOT)/.
+
+### 4. Apache Restart
+    service httpd restart
+
+### 5. Access URL by Browser
+    curl http://127.0.0.1/test.rb
+
+### Manual Build      
 * mruby/mruby build
 
         cd mod_mruby
@@ -26,34 +48,10 @@ Supported OS: Linux FreeBSD Windows and so on.
 
         ./configure
 
-
-* using mruby/murby
+* using mruby/mruby
 
         make
-
-
-### 3. Install
-    make install
-
-### 4. Test Settings
-* Add to /usr/local/apache/conf/httpd.conf
-
-        LoadModule mruby_module modules/mod_mruby.so
-        AddHandler mruby-script .mrb
-
-    * if hook mrb-script on ap_hook_translateName Middle phase
-
-             mrubyTranslateNameMiddle /path/to/file.mrb
-
-* test.mrb copy
-        
-        cp -p test/test.mrb $(APACHE_ROOT)htdocs/.
-
-### 5. Apache Restart
-    /etc/init.d/httpd restart
-
-### 6. Access URL by Browser
-    curl http://127.0.0.1/test.mrb
+        make install
 
 ## Example
 * Selecting vhost area like mod_vhost_alias(hook on translatename)
