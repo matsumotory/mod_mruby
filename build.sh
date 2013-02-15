@@ -2,7 +2,7 @@
 
 set -e
 
-if [ -d "./mruby/src" ]; then
+if [ ! -d "./mruby/src" ]; then
     echo "mruby Downloading ..."
     git submodule init
     git submodule update
@@ -25,5 +25,6 @@ echo "mod_mruby building ..."
 make
 make install
 echo "mod_mruby building ... Done"
+echo "build.sh ... successful"
 
 #make restart
