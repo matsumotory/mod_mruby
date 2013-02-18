@@ -634,11 +634,34 @@ mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
     return str;
 }
 
+mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
+{
+    request_rec *r = ap_mrb_get_request();
+    apr_status_t result = ap_run_handler(r);
+
+    if (result != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK
+            , APLOG_WARNING
+            , 0
+            , NULL
+            , "%s ERROR %s: ap_run_handler failed"
+            , MODULE_NAME
+            , __func__
+        );
+        r->connection->aborted = 1;
+    }
+
+    return self;
+}
+
 void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
 {
     struct RClass *class_request;
 
     class_request = mrb_define_class_under(mrb, class_core, "Request", mrb->object_class);
+
+    mrb_define_method(mrb, class_request, "run_handler", ap_mrb_run_handler, ARGS_NONE());
+
     //mrb_define_method(mrb, class_request, "Initialize", ap_mrb_init_request, ARGS_NONE());
     //mrb_define_method(mrb, class_request, "request_rec_json", ap_mrb_get_request_rec_json, ARGS_NONE());
     mrb_define_method(mrb, class_request, "the_request=", ap_mrb_set_request_the_request, ARGS_ANY());

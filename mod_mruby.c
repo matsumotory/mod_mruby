@@ -30,6 +30,7 @@
 //
 // -------------------------------------------------------------------
 */
+#define CORE_PRIVATE
 
 #include "apr_strings.h"
 #include "ap_config.h"
@@ -59,6 +60,7 @@
 
 #include <unistd.h>
 #include <sys/stat.h>
+//#include <sys/prctl.h>
 
 #include "mod_mruby.h"
 #include "ap_mrb_request.h"
@@ -90,6 +92,7 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
     mruby_config_t *conf = 
         (mruby_config_t *) apr_pcalloc(p, sizeof (*conf));
 
+    conf->mod_mruby_post_config_last_code           = NULL;
     conf->mod_mruby_handler_code_native_n           = -1;
     conf->mod_mruby_handler_code_native             = NULL;
     conf->mod_mruby_handler_code                    = NULL;
@@ -154,6 +157,21 @@ static const char *set_mod_mruby_handler_code(cmd_parms *cmd, void *mconfig, con
         return err;
 
     conf->mod_mruby_handler_code_native = apr_pstrdup(cmd->pool, arg);
+
+    return NULL;
+}
+
+
+static const char *set_mod_mruby_post_config_last(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_post_config_last_code = apr_pstrdup(cmd->pool, arg);
 
     return NULL;
 }
@@ -721,7 +739,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         , MODULE_VERSION
     );  
     
-    return OK;
+    return DECLINED;
 }
 
 static void ap_mruby_irep_clean(mrb_state *mrb, int n)
@@ -735,6 +753,82 @@ static void ap_mruby_irep_clean(mrb_state *mrb, int n)
     mrb_free(mrb, mrb->irep[n]->syms);
     mrb_free(mrb, mrb->irep[n]->lines);
     mrb_free(mrb, mrb->irep[n]);
+}
+
+// mruby_run for not request phase.
+static int ap_mruby_run_nr(const char *mruby_code_file)
+{
+
+    int n;
+    struct mrb_parser_state* p;
+    FILE *mrb_file;
+    mrb_state *mrb = mrb_open();
+    ap_mruby_class_init(mrb);
+
+    if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: mrb file oepn failed: %s"
+            , MODULE_NAME
+            , __func__
+            , mruby_code_file
+        );
+        mrb_close(mrb);
+        return -1;
+    }
+
+   ap_log_error(APLOG_MARK
+       , APLOG_DEBUG
+       , 0
+       , NULL
+       , "%s DEBUG %s: cache nothing on pid %d, compile code: %s"
+       , MODULE_NAME
+       , __func__
+       , getpid()
+       , mruby_code_file
+   );
+
+    p = mrb_parse_file(mrb, mrb_file, NULL);
+    fclose(mrb_file);
+    n = mrb_generate_code(mrb, p);
+
+    mrb_pool_close(p->pool);
+
+    ap_log_error(APLOG_MARK
+        , APLOG_DEBUG
+        , 0
+        , NULL
+        , "%s DEBUG %s: run mruby code: %s"
+        , MODULE_NAME
+        , __func__
+        , mruby_code_file
+    );
+
+    ap_mrb_set_status_code(OK);
+    mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
+
+    if (mrb->exc)
+        ap_mrb_raise_file_error_nr(mrb, mrb_obj_value(mrb->exc), mruby_code_file);
+
+    // mutex unlock
+    if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: mod_mruby_mutex unlock failed"
+            , MODULE_NAME
+            , __func__
+        );
+        mrb_close(mrb);
+        return -1;
+    }
+
+    mrb_close(mrb);
+
+    return APR_SUCCESS;
 }
 
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
@@ -839,6 +933,7 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
     mod_mruby_share_state = mrb_open();
     ap_mruby_class_init(mod_mruby_share_state);
 
+    //prctl(PR_SET_KEEPCAPS,1);
 
     if (conf->mod_mruby_handler_code_native != NULL) {
         struct mrb_parser_state* p;
@@ -871,6 +966,30 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
         , __func__
         , getpid()
     );
+}
+
+
+static int mod_mruby_post_config_last(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server)
+{
+    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
+
+    if (conf->mod_mruby_post_config_last_code == NULL)
+        return DECLINED;
+
+    // mutex lock
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: mod_mruby_mutex lock failed"
+            , MODULE_NAME
+            , __func__
+        );
+        return DECLINED;
+    }
+    ap_mruby_run_nr(conf->mod_mruby_post_config_last_code);
+    return OK;
 }
 
 
@@ -1703,6 +1822,7 @@ static const authn_provider authn_mruby_provider = {
 static void register_hooks(apr_pool_t *p)
 {
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_post_config(mod_mruby_post_config_last, NULL, NULL, APR_HOOK_LAST);
     ap_hook_child_init(mod_mruby_child_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_handler(mod_mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
     ap_hook_handler(mod_mruby_handler_code, NULL, NULL, APR_HOOK_MIDDLE);
@@ -1745,6 +1865,7 @@ static const command_rec mod_mruby_cmds[] = {
 
     AP_INIT_TAKE1("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
     AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_code, NULL, RSRC_CONF | ACCESS_CONF, "hook code for handler phase."),
+    AP_INIT_TAKE1("mrubyPostConfigLast", set_mod_mruby_post_config_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config last phase."),
     AP_INIT_TAKE1("mrubyPostReadRequestFirst", set_mod_mruby_post_read_request_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request first phase."),
     AP_INIT_TAKE1("mrubyPostReadRequestMiddle", set_mod_mruby_post_read_request_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request middle phase."),
     AP_INIT_TAKE1("mrubyPostReadRequestLast", set_mod_mruby_post_read_request_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request last phase."),
