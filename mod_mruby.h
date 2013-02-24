@@ -57,6 +57,10 @@
 #include "http_log.h"
 #include "ap_release.h"
 
+#if (AP_SERVER_MINORVERSION_NUMBER > 2)
+    #define __APACHE24__
+#endif
+
 typedef struct {
 
     const char *mod_mruby_authn_check_password_code;
