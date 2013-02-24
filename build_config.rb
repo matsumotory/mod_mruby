@@ -15,11 +15,13 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/iij/mruby-digest.git'
   conf.gem :git => 'git://github.com/mattn/mruby-json.git'
   conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-random.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
+
+  # linux only
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
 
   # Generate binaries
   # conf.bins = %w(mrbc mruby mirb)

@@ -84,13 +84,13 @@ if test "$APACHECTL_PATH" = no; then
 fi
 
 APACHE_VERSION=`$APACHECTL_PATH -v | awk "/Server version/ {print $ 3}"`
-NEED_DEFINE_VERSITON="Apache/2.4.*"
+#NEED_DEFINE_VERSITON="Apache/2.4.*"
 
 case $APACHE_VERSION in
-    $NEED_DEFINE_VERSITON) 
-        AC_DEFINE([__APACHE24__], [1], [apache 2.4 support])
-        echo "checking for apache version... $APACHE_VERSION set VERSION_DEF=$VERSION_DEF"
-    ;;
+#    $NEED_DEFINE_VERSITON) 
+#        AC_DEFINE([__APACHE24__], [1], [apache 2.4 support])
+#        echo "checking for apache version... $APACHE_VERSION set VERSION_DEF=$VERSION_DEF"
+#    ;;
     *)
         echo "checking for apache version... $APACHE_VERSION"
     ;;
