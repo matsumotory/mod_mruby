@@ -23,7 +23,7 @@ cd ..
 echo "mod_mruby building ..."
 ./configure
 make
-make install
+sudo make install
 echo "mod_mruby building ... Done"
 echo "build.sh ... successful"
 
