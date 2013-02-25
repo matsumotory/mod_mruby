@@ -24,7 +24,7 @@ module ModMruby
       @s = @a::Server.new
       @m = Discount.new("http://kevinburke.bitbucket.org/markdowncss/markdown.css", "mod_mruby test page")
     end
-    def parse
+    def call
       param = @r.uri.split("/")
       
       @el = {
@@ -41,9 +41,24 @@ module ModMruby
         @a.errlogger 4, "#{key}: #{@el[key]}"
       end
       @a.errlogger 4, "=== [#{@el[:id]}] api request [#{@el[:class]}:#{@el[:method]}]==="
+      call_api(@el[:class], @el[:method])
+    end
+    def call_api(cls, mtd)
+      if cls == "request"
+        ModMruby::API::Request.new(mtd)
+      end
+    end
+    class Request
+      def initialize(method)
+        @a = Apache
+        @r = Apache::Request.new
+        self.send(method)
+      end
+      def filename; @a.errlogger 4, "call api: #{@r.filename}"; end
+      def uri; @a.errlogger 4, "call api: #{@r.uri}"; end
     end
   end
 end
 
 api = ModMruby::API.new
-api.parse
+api.call
