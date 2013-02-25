@@ -4,6 +4,9 @@
 # LoadModule mruby_module modules/mod_mruby.so
 # mrubyTranslateNameFirst "/tmp/api_request.rb"
 #
+# cp api_request.rb /tmp/.
+# touch #{document_root}/dummy
+#
 
 module ModMruby
   def ModMruby.escape(str)
