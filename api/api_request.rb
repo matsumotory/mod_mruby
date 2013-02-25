@@ -18,7 +18,6 @@ module ModMruby
   end
   class API
     def initialize
-      @el = {}
       @a = Apache
       @r = @a::Request.new
       @s = @a::Server.new
@@ -27,35 +26,43 @@ module ModMruby
     def call
       param = @r.uri.split("/")
       
-      @el = {
+      el = {
         :id      => Random::rand(1000000),
-        :class   => ModMruby.escape(param[1]),
-        :method  => ModMruby.escape(param[2]),
-        :key     => ModMruby.escape(param[3]),
-        :val     => ModMruby.escape(param[4]),
-        :type    => ModMruby.escape(param[5]),
+        :key     => ModMruby.escape(param[1]),
+        :type    => ModMruby.escape(param[2]),
+        :class   => ModMruby.escape(param[3]),
+        :method  => ModMruby.escape(param[4]),
+        :val     => ModMruby.escape(param[5]),
       }
 
-      @a.errlogger 4, "=== [#{@el[:id]}] api request [#{@el[:class]}:#{@el[:method]}]==="
-      @el.each_key do |key|
-        @a.errlogger 4, "#{key}: #{@el[key]}"
+      @a.errlogger 4, "=== [#{el[:id]}] api request [#{el[:class]}:#{el[:method]}]==="
+      el.each_key do |key|
+        @a.errlogger 4, "#{key}: #{el[key]}"
       end
-      @a.errlogger 4, "=== [#{@el[:id]}] api request [#{@el[:class]}:#{@el[:method]}]==="
-      call_api(@el[:class], @el[:method])
+      @a.errlogger 4, "=== [#{el[:id]}] api request [#{el[:class]}:#{el[:method]}]==="
+      call_api(el)
     end
-    def call_api(cls, mtd)
-      if cls == "request"
-        ModMruby::API::Request.new(mtd)
+    def call_api(param)
+      if param[:class] == "request"
+        ModMruby::API::Request.new(param).send(param[:method])
       end
+      @a.return Apache::DECLINED
     end
     class Request
-      def initialize(method)
+      def initialize(param)
         @a = Apache
         @r = Apache::Request.new
-        self.send(method)
+        @s = Apache::Server.new
+        @param = param
       end
-      def filename; @a.errlogger 4, "call api: #{@r.filename}"; end
-      def uri; @a.errlogger 4, "call api: #{@r.uri}"; end
+      #def uri; @a.rputs JSON::stringify({@param, {result => {uri => @r.uri}}}); end
+      def uri
+        @a.rputs JSON::stringify({"hoge" => @r.uri})
+        @a.errlogger 4, JSON::stringify({"hoge" => @r.uri})
+        @r.filename = "#{@s.document_root}/index.html"
+        @r.status = 201
+        @a.return Apache::OK
+      end
     end
   end
 end
