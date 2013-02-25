@@ -46,9 +46,28 @@ module ModMruby
     def call_api(param)
       if param[:class] == "request"
         ModMruby::API::Request.new(param).send(param[:method])
+      elsif param[:class] == "scoreboard"
+        ModMruby::API::Scoreboard.new(param).send(param[:method])
       else
         @a.return Apache::DECLINED
       end
+    end
+    class Scoreboard
+      def initialize(param)
+        @a = Apache
+        @r = Apache::Request.new
+        @s = Apache::Server.new
+        @sc = Apache::Scoreboard.new
+        @param = param
+        @r.content_type = "application/json"
+        @r.filename = "#{@s.document_root}/dummy"
+        @r.status = 200
+        @a.return Apache::OK
+      end
+      def busy_worker;  @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.busy_worker}})); end
+      def idle_worker;  @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.idle_worker}})); end
+      def total_kbyte;  @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.total_kbyte}})); end
+      def total_access; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.total_access}})); end
     end
     class Request
       def initialize(param)
