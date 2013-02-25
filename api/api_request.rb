@@ -1,3 +1,10 @@
+#
+# mod_mruby API module
+#
+# LoadModule mruby_module modules/mod_mruby.so
+# mrubyTranslateNameFirst "/tmp/api_request.rb"
+#
+
 module ModMruby
   def ModMruby.escape(str)
     reserved_str = [
