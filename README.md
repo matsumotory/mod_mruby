@@ -27,7 +27,7 @@ see [mod_mruby](https://github.com/matsumoto-r/mod_mruby).
 http://127.0.0.1:3000/
 
 ## Sample
-![sample_display](https://pbs.twimg.com/media/BEA_sBiCMAAL6c7.png)
+![sample_display](https://github.com/matsumoto-r/mod_mruby_hackathon/blob/master/interface/views/sample_image.jpeg)
 
 ## License
 under the MIT License:
