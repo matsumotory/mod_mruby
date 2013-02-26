@@ -1,0 +1,11 @@
+npm install express socket.io ejs
+
+vi app.js
+modify your host
+
+vi static/client.js
+modify your host
+
+node app.js
+
+http://example.com:3000/

@@ -1,0 +1,18 @@
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script>
+      var server = "<%= server %>";
+      var port   = <%= port %>;
+    </script>
+    <script src="client.js"></script>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <textarea id="log" cols="50" rows="10" readonly></textarea>
+  </body>
+</html>
+
