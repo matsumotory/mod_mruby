@@ -1,4 +1,4 @@
-# Apache HTTP Server Status Moniter by mod_mruby
+# Apache HTTP Server Status Realtime Moniter by mod_mruby
 Implemtend in ApacheCon NA 2013 Hackathon
 ## Author
 - MATSUMOTO Ryosuke
@@ -15,7 +15,8 @@ see [mod_mruby](https://github.com/matsumoto-r/mod_mruby).
     mrubyTranslateNameFirst "/tmp/api_request.rb"
 
 ### file setteing
-    cp api_request.rb /tmp/.
+    git clone git://github.com/matsumoto-r/mod_mruby_hackathon.git
+    cp api/api_request.rb /tmp/.
     touch #{document_root}/dummy
 
 ## Start
