@@ -48,12 +48,13 @@ function get_api() {
     res.setEncoding('utf8');
     res.on('data', function (chunk) {
       console.log('BODY: ' + chunk);
-      io.sockets.emit('change', chunk);
+      var json_hash = JSON.parse(chunk); 
+      io.sockets.emit('change', json_hash.result.idle_worker);
     });
   }).on('error', function(e) {
     console.log("Got error: " + e.message);
   });
-  setTimeout(get_api, 5000);
+  setTimeout(get_api, 1000);
 }
 
 get_api();
