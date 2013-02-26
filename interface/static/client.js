@@ -232,7 +232,7 @@ $(document).ready(function() {
                   ['SERVER_GRACEFUL',       val.counter.SERVER_GRACEFUL],
                   ['SERVER_BUSY_READ',      val.counter.SERVER_BUSY_READ],
                   ['SERVER_IDLE_KILL',      val.counter.SERVER_IDLE_KILL],
-                  ['SERVER_DEAD',           val.counter.SERVER_DEAD],
+                  //['SERVER_DEAD',           val.counter.SERVER_DEAD],
                   ['SERVER_BUSY_LOG',       val.counter.SERVER_BUSY_LOG],
                   ['SERVER_BUSY_DNS',       val.counter.SERVER_BUSY_DNS],
                   ['SERVER_CLOSING',        val.counter.SERVER_CLOSING],
