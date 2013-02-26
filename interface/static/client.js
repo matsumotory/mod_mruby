@@ -28,6 +28,7 @@ $(document).ready(function() {
                     renderTo: 'container5',
                     type: 'spline',
                     marginRight: 10,
+                    plotBackgroundColor: '#EEEEEE',
                     events: {
                         load: function() {
                             var series = this.series[0];
@@ -71,6 +72,7 @@ $(document).ready(function() {
                 },
                 series: [{
                     name: 'Access per sec',
+                    color: '#006D56',
                     data: (function() {
                         var data = [],
                             time = (new Date()).getTime(),
@@ -103,6 +105,7 @@ $(document).ready(function() {
                     renderTo: 'container6',
                     type: 'spline',
                     marginRight: 10,
+                    plotBackgroundColor: '#EEEEEE',
                     events: {
                         load: function() {
                             var series = this.series[0];
@@ -146,6 +149,7 @@ $(document).ready(function() {
                 },
                 series: [{
                     name: 'kbyte per sec',
+                    color: '#DF3447',
                     data: (function() {
                         var data = [],
                             time = (new Date()).getTime(),
@@ -169,24 +173,24 @@ $(document).ready(function() {
         $('#val').append(val);
         gdata = val.idle_worker;
 	
-	if (total_access_prev == -1) {
-		total_access_prev = val.total_access;
-	} else {
-		total_access_prev = total_access_curr;
-	}
-	
-	total_access_curr = val.total_access;
-        
-    if (total_kbyte_prev == -1) {
-        total_kbyte_prev = val.total_kbyte;
-    } else {
-        total_kbyte_prev = total_kbyte_curr;
-    }
+	    if (total_access_prev == -1) {
+	    	total_access_prev = val.total_access;
+	    } else {
+	    	total_access_prev = total_access_curr;
+	    }
+	    
+	    total_access_curr = val.total_access;
+            
+        if (total_kbyte_prev == -1) {
+            total_kbyte_prev = val.total_kbyte;
+        } else {
+            total_kbyte_prev = total_kbyte_curr;
+        }
 
-    total_kbyte_curr = val.total_kbyte;
+        total_kbyte_curr = val.total_kbyte;
 
-	var chart;
-    $(document).ready(function() {
+	    var chart;
+        $(document).ready(function() {
         chart = new Highcharts.Chart({
             chart: {
                 renderTo: 'container7',
@@ -314,6 +318,7 @@ $(document).ready(function() {
             }, 
                 series: [{
                 name: 'the number of access',
+                color: '#006D56',
                 data: [val.total_access]
             }]
         });
@@ -354,6 +359,7 @@ $(document).ready(function() {
             }, 
                 series: [{
                 name: 'total_kbyte',
+                color: '#DF3447',
                 data: [val.total_kbyte]
             }]
         });
