@@ -26,15 +26,15 @@ $(document).ready(function() {
                     type: 'bar'
                 },
                 title: {
-                    text: 'Stacked bar chart'
+                    text: 'Apache Status Chart'
                 },
                 xAxis: {
-                    categories: ['Apples']
+                    categories: ['idle_worker', 'busy_worker', 'total_access', 'total_kbyte']
                 },
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Total fruit consumption'
+                        text: 'Total Apache Status consumption'
                     }
                 },
                 legend: {
@@ -53,8 +53,8 @@ $(document).ready(function() {
                     }
                 }, 
                     series: [{
-                    name: 'John',
-                    data: [val]
+                    name: 'counter',
+                    data: [val.idle_worker, val.busy_worker, val.total_access, val.total_kbyte]
                 }]
             });
         });

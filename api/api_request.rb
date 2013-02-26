@@ -78,6 +78,14 @@ module ModMruby
       def idle_worker;  @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.idle_worker}})); end
       def total_kbyte;  @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.total_kbyte}})); end
       def total_access; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.total_access}})); end
+      def all
+        @a.rputs JSON::stringify(@param.merge({:result => {
+            :busy_worker   => @sc.busy_worker,
+            :idle_worker   => @sc.idle_worker,
+            :total_access  => @sc.total_access,
+            :total_kbyte   => @sc.total_kbyte,
+          }})) 
+      end
     end
     class Request
       def initialize(param)

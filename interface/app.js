@@ -39,7 +39,7 @@ app.get('/', function(req, res){
 var options = {
   host: '127.0.0.1',
   port: 80,
-  path: '/api/get/scoreboard/idle_worker'
+  path: '/api/get/scoreboard/all'
 };
 
 function get_api() {
@@ -49,12 +49,13 @@ function get_api() {
     res.on('data', function (chunk) {
       console.log('BODY: ' + chunk);
       var json_hash = JSON.parse(chunk); 
-      io.sockets.emit('change', json_hash.result.idle_worker);
+      io.sockets.emit('change', json_hash.result);
+      //io.sockets.emit('change', json_hash.result.total_kbyte);
     });
   }).on('error', function(e) {
     console.log("Got error: " + e.message);
   });
-  setTimeout(get_api, 1000);
+  setTimeout(get_api, 5000);
 }
 
 get_api();
