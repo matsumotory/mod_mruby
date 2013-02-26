@@ -25,3 +25,9 @@ see [mod_mruby](https://github.com/matsumoto-r/mod_mruby).
 
 ## Access
 http://127.0.0.1:3000/
+
+## License
+under the MIT License:
+
+* http://www.opensource.org/licenses/mit-license.php
+
