@@ -29,7 +29,50 @@ $(document).ready(function() {
                     text: 'Apache Status Chart'
                 },
                 xAxis: {
-                    categories: ['idle_worker', 'busy_worker', 'total_access', 'total_kbyte']
+                    categories: ['worker']
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Total Apache Status consumption'
+                    }
+                },
+                legend: {
+                    backgroundColor: '#FFFFFF',
+                    reversed: true
+                },
+                tooltip: {
+                    formatter: function() {
+                        return ''+
+                            this.series.name +': '+ this.y +'';
+                    }
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal'
+                    }
+                }, 
+                    series: [{
+                    name: 'idle',
+                    data: [val.idle_worker]
+                }, {
+                    name: 'busy',
+                    data: [val.busy_worker]
+                }]
+            });
+        });
+
+        $(document).ready(function() {
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'container2',
+                    type: 'bar'
+                },
+                title: {
+                    text: 'Apache Status Chart'
+                },
+                xAxis: {
+                    categories: ['total_access']
                 },
                 yAxis: {
                     min: 0,
@@ -54,10 +97,49 @@ $(document).ready(function() {
                 }, 
                     series: [{
                     name: 'counter',
-                    data: [val.idle_worker, val.busy_worker, val.total_access, val.total_kbyte]
+                    data: [val.total_access]
+                }]
+            });
+        });
+
+        $(document).ready(function() {
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'container3',
+                    type: 'bar'
+                },
+                title: {
+                    text: 'Apache Status Chart'
+                },
+                xAxis: {
+                    categories: ['total_kbyte']
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Total Apache Status consumption'
+                    }
+                },
+                legend: {
+                    backgroundColor: '#FFFFFF',
+                    reversed: true
+                },
+                tooltip: {
+                    formatter: function() {
+                        return ''+
+                            this.series.name +': '+ this.y +'';
+                    }
+                },
+                plotOptions: {
+                    series: {
+                        stacking: 'normal'
+                    }
+                }, 
+                    series: [{
+                    name: 'total_kbyte',
+                    data: [val.total_kbyte]
                 }]
             });
         });
     });
-
 });
