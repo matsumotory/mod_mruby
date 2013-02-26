@@ -4,6 +4,8 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="http://code.highcharts.com/modules/exporting.js"></script>
     <script>
       var server = "<%= server %>";
       var port   = <%= port %>;
@@ -12,7 +14,8 @@
   </head>
   <body>
     <h1><%= title %></h1>
-    <textarea id="log" cols="50" rows="10" readonly></textarea>
+    <textarea id="val" cols="50" rows="10" readonly></textarea>
+    <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
   </body>
 </html>
 
