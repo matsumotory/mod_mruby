@@ -26,6 +26,9 @@ see [mod_mruby](https://github.com/matsumoto-r/mod_mruby).
 ## Access
 http://127.0.0.1:3000/
 
+## Sample
+![sample_display](https://pbs.twimg.com/media/BEA_sBiCMAAL6c7.png)
+
 ## License
 under the MIT License:
 

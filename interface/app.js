@@ -37,7 +37,7 @@ app.configure('production', function(){
 
 app.get('/', function(req, res){
     res.render('index', {
-        title:  'Apache HTTP Server Status with mod_mruby',
+        title:  'Apache HTTP Server Status Realtime Monitor with mod_mruby',
         server: server,
         port:   port
     });
