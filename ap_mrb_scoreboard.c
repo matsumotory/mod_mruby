@@ -346,13 +346,17 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
 
+    int start   = 0;
+    int ready   = 0;
     int bread   = 0;
     int bwrite  = 0;
     int bkeep   = 0;
     int blog    = 0;
     int bdns    = 0;
     int close   = 0;
+    int dead    = 0;
     int grace   = 0;
+    int idlek   = 0;
 
     mrb_value hash = mrb_hash_new(mrb);
 
@@ -362,25 +366,54 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
             ws_record = ap_get_scoreboard_worker(i, j);
 
             switch (ws_record->status) {
+                case SERVER_READY:
+                    ready++;
+                    break;
+                case SERVER_STARTING:
+                    start++;
+                    break;
                 case SERVER_BUSY_READ:
                     bread++;
+                    break;
                 case SERVER_BUSY_WRITE:
                     bwrite++;
+                    break;
                 case SERVER_BUSY_KEEPALIVE:
                     bkeep++;
+                    break;
                 case SERVER_BUSY_LOG:
                     blog++;
+                    break;
                 case SERVER_BUSY_DNS:
                     bdns++;
+                    break;
                 case SERVER_CLOSING:
                     close++;
+                    break;
+                case SERVER_DEAD:
+                    dead++;
+                    break;
                 case SERVER_GRACEFUL:
                     grace++;
+                    break;
+                case SERVER_IDLE_KILL:
+                    idlek++;
+                    break;
                 default:
                     break;
             }
         }
     }
+    mrb_hash_set(mrb
+        , hash
+        , mrb_str_new(mrb, "SERVER_READY", strlen("SERVER_READY"))
+        , mrb_fixnum_value(ready)
+    );
+    mrb_hash_set(mrb
+        , hash
+        , mrb_str_new(mrb, "SERVER_STARTING", strlen("SERVER_STARTING"))
+        , mrb_fixnum_value(start)
+    );
     mrb_hash_set(mrb
         , hash
         , mrb_str_new(mrb, "SERVER_BUSY_READ", strlen("SERVER_BUSY_READ"))
@@ -413,8 +446,18 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
     );
     mrb_hash_set(mrb
         , hash
+        , mrb_str_new(mrb, "SERVER_DEAD", strlen("SERVER_DEAD"))
+        , mrb_fixnum_value(dead)
+    );
+    mrb_hash_set(mrb
+        , hash
         , mrb_str_new(mrb, "SERVER_GRACEFUL", strlen("SERVER_GRACEFUL"))
         , mrb_fixnum_value(grace)
+    );
+    mrb_hash_set(mrb
+        , hash
+        , mrb_str_new(mrb, "SERVER_IDLE_KILL", strlen("SERVER_IDLE_KILL"))
+        , mrb_fixnum_value(idlek)
     );
 
     return hash;
