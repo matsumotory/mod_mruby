@@ -196,6 +196,55 @@ $(document).ready(function() {
 	total_access_curr = val.total_access;
         
 	var chart;
+  $(document).ready(function() {
+      chart = new Highcharts.Chart({
+          chart: {
+              renderTo: 'container7',
+              plotBackgroundColor: null,
+              plotBorderWidth: null,
+              plotShadow: false
+          },
+          title: {
+              text: 'thread status for request'
+          },
+          tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+            percentageDecimals: 1
+          },
+          plotOptions: {
+              pie: {
+                  allowPointSelect: true,
+                  cursor: 'pointer',
+                  dataLabels: {
+                      enabled: true,
+                      color: '#000000',
+                      connectorColor: '#000000',
+                      formatter: function() {
+                          return '<b>'+ this.point.name +'</b>: '+ this.percentage +' %';
+                      }
+                  }
+              }
+          },
+          series: [{
+              type: 'pie',
+              name: 'thread status',
+              data: [
+                  ['SERVER_GRACEFUL',       val.counter.SERVER_GRACEFUL],
+                  ['SERVER_BUSY_READ',      val.counter.SERVER_BUSY_READ],
+                  ['SERVER_IDLE_KILL',      val.counter.SERVER_IDLE_KILL],
+                  ['SERVER_DEAD',           val.counter.SERVER_DEAD],
+                  ['SERVER_BUSY_LOG',       val.counter.SERVER_BUSY_LOG],
+                  ['SERVER_BUSY_DNS',       val.counter.SERVER_BUSY_DNS],
+                  ['SERVER_CLOSING',        val.counter.SERVER_CLOSING],
+                  ['SERVER_STARTING',       val.counter.SERVER_STARTING],
+                  ['SERVER_BUSY_WRITE',     val.counter.SERVER_BUSY_WRITE],
+                  ['SERVER_BUSY_KEEPALIVE', val.counter.SERVER_BUSY_KEEPALIVE],
+                  ['SERVER_READY',          val.counter.SERVER_READY]
+              ]
+          }]
+      });
+  });
+
         $(document).ready(function() {
             chart = new Highcharts.Chart({
                 chart: {
