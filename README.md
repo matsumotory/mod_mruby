@@ -1,5 +1,5 @@
 # Apache HTTP Server Status Realtime Moniter by mod_mruby
-Implemtend in ApacheCon NA 2013 Hackathon
+Implemented in ApacheCon NA 2013 Hackathon
 ## Author
 - MATSUMOTO Ryosuke
 - TSUZAKI Yoshiharu
