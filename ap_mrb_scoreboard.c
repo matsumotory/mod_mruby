@@ -29,6 +29,15 @@ ap_generation_t volatile ap_my_generation = 0;
 scoreboard *ap_scoreboard_image = NULL;
 #endif
 
+#ifdef HAVE_TIMES
+typedef struct {
+    clock_t tu;
+    clock_t ts;
+    clock_t tcu;
+    clock_t tcs;
+} sc_clocks_t;
+#endif
+
 static int mruby_server_limit, mruby_thread_limit;
 
 static apr_off_t sb_get_kbcount();
@@ -37,6 +46,101 @@ static apr_time_t sb_get_restart_time();
 static apr_interval_time_t sb_get_uptime();
 static int sb_get_idle_worker();
 static int sb_get_process_worker();
+
+#ifdef HAVE_TIMES
+/* ugh... need to know if we're running with a pthread implementation
+ * such as linuxthreads that treats individual threads as distinct
+ * processes; that affects how we add up CPU time in a process
+ */
+static pid_t child_pid;
+#endif
+
+#ifdef HAVE_TIMES
+static void status_child_init(apr_pool_t *p, server_rec *s)
+{
+    child_pid = getpid();
+}
+#endif
+
+static sc_clocks_t ap_mrb_get_sc_clocks()
+{
+#ifdef HAVE_TIMES
+    float tick;
+    int times_per_thread;
+    sc_clocks_t cur, proc, tmp;
+#endif
+
+#ifdef __APACHE24__
+    ap_generation_t ap_my_generation;
+    ap_mpm_query(AP_MPMQ_GENERATION, &ap_my_generation);
+#endif
+
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
+
+    unsigned long lres;
+    int res, i, j;
+    worker_score *ws_record;
+
+#ifdef HAVE_TIMES
+    times_per_thread = getpid() != child_pid;
+#endif
+
+    for (i = 0; i < mruby_server_limit; ++i) {
+#ifdef HAVE_TIMES
+        //clock_t proc_tu = 0, proc_ts = 0, proc_tcu = 0, proc_tcs = 0;
+        //clock_t tmp_tu, tmp_ts, tmp_tcu, tmp_tcs;
+        proc.tu = 0;
+        proc.ts = 0;
+        proc.tcu = 0;
+        proc.tcs = 0;
+#endif
+        for (j = 0; j < mruby_thread_limit; ++j) {
+
+            ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
+            res = ws_record->status;
+
+            if (ap_extended_status) {
+                lres = ws_record->access_count;
+
+                if (lres != 0 || (res != SERVER_READY && res != SERVER_DEAD)) {
+#ifdef HAVE_TIMES
+                    tmp.tu = ws_record->times.tms_utime;
+                    tmp.ts = ws_record->times.tms_stime;
+                    tmp.tcu = ws_record->times.tms_cutime;
+                    tmp.tcs = ws_record->times.tms_cstime;
+
+                    if (times_per_thread) {
+                        proc.tu += tmp.tu;
+                        proc.ts += tmp.ts;
+                        proc.tcu += tmp.tcu;
+                        proc.tcs += tmp.tcs;
+                    }
+                    else {
+                        if (tmp.tu > proc.tu ||
+                            tmp.ts > proc.ts ||
+                            tmp.tcu > proc.tcu ||
+                            tmp.tcs > proc.tcs) {
+                            proc.tu = tmp.tu;
+                            proc.ts = tmp.ts;
+                            proc.tcu = tmp.tcu;
+                            proc.tcs = tmp.tcs;
+                        }
+                    }
+#endif /* HAVE_TIMES */
+                }
+            }
+        }
+#ifdef HAVE_TIMES
+        cur.tu += proc.tu;
+        cur.ts += proc.ts;
+        cur.tcu += proc.tcu;
+        cur.tcs += proc.tcs;
+#endif
+    }
+
+    return cur;
+}
 
 static apr_time_t sb_get_restart_time()
 {
@@ -201,6 +305,29 @@ static unsigned long sb_get_access_count()
         }
     }
     return count;
+}
+
+mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
+{
+#ifdef HAVE_TIMES
+    float tick;
+#endif
+
+#ifdef HAVE_TIMES
+#ifdef _SC_CLK_TCK
+    tick = sysconf(_SC_CLK_TCK);
+#else  
+    tick = HZ;
+#endif
+#endif
+
+#ifdef HAVE_TIMES
+    sc_clocks_t t = ap_mrb_get_sc_clocks();
+    /* Allow for OS/2 not having CPU stats */
+    if (t.ts || t.tu || t.tcu || t.tcs)
+        return mrb_float_value((mrb_float)((t.tu + t.ts + t.tcu + t.tcs) / tick / sb_get_uptime() * 100.));
+#endif
+    return self;
 }
 
 mrb_value ap_mrb_get_scoreboard_idle_worker(mrb_state *mrb, mrb_value str)
@@ -471,6 +598,7 @@ void ap_mruby_scoreboard_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_scoreboard, "status", ap_mrb_get_scoreboard_status, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "counter", ap_mrb_get_scoreboard_counter, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "pid", ap_mrb_get_scoreboard_pid, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "cpu_load", ap_mrb_get_scoreboard_cpu_load, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "server_limit", ap_mrb_get_scoreboard_server_limit, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "thread_limit", ap_mrb_get_scoreboard_thread_limit, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "access_counter", ap_mrb_get_scoreboard_access_counter, ARGS_ANY());
