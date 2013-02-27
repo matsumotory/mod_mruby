@@ -1,4 +1,4 @@
-npm install express socket.io ejs
+npm install express socket.io ejs routes http
 
 vi app.js
 modify your host

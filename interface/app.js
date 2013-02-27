@@ -1,9 +1,9 @@
 var express  = require('express');
 var routes   = require('routes');
 var socketio = require('socket.io');
-var fs       = require('fs');
 var http     = require('http');
 
+// app.js server settings
 var server   = '127.0.0.1';
 var port     = 3000;
 var log_file = '/tmp/tmp.log';
@@ -12,6 +12,7 @@ var interval = 5000;
 var app = express();
 var io  = socketio.listen(app.listen(port));
 
+// monitored httpd settings
 var options = {
     host: '127.0.0.1',
     port: 80,
@@ -37,7 +38,7 @@ app.configure('production', function(){
 
 app.get('/', function(req, res){
     res.render('index', {
-        title:  'Apache HTTP Server Status Realtime Monitor with mod_mruby',
+        title:  'Apache HTTP Server(' + options.host + ') Status Realtime Monitor with mod_mruby',
         server: server,
         port:   port
     });
