@@ -32,7 +32,7 @@ module ModMruby
       @r = @a::Request.new
       @s = @a::Server.new
       #@m = Discount.new("http://kevinburke.bitbucket.org/markdowncss/markdown.css", "mod_mruby test page")
-    #end
+    end
     def call
       param = @r.uri.split("/")
       
