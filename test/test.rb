@@ -27,7 +27,8 @@ module ModMruby
     end
     def core
       Apache.rputs "## Apache Class Test".to_html
-      Apache.rputs "- Apache version: #{Apache::apache_version}".to_html
+      Apache.rputs "- Apache version: #{Apache::server_version}".to_html
+      Apache.rputs "- Apache build: #{Apache::server_build}".to_html
       Apache.rputs "- mod_mruby version: #{Apache::mod_mruby_version}".to_html
       Apache.syslogger 4,"warn", "mod_mruby warning syslogger test."
       Apache.rputs "- syslogger function: OK".to_html

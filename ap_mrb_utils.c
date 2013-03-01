@@ -131,9 +131,14 @@ mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
 }
 
 
-mrb_value ap_mrb_get_apache_version(mrb_state *mrb, mrb_value str)
+mrb_value ap_mrb_get_server_version(mrb_state *mrb, mrb_value str)
 {
-    return mrb_str_new(mrb, AP_SERVER_BASEREVISION, strlen(AP_SERVER_BASEREVISION));
+    return mrb_str_new(mrb, ap_get_server_description(), strlen(ap_get_server_description()));
+}
+
+mrb_value ap_mrb_get_server_build(mrb_state *mrb, mrb_value str)
+{
+    return mrb_str_new(mrb, ap_get_server_built(), strlen(ap_get_server_built()));
 }
 
 mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
@@ -309,6 +314,7 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_const(mrb, class_core, "PROXYREQ_PROXY", mrb_fixnum_value(PROXYREQ_PROXY));
     mrb_define_const(mrb, class_core, "PROXYREQ_REVERSE", mrb_fixnum_value(PROXYREQ_REVERSE));
     mrb_define_const(mrb, class_core, "PROXYREQ_RESPONSE", mrb_fixnum_value(PROXYREQ_RESPONSE));
+
     mrb_define_class_method(mrb, class_core, "sleep", ap_mrb_sleep, ARGS_ANY());
     mrb_define_class_method(mrb, class_core, "rputs", ap_mrb_rputs, ARGS_ANY());
     mrb_define_class_method(mrb, class_core, "return", ap_mrb_return, ARGS_ANY());
@@ -316,5 +322,6 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_class_method(mrb, class_core, "syslogger", ap_mrb_syslogger, ARGS_ANY());
     //mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
     mrb_define_class_method(mrb, class_core, "mod_mruby_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
-    mrb_define_class_method(mrb, class_core, "apache_version", ap_mrb_get_apache_version, ARGS_NONE());
+    mrb_define_class_method(mrb, class_core, "server_version", ap_mrb_get_server_version, ARGS_NONE());
+    mrb_define_class_method(mrb, class_core, "server_build", ap_mrb_get_server_build, ARGS_NONE());
 }
