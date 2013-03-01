@@ -27,11 +27,22 @@ module ModMruby
     tmp
   end
   class API
-    def initialize
+    def initialize(ip)
+      @allow_ip = ip
       @a = Apache
       @r = @a::Request.new
       @s = @a::Server.new
-      #@m = Discount.new("http://kevinburke.bitbucket.org/markdowncss/markdown.css", "mod_mruby test page")
+    end
+    def allow_access?
+      c = Apache::Connection.new
+      @a.errlogger 4, "allow ip: #{@allow_ip} <=> access ip: #{c.remote_ip}"
+      if @allow_ip == c.remote_ip
+        @a.errlogger 4, "api access OK: #{c.remote_ip}"
+        true
+      else
+        @a.errlogger 4, "api access NG: #{c.remote_ip}. allow_ip is #{@allow_ip}"
+        false
+      end
     end
     def call
       param = @r.uri.split("/")
@@ -130,5 +141,9 @@ module ModMruby
   end
 end
 
-api = ModMruby::API.new
-api.call
+allow_ip = '127.0.0.1'
+
+api = ModMruby::API.new allow_ip
+if api.allow_access?
+  api.call
+end
