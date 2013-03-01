@@ -113,6 +113,8 @@ module ModMruby
       Apache.rputs "- thread limit    = #{wc.thread_limit.to_s}".to_html
       Apache.rputs "- server limit    = #{wc.server_limit.to_s}".to_html
       Apache.rputs "__Cannot get below values of scoreboard because of ExtendedStatus Off__".to_html if wc.restart_time == 0
+      Apache.rputs "- cpu load        = #{wc.cpu_load.to_s}".to_html
+      Apache.rputs "- load avereage   = #{wc.loadavg.to_s}".to_html
       Apache.rputs "- total kbyte     = #{wc.total_kbyte.to_s}".to_html
       Apache.rputs "- total access    = #{wc.total_access.to_s}".to_html
       Apache.rputs "- restart time    = #{wc.restart_time.to_s}".to_html

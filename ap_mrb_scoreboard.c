@@ -6,10 +6,13 @@
 
 #include "mod_mruby.h"
 #include "ap_mrb_scoreboard.h"
-#include "mruby/hash.h"
+
+#include <unistd.h>
 #include "scoreboard.h"
 #include "ap_mpm.h"
-#include <unistd.h>
+
+#include "mruby/hash.h"
+#include "mruby/array.h"
 
 #define KBYTE 1024
 #define MBYTE 1048576L
@@ -330,6 +333,20 @@ mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+mrb_value ap_mrb_get_scoreboard_loadavg(mrb_state *mrb, mrb_value self)
+{
+    mrb_value ary;
+    ap_loadavg_t t;
+
+    ap_get_loadavg(&t);
+    ary = mrb_ary_new(mrb);
+    mrb_ary_push(mrb, ary, mrb_float_value(t.loadavg));
+    mrb_ary_push(mrb, ary, mrb_float_value(t.loadavg5));
+    mrb_ary_push(mrb, ary, mrb_float_value(t.loadavg15));
+
+    return ary;
+}
+
 mrb_value ap_mrb_get_scoreboard_idle_worker(mrb_state *mrb, mrb_value str)
 {
     return mrb_fixnum_value((mrb_int)sb_get_idle_worker());
@@ -599,6 +616,7 @@ void ap_mruby_scoreboard_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_scoreboard, "counter", ap_mrb_get_scoreboard_counter, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "pid", ap_mrb_get_scoreboard_pid, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "cpu_load", ap_mrb_get_scoreboard_cpu_load, ARGS_NONE());
+    mrb_define_method(mrb, class_scoreboard, "loadavg", ap_mrb_get_scoreboard_loadavg, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "server_limit", ap_mrb_get_scoreboard_server_limit, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "thread_limit", ap_mrb_get_scoreboard_thread_limit, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "access_counter", ap_mrb_get_scoreboard_access_counter, ARGS_ANY());
