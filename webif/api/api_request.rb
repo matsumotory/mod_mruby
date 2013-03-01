@@ -117,6 +117,8 @@ module ModMruby
         @a.return Apache::OK
       end
       def mod_mruby_version; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @a.mod_mruby_version}})); end
+      def server_version; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @a.server_version}})); end
+      def server_build; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @a.server_build}})); end
     end
   end
 end
