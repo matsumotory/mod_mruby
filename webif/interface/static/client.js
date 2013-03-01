@@ -37,7 +37,7 @@ $(document).ready(function() {
 
 			    if((total_access_curr - total_access_prev)>0){
                                 var x = (new Date()).getTime(),
-                                    y = (total_kbyte_curr -  total_kbyte_prev) / (total_access_curr - total_access_prev);
+                                    y = (total_kbyte_curr -  total_kbyte_prev) * 1000 / (total_access_curr - total_access_prev);
 			    }
 			    else{
 			        var x = (new Date()).getTime(),
@@ -49,7 +49,7 @@ $(document).ready(function() {
                     }
                 },
                 title: {
-                    text: 'Kbyte per request'
+                    text: 'Byte per Request'
                 },
                 xAxis: {
                     type: 'datetime',
@@ -57,7 +57,7 @@ $(document).ready(function() {
                 },
                 yAxis: {
                     title: {
-                        text: 'Kb/req'
+                        text: 'byte/req'
                     },
                     plotLines: [{
                         value: 0,
@@ -79,8 +79,8 @@ $(document).ready(function() {
                     enabled: false
                 },
                 series: [{
-                    name: 'kbyte per reqeust',
-                    color: '#006D56',
+                    name: 'byte per reqeust',
+                    color: '#00008B',
                     data: (function() {
                         var data = [],
                             time = (new Date()).getTime(),
@@ -90,7 +90,7 @@ $(document).ready(function() {
 			    if((total_access_curr - total_access_prev) > 0){
                                 data.push({
                                     x: time + i * 1000,
-                                    y: (total_kbyte_curr -  total_kbyte_prev) / (total_access_curr - total_access_prev)
+                                    y: (total_kbyte_curr -  total_kbyte_prev) * 1000 / (total_access_curr - total_access_prev)
 			        });
 			    }
 			    else{
@@ -135,7 +135,7 @@ $(document).ready(function() {
                     }
                 },
                 title: {
-                    text: 'Access per second'
+                    text: 'Request per Second'
                 },
                 xAxis: {
                     type: 'datetime',
@@ -143,7 +143,7 @@ $(document).ready(function() {
                 },
                 yAxis: {
                     title: {
-                        text: 'Access/sec'
+                        text: 'req/sec'
                     },
                     plotLines: [{
                         value: 0,
@@ -165,7 +165,7 @@ $(document).ready(function() {
                     enabled: false
                 },
                 series: [{
-                    name: 'Access per sec',
+                    name: 'request per sec',
                     color: '#006D56',
                     data: (function() {
                         var data = [],
@@ -205,14 +205,14 @@ $(document).ready(function() {
                             var series = this.series[0];
                             setInterval(function() {
                                 var x = (new Date()).getTime(), 
-                                    y = (total_kbyte_curr - total_kbyte_prev) / 5;
+                                    y = (total_kbyte_curr - total_kbyte_prev) * 1000 / 5;
                                 series.addPoint([x, y], true, true);
                             }, 1000);
                         }
                     }
                 },
                 title: {
-                    text: 'Kbyte per second'
+                    text: 'Byte per Second'
                 },
                 xAxis: {
                     type: 'datetime',
@@ -220,7 +220,7 @@ $(document).ready(function() {
                 },
                 yAxis: {
                     title: {
-                        text: 'kbyte/sec'
+                        text: 'byte/sec'
                     },
                     plotLines: [{
                         value: 0,
@@ -242,7 +242,7 @@ $(document).ready(function() {
                     enabled: false
                 },
                 series: [{
-                    name: 'kbyte per sec',
+                    name: 'byte per sec',
                     color: '#DF3447',
                     data: (function() {
                         var data = [],
@@ -252,7 +252,7 @@ $(document).ready(function() {
                         for (i = -19; i <= 0; i++) {
                             data.push({
                                 x: time + i * 1000,
-                                y: (total_kbyte_curr - total_kbyte_prev) / 5
+                                y: (total_kbyte_curr - total_kbyte_prev) * 1000 / 5
                             });
                         }
                         return data;
@@ -426,15 +426,15 @@ $(document).ready(function() {
                 type: 'bar'
             },
             title: {
-                text: 'Apache Total Kbyte'
+                text: 'Apache Total Byte'
             },
             xAxis: {
-                categories: ['total_kbyte']
+                categories: ['total_byte']
             },
             yAxis: {
                 min: 0,
                 title: {
-                    text: 'total kbyte'
+                    text: 'total byte'
                 }
             },
             legend: {
@@ -453,9 +453,9 @@ $(document).ready(function() {
                 }
             }, 
                 series: [{
-                name: 'total_kbyte',
+                name: 'total_byte',
                 color: '#DF3447',
-                data: [val.total_kbyte]
+                data: [val.total_kbyte * 1000]
             }]
         });
     });
