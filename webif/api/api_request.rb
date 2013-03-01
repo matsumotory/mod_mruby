@@ -58,6 +58,8 @@ module ModMruby
         ModMruby::API::Request.new(param).send(param[:method])
       elsif param[:class] == "scoreboard"
         ModMruby::API::Scoreboard.new(param).send(param[:method])
+      elsif param[:class] == "core"
+        ModMruby::API::Core.new(param).send(param[:method])
       else
         @a.return Apache::DECLINED
       end
@@ -102,6 +104,28 @@ module ModMruby
         @a.return Apache::OK
       end
       def uri; @a.rputs JSON::stringify(@param.merge({:result => {:uri => @r.uri}})); end
+    end
+    class Core
+      def initialize(param)
+        @a = Apache
+        @r = Apache::Request.new
+        @s = Apache::Server.new
+        @param = param
+        @r.content_type = "application/json"
+        @r.filename = "#{@s.document_root}/dummy"
+        @r.status = 200
+        @a.return Apache::OK
+      end
+      def mod_mruby_version; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @a.mod_mruby_version}})); end
+      def server_version; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @a.server_version}})); end
+      def server_build; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @a.server_build}})); end
+      def all
+        @a.rputs JSON::stringify(@param.merge({:result => {
+            :mod_mruby_version  => @a.mod_mruby_version,
+            :server_version     => @a.server_version,
+            :server_build       => @a.server_build,
+          }}))
+      end
     end
   end
 end
