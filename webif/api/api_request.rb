@@ -100,6 +100,7 @@ module ModMruby
             :total_kbyte   => @sc.total_kbyte,
             :counter       => @sc.counter,
             :cpu_load      => @sc.cpu_load,
+            :loadavg       => @sc.loadavg,
           }})) 
       end
     end

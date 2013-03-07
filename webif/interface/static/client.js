@@ -1,6 +1,9 @@
 $(document).ready(function() {
     var socket = io.connect('http://'+ server +':'+ port);
     var gdata = 0;
+    var loadavg1  = 0;
+    var loadavg5  = 0;
+    var loadavg15 = 0;
     var total_access_prev = -1;
     var total_access_curr = -1;
     var total_kbyte_prev = -1;
@@ -14,6 +17,117 @@ $(document).ready(function() {
         console.log('disconnect');
     });
 
+    $(function () {
+        $(document).ready(function() {
+            Highcharts.setOptions({
+                global: {
+                    useUTC: false
+                }
+            });
+        
+            var chart;
+            chart = new Highcharts.Chart({
+                chart: {
+                    renderTo: 'container9',
+                    type: 'spline',
+                    marginRight: 10,
+                    plotBackgroundColor: '#EEEEEE',
+                    events: {
+                        load: function() {
+                            var load1  = this.series[0],
+                                load5  = this.series[1],
+                                load15 = this.series[2];
+                            setInterval(function() {
+                                var x = (new Date()).getTime(),
+                                    y0 = loadavg1,
+                                    y1 = loadavg5,
+                                    y2 = loadavg15;
+                                load1.addPoint([x, y0], true, true);
+                                load5.addPoint([x, y1], false, true);
+                                load15.addPoint([x, y2], false, true);
+                            }, 1000);
+                        }
+                    }
+                },
+                title: {
+                    text: 'Load Average [1 5 15]'
+                },
+                xAxis: {
+                    type: 'datetime',
+                    tickPixelInterval: 150
+                },
+                yAxis: {
+                    title: {
+                        text: 'loadavg'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    formatter: function() {
+                            return '<b>'+ this.series.name +'</b><br/>'+
+                            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+                            Highcharts.numberFormat(this.y, 2);
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                exporting: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'load avg 1',
+                    data: (function() {
+                        var data = [],
+                            time = (new Date()).getTime(),
+                            i;
+
+                        for (i = -19; i <= 0; i++) {
+                            data.push({
+                                x: time + i * 1000,
+                                y: 0
+                            });
+                        }
+                        return data;
+                    })()
+                }, {
+                    name: 'load avg 5',
+                    data: (function() {
+                        var data = [],
+                            time = (new Date()).getTime(),
+                            i;
+
+                        for (i = -19; i <= 0; i++) {
+                            data.push({
+                                x: time + i * 1000,
+                                y: 0
+                            });
+                        }
+                        return data;
+                    })()
+                }, {
+                    name: 'load avg 15',
+                    data: (function() {
+                        var data = [], 
+                            time = (new Date()).getTime(),
+                            i;  
+    
+                        for (i = -19; i <= 0; i++) {
+                            data.push({
+                                x: time + i * 1000,
+                                y: 0
+                            }); 
+                        }   
+                        return data;
+                    })()
+                }]
+            });
+        });
+    });
 
     $(function () {
         $(document).ready(function() {
@@ -266,6 +380,9 @@ $(document).ready(function() {
         console.log('change:' + val);
         $('#val').append(val);
         gdata = val.idle_worker;
+        loadavg1  = val.loadavg[0];
+        loadavg5  = val.loadavg[1];
+        loadavg15 = val.loadavg[2];
 	
 	    if (total_access_prev == -1) {
 	    	total_access_prev = val.total_access;
