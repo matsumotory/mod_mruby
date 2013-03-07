@@ -149,14 +149,13 @@ $(document).ready(function() {
                             var series = this.series[0];
                             setInterval(function() {
 
-			    if((total_access_curr - total_access_prev)>0){
+			                      if ((total_access_curr - total_access_prev)>0) {
                                 var x = (new Date()).getTime(),
                                     y = (total_kbyte_curr -  total_kbyte_prev) * 1000 / (total_access_curr - total_access_prev);
-			    }
-			    else{
-			        var x = (new Date()).getTime(),
-				    y = 0;
-			    }
+			                      } else {
+			                          var x = (new Date()).getTime(),
+				                        y = 0;
+			                      }
                                 series.addPoint([x, y], true, true);
                             }, 1000);
                         }
@@ -181,9 +180,9 @@ $(document).ready(function() {
                 },
                 tooltip: {
                     formatter: function() {
-                            return '<b>'+ this.series.name +'</b><br/>'+
-                            Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
-                            Highcharts.numberFormat(this.y, 2);
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+                        Highcharts.numberFormat(this.y, 2);
                     }
                 },
                 legend: {
@@ -201,18 +200,17 @@ $(document).ready(function() {
                             i;
         
                         for (i = -19; i <= 0; i++) {
-			    if((total_access_curr - total_access_prev) > 0){
+			                      if ((total_access_curr - total_access_prev) > 0) {
                                 data.push({
                                     x: time + i * 1000,
                                     y: (total_kbyte_curr -  total_kbyte_prev) * 1000 / (total_access_curr - total_access_prev)
-			        });
-			    }
-			    else{
-			        data.push({
-			            x: time + i * 1000,
-			            y: 0
-			        });
-			    }
+			                          });
+			                      } else {
+			                          data.push({
+			                              x: time + i * 1000,
+			                              y: 0
+			                          });
+			                      }
                         }
                         return data;
                     })()
@@ -405,7 +403,7 @@ $(document).ready(function() {
         chart = new Highcharts.Chart({
             chart: {
                 renderTo: 'container7',
-		spacingRight: 180,
+		            spacingRight: 180,
                 plotBackgroundColor: null,
                 plotBorderWidth: null,
                 plotShadow: false
@@ -414,8 +412,8 @@ $(document).ready(function() {
                 text: 'Thread status for request'
             },
             tooltip: {
-              pointFormat: '{series.name}: <b>{point.percentage}%</b>',
-              percentageDecimals: 1
+                pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+                percentageDecimals: 1
             },
             plotOptions: {
                 pie: {
