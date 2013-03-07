@@ -65,6 +65,46 @@ static void status_child_init(apr_pool_t *p, server_rec *s)
 }
 #endif
 
+#if (AP_SERVER_MINORVERSION_NUMBER < 5)
+#if (AP_SERVER_MINORVERSION_NUMBER < 4) || (AP_SERVER_PATCHLEVEL_NUMBER < 4)
+typedef struct ap_loadavg_t ap_loadavg_t;
+struct ap_loadavg_t {
+    /* current loadavg, ala getloadavg() */
+    float loadavg;
+    /* 5 min loadavg */
+    float loadavg5;
+    /* 15 min loadavg */
+    float loadavg15;
+};
+
+static void ap_get_loadavg(ap_loadavg_t *ld)
+{
+    /* preload errored fields, we overwrite */
+    ld->loadavg = -1.0;
+    ld->loadavg5 = -1.0;
+    ld->loadavg15 = -1.0;
+
+#if HAVE_GETLOADAVG
+    {  
+        double la[3];
+        int num;
+
+        num = getloadavg(la, 3);
+        if (num > 0) {
+            ld->loadavg = (float)la[0];
+        }
+        if (num > 1) {
+            ld->loadavg5 = (float)la[1];
+        }
+        if (num > 2) {
+            ld->loadavg15 = (float)la[2];
+        }
+    }
+#endif
+}
+#endif
+#endif
+
 static sc_clocks_t ap_mrb_get_sc_clocks()
 {
 #ifdef HAVE_TIMES
