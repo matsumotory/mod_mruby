@@ -140,7 +140,7 @@ static sc_clocks_t ap_mrb_get_sc_clocks()
 #endif
         for (j = 0; j < mruby_thread_limit; ++j) {
 
-            ws_record = ap_get_scoreboard_worker_from_indexes(i, j);
+            ws_record = ap_get_scoreboard_worker(i, j);
             res = ws_record->status;
 
             if (ap_extended_status) {
