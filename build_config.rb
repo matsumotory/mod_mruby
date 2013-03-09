@@ -37,6 +37,8 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-random.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
+  conf.gem 'mrbgems/mruby-time'
+  conf.gem 'mrbgems/mruby-struct'
 
   # linux only
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
