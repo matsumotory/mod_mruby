@@ -10,6 +10,25 @@ MRuby::Build.new do |conf|
   # conf.gem 'examples/mrbgems/c_and_ruby_extension_example'
   # conf.gem :github => 'masuidrive/mrbgems-example', :branch => 'master'
   # conf.gem :git => 'git@github.com:masuidrive/mrbgems-example.git', :branch => 'master', :options => '-v'
+
+  # Use standard Math module
+  conf.gem 'mrbgems/mruby-math'
+
+  # Use standard Time class
+  conf.gem 'mrbgems/mruby-time'
+
+  # Use standard Struct class
+  conf.gem 'mrbgems/mruby-struct'
+
+  # Use standard Kernel#sprintf method
+  conf.gem 'mrbgems/mruby-sprintf'
+
+  # Use extensional String class
+  conf.gem 'mrbgems/mruby-string-ext'
+
+  # Use extensional Numeric class
+  conf.gem 'mrbgems/mruby-numeric-ext'
+
   conf.gem :git => 'git://github.com/iij/mruby-process.git'
   conf.gem :git => 'git://github.com/iij/mruby-pack.git'
   conf.gem :git => 'git://github.com/iij/mruby-digest.git'
