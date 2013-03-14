@@ -62,10 +62,13 @@
 #endif
 
 typedef struct {
+    const char *path;
+    int irep_n;
+} mod_mruby_code_t;
 
-    const char *mod_mruby_authn_check_password_code;
-    const char *mod_mruby_authn_get_realm_hash_code;
-
+typedef struct {
+    mod_mruby_code_t *mod_mruby_authn_check_password_code;
+    mod_mruby_code_t *mod_mruby_authn_get_realm_hash_code;
 } mruby_dir_config_t;
 
 typedef struct {
@@ -73,46 +76,47 @@ typedef struct {
     int mod_mruby_handler_code_native_n;
     const char *mod_mruby_handler_code_native;
 
-    const char *mod_mruby_handler_code;
-    const char *mod_mruby_handler_first_code;
-    const char *mod_mruby_handler_middle_code;
-    const char *mod_mruby_handler_last_code;
-    const char *mod_mruby_post_config_first_code;
-    const char *mod_mruby_post_config_middle_code;
-    const char *mod_mruby_post_config_last_code;
-    const char *mod_mruby_child_init_first_code;
-    const char *mod_mruby_child_init_middle_code;
-    const char *mod_mruby_child_init_last_code;
-    const char *mod_mruby_post_read_request_first_code;
-    const char *mod_mruby_post_read_request_middle_code;
-    const char *mod_mruby_post_read_request_last_code;
-    const char *mod_mruby_quick_handler_first_code;
-    const char *mod_mruby_quick_handler_middle_code;
-    const char *mod_mruby_quick_handler_last_code;
-    const char *mod_mruby_translate_name_first_code;
-    const char *mod_mruby_translate_name_middle_code;
-    const char *mod_mruby_translate_name_last_code;
-    const char *mod_mruby_map_to_storage_first_code;
-    const char *mod_mruby_map_to_storage_middle_code;
-    const char *mod_mruby_map_to_storage_last_code;
-    const char *mod_mruby_access_checker_first_code;
-    const char *mod_mruby_access_checker_middle_code;
-    const char *mod_mruby_access_checker_last_code;
-    const char *mod_mruby_check_user_id_first_code;
-    const char *mod_mruby_check_user_id_middle_code;
-    const char *mod_mruby_check_user_id_last_code;
-    const char *mod_mruby_auth_checker_first_code;
-    const char *mod_mruby_auth_checker_middle_code;
-    const char *mod_mruby_auth_checker_last_code;
-    const char *mod_mruby_fixups_first_code;
-    const char *mod_mruby_fixups_middle_code;
-    const char *mod_mruby_fixups_last_code;
-    const char *mod_mruby_insert_filter_first_code;
-    const char *mod_mruby_insert_filter_middle_code;
-    const char *mod_mruby_insert_filter_last_code;
-    const char *mod_mruby_log_transaction_first_code;
-    const char *mod_mruby_log_transaction_middle_code;
-    const char *mod_mruby_log_transaction_last_code;
+    mod_mruby_code_t *mod_mruby_handler_code;
+    mod_mruby_code_t *mod_mruby_handler_first_code;
+    mod_mruby_code_t *mod_mruby_handler_middle_code;
+    mod_mruby_code_t *mod_mruby_handler_last_code;
+    mod_mruby_code_t *mod_mruby_post_config_first_code;
+    mod_mruby_code_t *mod_mruby_post_config_middle_code;
+    mod_mruby_code_t *mod_mruby_post_config_last_code;
+    mod_mruby_code_t *mod_mruby_child_init_first_code;
+    mod_mruby_code_t *mod_mruby_child_init_middle_code;
+    mod_mruby_code_t *mod_mruby_child_init_last_code;
+    mod_mruby_code_t *mod_mruby_post_read_request_first_code;
+    mod_mruby_code_t *mod_mruby_post_read_request_middle_code;
+    mod_mruby_code_t *mod_mruby_post_read_request_last_code;
+    mod_mruby_code_t *mod_mruby_quick_handler_first_code;
+    mod_mruby_code_t *mod_mruby_quick_handler_middle_code;
+    mod_mruby_code_t *mod_mruby_quick_handler_last_code;
+    mod_mruby_code_t *mod_mruby_translate_name_first_code;
+    mod_mruby_code_t *mod_mruby_translate_name_middle_code;
+    mod_mruby_code_t *mod_mruby_translate_name_last_code;
+    mod_mruby_code_t *mod_mruby_map_to_storage_first_code;
+    mod_mruby_code_t *mod_mruby_map_to_storage_middle_code;
+    mod_mruby_code_t *mod_mruby_map_to_storage_last_code;
+    mod_mruby_code_t *mod_mruby_access_checker_first_code;
+    mod_mruby_code_t *mod_mruby_access_checker_middle_code;
+    mod_mruby_code_t *mod_mruby_access_checker_last_code;
+    mod_mruby_code_t *mod_mruby_check_user_id_first_code;
+    mod_mruby_code_t *mod_mruby_check_user_id_middle_code;
+    mod_mruby_code_t *mod_mruby_check_user_id_last_code;
+    mod_mruby_code_t *mod_mruby_auth_checker_first_code;
+    mod_mruby_code_t *mod_mruby_auth_checker_middle_code;
+    mod_mruby_code_t *mod_mruby_auth_checker_last_code;
+    mod_mruby_code_t *mod_mruby_fixups_first_code;
+    mod_mruby_code_t *mod_mruby_fixups_middle_code;
+    mod_mruby_code_t *mod_mruby_fixups_last_code;
+    mod_mruby_code_t *mod_mruby_insert_filter_first_code;
+    mod_mruby_code_t *mod_mruby_insert_filter_middle_code;
+    mod_mruby_code_t *mod_mruby_insert_filter_last_code;
+    mod_mruby_code_t *mod_mruby_log_transaction_first_code;
+    mod_mruby_code_t *mod_mruby_log_transaction_middle_code;
+    mod_mruby_code_t *mod_mruby_log_transaction_last_code;
+
     int mruby_cache_table_size;
 
 } mruby_config_t;

@@ -21,6 +21,7 @@ rake CFLAGS="-fPIC"
 echo "mruby building ... Done"
 cd ..
 echo "mod_mruby building ..."
+#./configure --with-apxs=/usr/local/apache/bin/apxs --with-apachectl=/usr/local/apache/bin/apachectl
 ./configure
 make
 sudo make install
