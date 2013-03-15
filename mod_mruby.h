@@ -61,9 +61,18 @@
     #define __APACHE24__
 #endif
 
+enum code_type {
+    MOD_MRUBY_STRING,
+    MOD_MRUBY_FILE
+};
+
 typedef struct {
-    const char *path;
+    union {
+        char *path;
+        char *code;
+    };
     int irep_n;
+    enum code_type type;
 } mod_mruby_code_t;
 
 typedef struct {
@@ -73,8 +82,7 @@ typedef struct {
 
 typedef struct {
 
-    int mod_mruby_handler_code_native_n;
-    const char *mod_mruby_handler_code_native;
+    mod_mruby_code_t *mod_mruby_handler_code_inline;
 
     mod_mruby_code_t *mod_mruby_handler_code;
     mod_mruby_code_t *mod_mruby_handler_first_code;

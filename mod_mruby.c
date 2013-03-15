@@ -93,8 +93,7 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
         (mruby_config_t *)apr_pcalloc(p, sizeof(mruby_config_t));
 
     // inlinde core in httpd.conf
-    conf->mod_mruby_handler_code_native_n           = -1;
-    conf->mod_mruby_handler_code_native             = NULL;
+    conf->mod_mruby_handler_code_inline             = NULL;
 
     // hook script file
     conf->mod_mruby_handler_code                    = NULL;
@@ -145,15 +144,66 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
     return conf;
 }
 
-static void ap_mrb_set_code(apr_pool_t *p, const char *path, mod_mruby_code_t *code)
+static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *arg)
 {
     mod_mruby_code_t *c = 
         (mod_mruby_code_t *)apr_pcalloc(p, sizeof(mod_mruby_code_t));
 
-    c->path = apr_pstrdup(p, path);
-    code = c;
+    c->type = MOD_MRUBY_FILE;
+    c->path = apr_pstrdup(p, arg);
+
+    return c;
 }
 
+static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
+{
+    mod_mruby_code_t *c = 
+        (mod_mruby_code_t *)apr_pcalloc(p, sizeof(mod_mruby_code_t));
+
+    c->type = MOD_MRUBY_STRING;
+    c->code = apr_pstrdup(p, arg);
+
+    return c;
+}
+
+// load mruby string
+static const char *set_mod_mruby_handler_code(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: hoge1: %x"
+            , MODULE_NAME
+            , __func__
+            , conf->mod_mruby_handler_code_inline
+        );
+
+    conf->mod_mruby_handler_code_inline = ap_mrb_set_string(cmd->pool, arg);
+
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: hoge2: %x"
+            //, "%s ERROR %s: hoge2: %s %p"
+            , MODULE_NAME
+            , __func__
+            //, conf->mod_mruby_handler_code_inline->code
+            , conf->mod_mruby_handler_code_inline
+        );
+
+    return NULL;
+}
+
+// load mruby file
 static const char *set_mod_mruby_handler(cmd_parms *cmd, void *mconfig, const char *arg)
 {
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
@@ -163,11 +213,10 @@ static const char *set_mod_mruby_handler(cmd_parms *cmd, void *mconfig, const ch
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_handler_code);
+    conf->mod_mruby_handler_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_handler_first(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -178,11 +227,10 @@ static const char *set_mod_mruby_handler_first(cmd_parms *cmd, void *mconfig, co
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_handler_first_code);
+    conf->mod_mruby_handler_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_handler_middle(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -193,11 +241,10 @@ static const char *set_mod_mruby_handler_middle(cmd_parms *cmd, void *mconfig, c
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_handler_middle_code);
+    conf->mod_mruby_handler_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_handler_last(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -208,26 +255,10 @@ static const char *set_mod_mruby_handler_last(cmd_parms *cmd, void *mconfig, con
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_handler_last_code);
+    conf->mod_mruby_handler_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
-
-static const char *set_mod_mruby_handler_code(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_handler_code_native = apr_pstrdup(cmd->pool, arg);
-
-    return NULL;
-}
-
 
 static const char *set_mod_mruby_post_config_first(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -238,11 +269,10 @@ static const char *set_mod_mruby_post_config_first(cmd_parms *cmd, void *mconfig
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_post_config_first_code);
+    conf->mod_mruby_post_config_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_post_config_middle(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -253,11 +283,10 @@ static const char *set_mod_mruby_post_config_middle(cmd_parms *cmd, void *mconfi
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_post_config_middle_code);
+    conf->mod_mruby_post_config_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_post_config_last(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -268,11 +297,10 @@ static const char *set_mod_mruby_post_config_last(cmd_parms *cmd, void *mconfig,
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_post_config_last_code);
+    conf->mod_mruby_post_config_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_child_init_first(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -283,11 +311,10 @@ static const char *set_mod_mruby_child_init_first(cmd_parms *cmd, void *mconfig,
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_child_init_first_code);
+    conf->mod_mruby_child_init_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_child_init_middle(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -298,11 +325,10 @@ static const char *set_mod_mruby_child_init_middle(cmd_parms *cmd, void *mconfig
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_child_init_middle_code);
+    conf->mod_mruby_child_init_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_child_init_last(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -313,11 +339,10 @@ static const char *set_mod_mruby_child_init_last(cmd_parms *cmd, void *mconfig, 
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_child_init_last_code);
+    conf->mod_mruby_child_init_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
-
 
 static const char *set_mod_mruby_post_read_request_first(cmd_parms *cmd, void *mconfig, const char *arg)
 {
@@ -328,7 +353,7 @@ static const char *set_mod_mruby_post_read_request_first(cmd_parms *cmd, void *m
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_post_read_request_first_code);
+    conf->mod_mruby_post_read_request_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -343,7 +368,7 @@ static const char *set_mod_mruby_post_read_request_middle(cmd_parms *cmd, void *
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_post_read_request_middle_code);
+    conf->mod_mruby_post_read_request_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -358,7 +383,7 @@ static const char *set_mod_mruby_post_read_request_last(cmd_parms *cmd, void *mc
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_post_read_request_last_code);
+    conf->mod_mruby_post_read_request_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -373,7 +398,7 @@ static const char *set_mod_mruby_quick_handler_first(cmd_parms *cmd, void *mconf
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_quick_handler_first_code);
+    conf->mod_mruby_quick_handler_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -388,7 +413,7 @@ static const char *set_mod_mruby_quick_handler_middle(cmd_parms *cmd, void *mcon
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_quick_handler_middle_code);
+    conf->mod_mruby_quick_handler_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -403,7 +428,7 @@ static const char *set_mod_mruby_quick_handler_last(cmd_parms *cmd, void *mconfi
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_quick_handler_last_code);
+    conf->mod_mruby_quick_handler_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -418,7 +443,7 @@ static const char *set_mod_mruby_translate_name_first(cmd_parms *cmd, void *mcon
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_translate_name_first_code);
+    conf->mod_mruby_translate_name_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -433,7 +458,7 @@ static const char *set_mod_mruby_translate_name_middle(cmd_parms *cmd, void *mco
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_translate_name_middle_code);
+    conf->mod_mruby_translate_name_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -448,7 +473,7 @@ static const char *set_mod_mruby_translate_name_last(cmd_parms *cmd, void *mconf
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_translate_name_last_code);
+    conf->mod_mruby_translate_name_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -463,7 +488,7 @@ static const char *set_mod_mruby_map_to_storage_first(cmd_parms *cmd, void *mcon
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_map_to_storage_first_code);
+    conf->mod_mruby_map_to_storage_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -478,7 +503,7 @@ static const char *set_mod_mruby_map_to_storage_middle(cmd_parms *cmd, void *mco
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_map_to_storage_middle_code);
+    conf->mod_mruby_map_to_storage_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -493,7 +518,7 @@ static const char *set_mod_mruby_map_to_storage_last(cmd_parms *cmd, void *mconf
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_map_to_storage_last_code);
+    conf->mod_mruby_map_to_storage_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -508,7 +533,7 @@ static const char *set_mod_mruby_access_checker_first(cmd_parms *cmd, void *mcon
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_access_checker_first_code);
+    conf->mod_mruby_access_checker_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -523,7 +548,7 @@ static const char *set_mod_mruby_access_checker_middle(cmd_parms *cmd, void *mco
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_access_checker_middle_code);
+    conf->mod_mruby_access_checker_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -538,7 +563,7 @@ static const char *set_mod_mruby_access_checker_last(cmd_parms *cmd, void *mconf
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_access_checker_last_code);
+    conf->mod_mruby_access_checker_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -553,7 +578,7 @@ static const char *set_mod_mruby_check_user_id_first(cmd_parms *cmd, void *mconf
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_check_user_id_first_code);
+    conf->mod_mruby_check_user_id_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -568,7 +593,7 @@ static const char *set_mod_mruby_check_user_id_middle(cmd_parms *cmd, void *mcon
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_check_user_id_middle_code);
+    conf->mod_mruby_check_user_id_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -583,7 +608,7 @@ static const char *set_mod_mruby_check_user_id_last(cmd_parms *cmd, void *mconfi
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_check_user_id_last_code);
+    conf->mod_mruby_check_user_id_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -598,7 +623,7 @@ static const char *set_mod_mruby_auth_checker_first(cmd_parms *cmd, void *mconfi
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_auth_checker_first_code);
+    conf->mod_mruby_auth_checker_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -613,7 +638,7 @@ static const char *set_mod_mruby_auth_checker_middle(cmd_parms *cmd, void *mconf
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_auth_checker_middle_code);
+    conf->mod_mruby_auth_checker_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -628,7 +653,7 @@ static const char *set_mod_mruby_auth_checker_last(cmd_parms *cmd, void *mconfig
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_auth_checker_last_code);
+    conf->mod_mruby_auth_checker_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -643,7 +668,7 @@ static const char *set_mod_mruby_fixups_first(cmd_parms *cmd, void *mconfig, con
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_fixups_first_code);
+    conf->mod_mruby_fixups_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -658,7 +683,7 @@ static const char *set_mod_mruby_fixups_middle(cmd_parms *cmd, void *mconfig, co
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_fixups_middle_code);
+    conf->mod_mruby_fixups_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -673,7 +698,7 @@ static const char *set_mod_mruby_fixups_last(cmd_parms *cmd, void *mconfig, cons
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_fixups_last_code);
+    conf->mod_mruby_fixups_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -688,7 +713,7 @@ static const char *set_mod_mruby_insert_filter_first(cmd_parms *cmd, void *mconf
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_insert_filter_first_code);
+    conf->mod_mruby_insert_filter_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -703,7 +728,7 @@ static const char *set_mod_mruby_insert_filter_middle(cmd_parms *cmd, void *mcon
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_insert_filter_middle_code);
+    conf->mod_mruby_insert_filter_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -718,7 +743,7 @@ static const char *set_mod_mruby_insert_filter_last(cmd_parms *cmd, void *mconfi
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_insert_filter_last_code);
+    conf->mod_mruby_insert_filter_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -733,7 +758,7 @@ static const char *set_mod_mruby_log_transaction_first(cmd_parms *cmd, void *mco
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_log_transaction_first_code);
+    conf->mod_mruby_log_transaction_first_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -748,7 +773,7 @@ static const char *set_mod_mruby_log_transaction_middle(cmd_parms *cmd, void *mc
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_log_transaction_middle_code);
+    conf->mod_mruby_log_transaction_middle_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -763,7 +788,7 @@ static const char *set_mod_mruby_log_transaction_last(cmd_parms *cmd, void *mcon
     if (err != NULL)
         return err;
 
-    ap_mrb_set_code(cmd->pool, arg, conf->mod_mruby_log_transaction_last_code);
+    conf->mod_mruby_log_transaction_last_code = ap_mrb_set_file(cmd->pool, arg);
 
     return NULL;
 }
@@ -1021,10 +1046,10 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 
     //prctl(PR_SET_KEEPCAPS,1);
 
-    if (conf->mod_mruby_handler_code_native != NULL) {
+    if (conf->mod_mruby_handler_code_inline != NULL) {
         struct mrb_parser_state* p;
-        p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_handler_code_native, NULL);
-        conf->mod_mruby_handler_code_native_n = mrb_generate_code(mod_mruby_share_state, p);
+        p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_handler_code_inline->code, NULL);
+        conf->mod_mruby_handler_code_inline->irep_n = mrb_generate_code(mod_mruby_share_state, p);
         mrb_pool_close(p->pool);
     }
 
@@ -1034,10 +1059,12 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
         , APLOG_INFO
         , 0
         , pool
-        , "%s %s: child process (pid=%d) initialized."
+        , "%s %s: child process (pid=%d) initialized. %d "
         , MODULE_NAME
         , __func__
         , getpid()
+        , conf->mod_mruby_handler_code_inline->irep_n
+//        , conf->mod_mruby_handler_code_inline->code
     );
 }
 
@@ -1133,12 +1160,29 @@ static int mod_mruby_handler_code(request_rec *r)
     }
     ap_mrb_push_request(r);
     int ai = mrb_gc_arena_save(mod_mruby_share_state);
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: hoge %s %d"
+            , MODULE_NAME
+            , __func__
+            , conf->mod_mruby_handler_code_inline->code
+            , conf->mod_mruby_handler_code_inline->irep_n
+        );
     mrb_run(mod_mruby_share_state
-        , mrb_proc_new(mod_mruby_share_state, mod_mruby_share_state->irep[conf->mod_mruby_handler_code_native_n])
+        , mrb_proc_new(mod_mruby_share_state, mod_mruby_share_state->irep[conf->mod_mruby_handler_code_inline->irep_n])
         , mrb_top_self(mod_mruby_share_state)
     );
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: hoge"
+            , MODULE_NAME
+            , __func__
+        );
     mrb_gc_arena_restore(mod_mruby_share_state, ai);
-    //ap_mruby_irep_clean(mod_mruby_share_state, conf->mod_mruby_handler_code_native_n);
     // mutex unlock
     if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
         ap_log_error(APLOG_MARK
@@ -1171,7 +1215,7 @@ static int mod_mruby_handler(request_rec *r)
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
 
     if (strcmp(r->handler, "mruby-script") == 0)
-        ap_mrb_set_code(r->pool, r->filename, conf->mod_mruby_handler_code);
+        conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename);
     else
         return DECLINED;
 
