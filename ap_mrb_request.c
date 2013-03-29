@@ -8,6 +8,7 @@
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
 #include "mruby/hash.h"
+#include "http_protocol.h"
 //#include "apr_table.h"
 //#include "json.h"
 
@@ -102,6 +103,21 @@ mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str)
 }
 */
 
+mrb_value ap_mrb_get_request_body(mrb_state *mrb, mrb_value str)
+{
+    char *val;
+    int len;
+    request_rec *r = ap_mrb_get_request();
+    if (r->method_number == M_POST) {
+        ap_setup_client_block(r, REQUEST_CHUNKED_ERROR);
+        len = r->remaining;
+        val = apr_pcalloc(r->pool, len);
+        ap_should_client_block(r);
+        ap_get_client_block(r, val, len);
+        return mrb_str_new(mrb, val, len);
+    }
+    return mrb_nil_value();
+}
 
 mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str)
 {
@@ -664,6 +680,8 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
 
     //mrb_define_method(mrb, class_request, "Initialize", ap_mrb_init_request, ARGS_NONE());
     //mrb_define_method(mrb, class_request, "request_rec_json", ap_mrb_get_request_rec_json, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "body", ap_mrb_get_request_body, ARGS_NONE());
+
     mrb_define_method(mrb, class_request, "the_request=", ap_mrb_set_request_the_request, ARGS_ANY());
     mrb_define_method(mrb, class_request, "the_request", ap_mrb_get_request_the_request, ARGS_NONE());
     mrb_define_method(mrb, class_request, "protocol=", ap_mrb_set_request_protocol, ARGS_ANY());
