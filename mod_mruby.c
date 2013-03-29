@@ -1059,11 +1059,12 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
         , APLOG_INFO
         , 0
         , pool
-        , "%s %s: child process (pid=%d) initialized. %d "
+        //, "%s %s: child process (pid=%d) initialized. %d "
+        , "%s %s: child process (pid=%d) initialized."
         , MODULE_NAME
         , __func__
         , getpid()
-        , conf->mod_mruby_handler_code_inline->irep_n
+//        , conf->mod_mruby_handler_code_inline->irep_n
 //        , conf->mod_mruby_handler_code_inline->code
     );
 }
