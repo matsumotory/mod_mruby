@@ -16,6 +16,7 @@ void ap_mruby_conn_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_scoreboard_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_env_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_authnprovider_init(mrb_state *mrb, struct RClass *class_core);
+void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core);
 
 // add extended class init functions like ap_mruby_redis_init() in lib/redis/redis.c
 void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core);
@@ -47,6 +48,7 @@ int ap_mruby_class_init(mrb_state *mrb)
     ap_mruby_request_init(mrb, class); GC_ARENA_RESTORE;
     ap_mruby_env_init(mrb, class); GC_ARENA_RESTORE;
     ap_mruby_authnprovider_init(mrb, class); GC_ARENA_RESTORE;
+    ap_mruby_filter_init(mrb, class); GC_ARENA_RESTORE;
     ap_mruby_ext_class_init(mrb, class);
 
     return OK;

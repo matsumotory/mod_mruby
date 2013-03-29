@@ -78,6 +78,7 @@ typedef struct {
 typedef struct {
     mod_mruby_code_t *mod_mruby_authn_check_password_code;
     mod_mruby_code_t *mod_mruby_authn_get_realm_hash_code;
+    mod_mruby_code_t *mod_mruby_output_filter_code;
 } mruby_dir_config_t;
 
 typedef struct {
