@@ -24,11 +24,35 @@ ap_mrb_filter_rec *ap_mrb_get_filter()
     return mrb_filter_state;
 }
 
-static mrb_value ap_mrb_filter_init(mrb_state *mrb, mrb_value self)
+mrb_value ap_mrb_filter_init(mrb_state *mrb, mrb_value self)
 {
     request_rec *r = ap_mrb_get_request();
     return self;
 }
+
+static void mrb_apr_bucket_brigade_free(mrb_state *mrb, void *p)
+{
+}
+
+static const struct mrb_data_type mrb_apr_bucket_brigade_type = {
+    "apr_bucket_brigade", mrb_apr_bucket_brigade_free,
+};
+
+static void mrb_apr_bucket_free(mrb_state *mrb, void *p)
+{
+}
+
+static const struct mrb_data_type mrb_apr_bucket_type = {
+    "apr_bucket", mrb_apr_bucket_free,
+};
+
+static mrb_value ap_mrb_filter_brigade_first(mrb_state *mrb, mrb_value self)
+{
+    ap_mrb_filter_rec *ff = ap_mrb_get_filter();
+    const apr_bucket *bkt = APR_BRIGADE_FIRST(ff->bb);
+    return mrb_obj_value(Data_Wrap_Struct(mrb, mrb->object_class, &mrb_apr_bucket_type, (void*) bkt));
+}
+
 
 static mrb_value ap_mrb_filter_puts(mrb_state *mrb, mrb_value self)
 {
@@ -43,9 +67,10 @@ static mrb_value ap_mrb_filter_puts(mrb_state *mrb, mrb_value self)
 static mrb_value ap_mrb_filter_insert_tail(mrb_state *mrb, mrb_value self)
 {
     ap_mrb_filter_rec *ff = ap_mrb_get_filter();
-    char *str;
-    mrb_get_args(mrb, "z", &str);
-    APR_BRIGADE_INSERT_TAIL(ff->bb, apr_bucket_immortal_create(str, strlen(str), ff->f->c->bucket_alloc));
+    mrb_value bkt_o;
+    mrb_get_args(mrb, "o", &bkt_o);
+    apr_bucket *b = (apr_bucket *)mrb_check_datatype(mrb, bkt_o, &mrb_apr_bucket_type);
+    APR_BRIGADE_INSERT_TAIL(ff->bb, b);
     return self;
 }
 
@@ -98,36 +123,13 @@ static mrb_value ap_mrb_filter_brigade_empty(mrb_state *mrb, mrb_value self)
     return (rv) ? mrb_true_value()  : mrb_false_value();
 }
 
-static void mrb_apr_bucket_brigade_free(mrb_state *mrb, void *p)
-{
-}
-
-static const struct mrb_data_type mrb_apr_bucket_brigade_type = {
-    "apr_bucket_brigade", mrb_apr_bucket_brigade_free,
-};
-
-static void mrb_apr_bucket_free(mrb_state *mrb, void *p)
-{
-}
-
-static const struct mrb_data_type mrb_apr_bucket_type = {
-    "apr_bucket", mrb_apr_bucket_free,
-};
-
-static mrb_value ap_mrb_filter_brigade_first(mrb_state *mrb, mrb_value self)
-{
-    ap_mrb_filter_rec *ff = ap_mrb_get_filter();
-    const apr_bucket *bkt = APR_BRIGADE_FIRST(ff->bb);
-    return mrb_obj_value(Data_Wrap_Struct(mrb, mrb->object_class, &mrb_apr_bucket_type, (void*) bkt));
-}
-
 static mrb_value ap_mrb_filter_brigade_is_eos(mrb_state *mrb, mrb_value self)
 {
     apr_status_t rv;
     apr_bucket *b;
-    mrb_value bkt_o;
-    mrb_get_args(mrb, "o", &bkt_o);
-    b = (apr_bucket *)mrb_check_datatype(mrb, bkt_o, &mrb_apr_bucket_type);
+    //mrb_value bkt_o;
+    //mrb_get_args(mrb, "o", &bkt_o);
+    b = (apr_bucket *)mrb_check_datatype(mrb, self, &mrb_apr_bucket_type);
     rv = APR_BUCKET_IS_EOS(b);
     return (rv) ? mrb_true_value()  : mrb_false_value();
 }
@@ -149,6 +151,8 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
 {
     struct RClass *class_filter;
 
+    mrb_define_method(mrb, mrb->kernel_module, "is_eos?", ap_mrb_filter_brigade_is_eos, ARGS_NONE());
+
     class_filter = mrb_define_class_under(mrb, class_core, "Filter", mrb->object_class);
     mrb_define_method(mrb, class_filter, "initialize", ap_mrb_filter_init, ARGS_NONE());
     mrb_define_method(mrb, class_filter, "puts", ap_mrb_filter_puts, ARGS_REQ(1));
@@ -159,7 +163,7 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_filter, "flatten", ap_mrb_filter_brigade_pflatten, ARGS_NONE());
     mrb_define_method(mrb, class_filter, "length", ap_mrb_filter_brigade_length, ARGS_NONE());
     mrb_define_method(mrb, class_filter, "empty?", ap_mrb_filter_brigade_empty, ARGS_NONE());
-    mrb_define_method(mrb, class_filter, "is_eos?", ap_mrb_filter_brigade_is_eos, ARGS_REQ(1));
     mrb_define_method(mrb, class_filter, "first_bucket", ap_mrb_filter_brigade_first, ARGS_NONE());
     mrb_define_method(mrb, class_filter, "bucket_read", ap_mrb_filter_bucket_read, ARGS_REQ(1));
+    
 }
