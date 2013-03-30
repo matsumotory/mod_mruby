@@ -796,6 +796,45 @@ static const char *set_mod_mruby_log_transaction_last(cmd_parms *cmd, void *mcon
 }
 
 
+static const char *set_mod_mruby_authn_check_password(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;
+
+    if (err != NULL)
+        return err;
+
+    dir_conf->mod_mruby_authn_check_password_code = ap_mrb_set_file(cmd->pool, arg);
+
+    return NULL;
+}
+
+static const char *set_mod_mruby_authn_get_realm_hash(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;
+
+    if (err != NULL)
+        return err;
+
+    dir_conf->mod_mruby_authn_get_realm_hash_code = ap_mrb_set_file(cmd->pool, arg);
+
+    return NULL;
+}
+
+static const char *set_mod_mruby_output_filter(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;
+
+    if (err != NULL)
+        return err;
+
+    dir_conf->mod_mruby_output_filter_code = ap_mrb_set_file(cmd->pool, arg);
+
+    return NULL;
+}
+/*
 static const char *set_mod_mruby_cache_table_size(cmd_parms *cmd, void *mconfig, const char *arg)
 {
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
@@ -819,6 +858,7 @@ static const char *set_mod_mruby_cache_table_size(cmd_parms *cmd, void *mconfig,
 
     return NULL;
 }
+*/
 
 //
 // hook functions
@@ -2064,7 +2104,7 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* 
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
     mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
 
-    if (dir_conf->mod_mruby_authn_get_realm_hash_code == NULL)
+    if (dir_conf->mod_mruby_output_filter_code == NULL)
         return ap_pass_brigade(f->next, bb);
 
     // mutex lock
@@ -2191,12 +2231,12 @@ static const command_rec mod_mruby_cmds[] = {
     AP_INIT_TAKE1("mrubyLogTransactionFirst", set_mod_mruby_log_transaction_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction first phase."),
     AP_INIT_TAKE1("mrubyLogTransactionMiddle", set_mod_mruby_log_transaction_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction middle phase."),
     AP_INIT_TAKE1("mrubyLogTransactionLast", set_mod_mruby_log_transaction_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction last phase."),
-    AP_INIT_TAKE1("mrubyCacheSize", set_mod_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
+    //AP_INIT_TAKE1("mrubyCacheSize", set_mod_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
 
-    AP_INIT_TAKE1("mrubyAuthnCheckPassword", ap_set_string_slot, (void *)APR_OFFSETOF(mruby_dir_config_t, mod_mruby_authn_check_password_code), OR_AUTHCFG, "hook for authn basic."),
-    AP_INIT_TAKE1("mrubyAuthnGetRealmHash", ap_set_string_slot, (void *)APR_OFFSETOF(mruby_dir_config_t, mod_mruby_authn_get_realm_hash_code), OR_AUTHCFG, "hook for authn digest."),
+    AP_INIT_TAKE1("mrubyAuthnCheckPassword", set_mod_mruby_authn_check_password, NULL, OR_AUTHCFG, "hook for authn basic."),
+    AP_INIT_TAKE1("mrubyAuthnGetRealmHash", set_mod_mruby_authn_get_realm_hash, NULL, OR_AUTHCFG, "hook for authn digest."),
 
-    AP_INIT_TAKE1("mrubyOutputFilter", ap_set_string_slot, (void *)APR_OFFSETOF(mruby_dir_config_t, mod_mruby_output_filter_code), OR_OPTIONS, "set mruby output filter script."),
+    AP_INIT_TAKE1("mrubyOutputFilter", set_mod_mruby_output_filter, NULL, OR_OPTIONS, "set mruby output filter script."),
 
     {NULL}
 };
