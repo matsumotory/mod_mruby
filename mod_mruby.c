@@ -913,7 +913,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     return DECLINED;
 }
 
-static void ap_mruby_irep_clean(mrb_state *mrb, int n)
+static void ap_mruby_irep_clean(mrb_state *mrb, int n, request_rec *r)
 {
     mrb->irep_len = n;
 
@@ -924,6 +924,16 @@ static void ap_mruby_irep_clean(mrb_state *mrb, int n)
     mrb_free(mrb, mrb->irep[n]->syms);
     mrb_free(mrb, mrb->irep[n]->lines);
     mrb_free(mrb, mrb->irep[n]);
+
+    ap_log_rerror(APLOG_MARK
+        , APLOG_DEBUG
+        , 0
+        , r
+        , "%s DEBUG %s: irep[%d] cleaning"
+        , MODULE_NAME
+        , __func__
+        , n
+    );
 }
 
 // mruby_run for not request phase.
@@ -1064,7 +1074,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         , mruby_code_file
     );
 
-    ap_mruby_irep_clean(mrb, n);
+    ap_mruby_irep_clean(mrb, n, r);
 
     // mutex unlock
     if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
