@@ -60,6 +60,7 @@
 
 #include <unistd.h>
 #include <sys/stat.h>
+#include <setjmp.h>
 //#include <sys/prctl.h>
 
 #include "mod_mruby.h"
@@ -1039,7 +1040,13 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     );
 
     ap_mrb_set_status_code(OK);
-    mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
+    jmp_buf mod_mruby_jmp;
+    if (!setjmp(mod_mruby_jmp)) {
+        mrb->jmp = &mod_mruby_jmp;
+        mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
+    } else {
+        mrb->jmp = 0;
+    }
     mrb_gc_arena_restore(mrb, ai);
 
     if (mrb->exc)

@@ -11,23 +11,42 @@ MRuby::Build.new do |conf|
   # conf.gem :github => 'masuidrive/mrbgems-example', :branch => 'master'
   # conf.gem :git => 'git@github.com:masuidrive/mrbgems-example.git', :branch => 'master', :options => '-v'
 
+  # Use standard Kernel#sprintf method
+  conf.gem "#{root}/mrbgems/mruby-sprintf"
+
+  # Use standard print/puts/p
+  conf.gem "#{root}/mrbgems/mruby-print"
+
   # Use standard Math module
-  conf.gem 'mrbgems/mruby-math'
+  conf.gem "#{root}/mrbgems/mruby-math"
 
   # Use standard Time class
-  conf.gem 'mrbgems/mruby-time'
+  conf.gem "#{root}/mrbgems/mruby-time"
 
   # Use standard Struct class
-  conf.gem 'mrbgems/mruby-struct'
+  conf.gem "#{root}/mrbgems/mruby-struct"
 
-  # Use standard Kernel#sprintf method
-  conf.gem 'mrbgems/mruby-sprintf'
+  # Use extensional Enumerable module
+  conf.gem "#{root}/mrbgems/mruby-enum-ext"
 
   # Use extensional String class
-  conf.gem 'mrbgems/mruby-string-ext'
+  conf.gem "#{root}/mrbgems/mruby-string-ext"
 
   # Use extensional Numeric class
-  conf.gem 'mrbgems/mruby-numeric-ext'
+  conf.gem "#{root}/mrbgems/mruby-numeric-ext"
+
+  # Use extensional Array class
+  conf.gem "#{root}/mrbgems/mruby-array-ext"
+
+  # Use extensional Hash class
+  conf.gem "#{root}/mrbgems/mruby-hash-ext"
+
+  # Use Random class
+  conf.gem "#{root}/mrbgems/mruby-random"
+  
+  # No use eval method
+  # conf.gem "#{root}/mrbgems/mruby-eval"
+  #
 
   conf.gem :git => 'git://github.com/iij/mruby-process.git'
   conf.gem :git => 'git://github.com/iij/mruby-pack.git'
@@ -37,14 +56,13 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-random.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
 
-  # linux only
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
 
   # Generate binaries
   # conf.bins = %w(mrbc mruby mirb)
-  
+
   # C compiler settings
   # conf.cc do |cc|
   #   cc.command = ENV['CC'] || 'gcc'
