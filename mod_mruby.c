@@ -1044,9 +1044,9 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     if (!setjmp(mod_mruby_jmp)) {
         mrb->jmp = &mod_mruby_jmp;
         mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
-    } else {
-        mrb->jmp = 0;
     }
+
+    mrb->jmp = 0;
     mrb_gc_arena_restore(mrb, ai);
 
     if (mrb->exc)
