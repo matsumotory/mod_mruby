@@ -146,4 +146,6 @@ allow_ip = '127.0.0.1'
 api = ModMruby::API.new allow_ip
 if api.allow_access?
   api.call
+else
+  Apache.return Apache::DECLINED
 end
