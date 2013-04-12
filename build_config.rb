@@ -48,6 +48,9 @@ MRuby::Build.new do |conf|
   # conf.gem "#{root}/mrbgems/mruby-eval"
   #
 
+  #
+  # Recommended for mod_mruby
+  #
   conf.gem :git => 'git://github.com/iij/mruby-process.git'
   conf.gem :git => 'git://github.com/iij/mruby-pack.git'
   conf.gem :git => 'git://github.com/iij/mruby-digest.git'
@@ -55,10 +58,10 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
-
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
   # Linux only
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
 
 
   # Generate binaries
