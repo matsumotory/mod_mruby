@@ -11,42 +11,8 @@ MRuby::Build.new do |conf|
   # conf.gem :github => 'masuidrive/mrbgems-example', :branch => 'master'
   # conf.gem :git => 'git@github.com:masuidrive/mrbgems-example.git', :branch => 'master', :options => '-v'
 
-  # Use standard Kernel#sprintf method
-  conf.gem "#{root}/mrbgems/mruby-sprintf"
-
-  # Use standard print/puts/p
-  conf.gem "#{root}/mrbgems/mruby-print"
-
-  # Use standard Math module
-  conf.gem "#{root}/mrbgems/mruby-math"
-
-  # Use standard Time class
-  conf.gem "#{root}/mrbgems/mruby-time"
-
-  # Use standard Struct class
-  conf.gem "#{root}/mrbgems/mruby-struct"
-
-  # Use extensional Enumerable module
-  conf.gem "#{root}/mrbgems/mruby-enum-ext"
-
-  # Use extensional String class
-  conf.gem "#{root}/mrbgems/mruby-string-ext"
-
-  # Use extensional Numeric class
-  conf.gem "#{root}/mrbgems/mruby-numeric-ext"
-
-  # Use extensional Array class
-  conf.gem "#{root}/mrbgems/mruby-array-ext"
-
-  # Use extensional Hash class
-  conf.gem "#{root}/mrbgems/mruby-hash-ext"
-
-  # Use Random class
-  conf.gem "#{root}/mrbgems/mruby-random"
-  
-  # No use eval method
-  # conf.gem "#{root}/mrbgems/mruby-eval"
-  #
+  # include the default GEMs
+  conf.gembox 'default'
 
   #
   # Recommended for mod_mruby
@@ -56,16 +22,15 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/iij/mruby-digest.git'
   conf.gem :git => 'git://github.com/mattn/mruby-json.git'
   conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
-  # Linux only
+
+  # use markdown on mod_mruby
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
+
+  # Linux only for mod_mruby
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
-
-
-  # Generate binaries
-  # conf.bins = %w(mrbc mruby mirb)
 
   # C compiler settings
   # conf.cc do |cc|
@@ -76,6 +41,11 @@ MRuby::Build.new do |conf|
   #   cc.option_include_path = '-I%s'
   #   cc.option_define = '-D%s'
   #   cc.compile_options = "%{flags} -MMD -o %{outfile} -c %{infile}"
+  # end
+
+  # mrbc settings
+  # conf.mrbc do |mrbc|
+  #   mrbc.compile_options = "-g -B%{funcname} -o-" # The -g option is required for line numbers
   # end
 
   # Linker settings
@@ -130,4 +100,7 @@ end
 #   conf.build_mrbtest_lib_only
 #   
 #   conf.gem 'examples/mrbgems/c_and_ruby_extension_example'
+#
+#   conf.test_runner.command = 'env'
+#
 # end
