@@ -1270,6 +1270,9 @@ static int mod_mruby_handler(request_rec *r)
 
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
 
+    if (!r->handler)
+        return DECLINED;
+
     if (strcmp(r->handler, "mruby-script") == 0)
         conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename);
     else

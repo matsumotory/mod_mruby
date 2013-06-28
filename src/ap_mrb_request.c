@@ -653,7 +653,7 @@ mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
 {
     request_rec *r = ap_mrb_get_request();
-    apr_status_t result = ap_run_handler(r);
+    apr_status_t result = ap_invoke_handler(r);
 
     if (result != APR_SUCCESS) {
         ap_log_error(APLOG_MARK
