@@ -368,7 +368,7 @@ mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
     sc_clocks_t t = ap_mrb_get_sc_clocks();
     /* Allow for OS/2 not having CPU stats */
     if (t.ts || t.tu || t.tcu || t.tcs)
-        return mrb_float_value((mrb_float)((t.tu + t.ts + t.tcu + t.tcs) / tick / sb_get_uptime() * 100.));
+        return mrb_float_value(mrb, (mrb_float)((t.tu + t.ts + t.tcu + t.tcs) / tick / sb_get_uptime() * 100.));
 #endif
     return self;
 }
@@ -380,9 +380,9 @@ mrb_value ap_mrb_get_scoreboard_loadavg(mrb_state *mrb, mrb_value self)
 
     ap_get_loadavg(&t);
     ary = mrb_ary_new(mrb);
-    mrb_ary_push(mrb, ary, mrb_float_value(t.loadavg));
-    mrb_ary_push(mrb, ary, mrb_float_value(t.loadavg5));
-    mrb_ary_push(mrb, ary, mrb_float_value(t.loadavg15));
+    mrb_ary_push(mrb, ary, mrb_float_value(mrb, t.loadavg));
+    mrb_ary_push(mrb, ary, mrb_float_value(mrb, t.loadavg5));
+    mrb_ary_push(mrb, ary, mrb_float_value(mrb, t.loadavg15));
 
     return ary;
 }
@@ -399,7 +399,7 @@ mrb_value ap_mrb_get_scoreboard_process_worker(mrb_state *mrb, mrb_value str)
 
 mrb_value ap_mrb_get_scoreboard_restart_time(mrb_state *mrb, mrb_value str)
 {
-    return mrb_float_value((mrb_float)sb_get_restart_time());
+    return mrb_float_value(mrb, (mrb_float)sb_get_restart_time());
 }
 
 mrb_value ap_mrb_get_scoreboard_pid(mrb_state *mrb, mrb_value str)
@@ -441,17 +441,17 @@ mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
 
 mrb_value ap_mrb_get_scoreboard_uptime(mrb_state *mrb, mrb_value str)
 {
-    return mrb_float_value((mrb_float)sb_get_uptime());
+    return mrb_float_value(mrb, (mrb_float)sb_get_uptime());
 }
 
 mrb_value ap_mrb_get_scoreboard_total_kbyte(mrb_state *mrb, mrb_value str)
 {
-    return mrb_float_value((mrb_float)sb_get_kbcount());
+    return mrb_float_value(mrb, (mrb_float)sb_get_kbcount());
 }
 
 mrb_value ap_mrb_get_scoreboard_total_access(mrb_state *mrb, mrb_value str)
 {
-    return mrb_float_value((mrb_float)sb_get_access_count());
+    return mrb_float_value(mrb, (mrb_float)sb_get_access_count());
 }
 
 mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)

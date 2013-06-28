@@ -133,7 +133,11 @@ mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
 
 mrb_value ap_mrb_get_server_version(mrb_state *mrb, mrb_value str)
 {
+#if AP_SERVER_PATCHLEVEL_NUMBER > 3
     return mrb_str_new(mrb, ap_get_server_description(), strlen(ap_get_server_description()));
+#else
+    return mrb_str_new_cstr(mrb, AP_SERVER_BASEVERSION " (" PLATFORM ")");
+#endif
 }
 
 mrb_value ap_mrb_get_server_build(mrb_state *mrb, mrb_value str)
