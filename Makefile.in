@@ -4,7 +4,7 @@
 ##
 
 # target module source
-TARGET=mod_mruby.c ap_mrb_*.c @FEATURE_TARGETS@
+TARGET=src/mod_mruby.c src/ap_mrb_*.c @FEATURE_TARGETS@
 
 #   the used tools
 APXS=@APXS_PATH@
@@ -45,11 +45,11 @@ mod_mruby.so: $(TARGET)
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
 install:
-	$(APXS) -i -a -n 'mruby' .libs/mod_mruby.so
+	$(APXS) -i -a -n 'mruby' src/.libs/mod_mruby.so
 
 #   cleanup
 clean:
-	-rm -rf .libs *.o *.so *.lo *.la *.slo *.loT
+	-rm -rf src/.libs src/*.o src/*.so src/*.lo src/*.la src/*.slo src/*.loT
 	-rm -rf ./lib/*/.libs ./lib/*/*.o ./lib/*/*.lo ./lib/*/*.slo
 
 #   clobber
@@ -66,16 +66,3 @@ restart:
 	$(APACHECTL) restart
 stop:
 	$(APACHECTL) stop
-
-## libmruby.a
-#tmp/mruby:
-#	mkdir -p tmp vendors
-#	cd tmp; git clone "$(MRUBY_REPOS)"
-#
-#libmruby.a: tmp/mruby
-#	cd tmp/mruby && $(RAKE_PATH) CFLAGS="-O3 -fPIC" ENABLE_GEMS=$(ENABLE_GEMS)
-#	cp -r tmp/mruby/include vendors/
-#	cp -r tmp/mruby/lib vendors/
-#	cp -r tmp/mruby/src vendors/
-#	cp -r tmp/mruby/bin vendors/
-#	cp -r tmp/mruby/mrblib vendors/
