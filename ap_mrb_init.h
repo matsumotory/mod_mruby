@@ -9,7 +9,7 @@
 #include "ap_mrb_request.h"
 #include "ap_mrb_server.h"
 #include "ap_mrb_connection.h"
-#include "ap_mrb_utils.h"
+#include "ap_mrb_core.h"
 #include "ap_mrb_string.h"
 
 struct RClass *class;

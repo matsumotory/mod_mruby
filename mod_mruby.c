@@ -66,7 +66,7 @@
 #include "mod_mruby.h"
 #include "ap_mrb_request.h"
 #include "ap_mrb_authnprovider.h"
-#include "ap_mrb_utils.h"
+#include "ap_mrb_core.h"
 #include "ap_mrb_filter.h"
 
 mrb_state *mod_mruby_share_state = NULL;
