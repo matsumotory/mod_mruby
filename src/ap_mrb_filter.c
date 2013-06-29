@@ -68,8 +68,9 @@ static mrb_value ap_mrb_filter_insert_tail(mrb_state *mrb, mrb_value self)
 {
     ap_mrb_filter_rec *ff = ap_mrb_get_filter();
     mrb_value bkt_o;
+    apr_bucket *b;
     mrb_get_args(mrb, "o", &bkt_o);
-    apr_bucket *b = (apr_bucket *)mrb_check_datatype(mrb, bkt_o, &mrb_apr_bucket_type);
+    b = (apr_bucket *)mrb_check_datatype(mrb, bkt_o, &mrb_apr_bucket_type);
     APR_BRIGADE_INSERT_TAIL(ff->bb, b);
     return self;
 }

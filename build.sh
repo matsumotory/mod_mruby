@@ -18,13 +18,13 @@ echo "mruby building ..."
 mv build_config.rb{,.orig}
 cp ../build_config.rb .
 #rake BUILD_BIT='32'
-#rake BUILD_TYPE='debug'
-rake
+rake BUILD_TYPE='debug'
+#rake
 echo "mruby building ... Done"
 cd ..
 echo "mod_mruby building ..."
-#./configure --with-apxs=/usr/local/apache/bin/apxs --with-apachectl=/usr/local/apache/bin/apachectl
-./configure
+./configure --with-apxs=/usr/local/apache/bin/apxs --with-apachectl=/usr/local/apache/bin/apachectl
+#./configure
 make
 sudo make install
 echo "mod_mruby building ... Done"

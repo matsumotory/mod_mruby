@@ -111,6 +111,10 @@ static sc_clocks_t ap_mrb_get_sc_clocks()
     float tick;
     int times_per_thread;
     sc_clocks_t cur, proc, tmp;
+    unsigned long lres;
+    int res, i, j;
+    worker_score *ws_record;
+
 #endif
 
 #ifdef __APACHE24__
@@ -120,10 +124,6 @@ static sc_clocks_t ap_mrb_get_sc_clocks()
 
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
-
-    unsigned long lres;
-    int res, i, j;
-    worker_score *ws_record;
 
 #ifdef HAVE_TIMES
     times_per_thread = getpid() != child_pid;
@@ -211,6 +211,7 @@ static int sb_get_process_worker()
     int i, j, res;
     worker_score *ws_record;
     process_score *ps_record;
+    int process = 0;
 
 #ifdef __APACHE24__
     ap_generation_t ap_my_generation;
@@ -220,7 +221,6 @@ static int sb_get_process_worker()
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
 
-    int process = 0;
     if (!ap_extended_status)
         return process;
 
@@ -246,6 +246,7 @@ static int sb_get_idle_worker()
     int i, j, res;
     worker_score *ws_record;
     process_score *ps_record;
+    int idle = 0;
 
 #ifdef __APACHE24__
     ap_generation_t ap_my_generation;
@@ -255,7 +256,6 @@ static int sb_get_idle_worker()
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
 
-    int idle = 0;
     if (!ap_extended_status)
         return idle;
 
@@ -280,12 +280,11 @@ static apr_off_t sb_get_kbcount()
     unsigned long lres;
     apr_off_t bytes;
     apr_off_t bcount, kbcount;
+    worker_score *ws_record;
+    process_score *ps_record;
 
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
-
-    worker_score *ws_record;
-    process_score *ps_record;
 
     bcount = 0;
     kbcount = 0;
@@ -323,11 +322,11 @@ static unsigned long sb_get_access_count()
     unsigned long count;
     unsigned long lres;
 
-    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
-    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
-
     worker_score *ws_record;
     process_score *ps_record;
+
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
 
     count = 0;
 
@@ -354,6 +353,7 @@ mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
 {
 #ifdef HAVE_TIMES
     float tick;
+    sc_clocks_t t;
 #endif
 
 #ifdef HAVE_TIMES
@@ -365,7 +365,7 @@ mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
 #endif
 
 #ifdef HAVE_TIMES
-    sc_clocks_t t = ap_mrb_get_sc_clocks();
+    t = ap_mrb_get_sc_clocks();
     /* Allow for OS/2 not having CPU stats */
     if (t.ts || t.tu || t.tcu || t.tcs)
         return mrb_float_value(mrb, (mrb_float)((t.tu + t.ts + t.tcu + t.tcs) / tick / sb_get_uptime() * 100.));
@@ -423,8 +423,8 @@ mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
 {
     int i, j;
     mrb_int pid;
-    mrb_get_args(mrb, "i", &pid);
     worker_score *ws_record;
+    mrb_get_args(mrb, "i", &pid);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
     for (i = 0; i < mruby_server_limit; ++i) {
@@ -459,10 +459,10 @@ mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
 
     int i, j;
     worker_score *ws_record;
+    mrb_value hash = mrb_hash_new(mrb);
+
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
     ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
-
-    mrb_value hash = mrb_hash_new(mrb);
 
     for (i = 0; i < mruby_server_limit; ++i) {
         for (j = 0; j < mruby_thread_limit; ++j) {
@@ -527,8 +527,6 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
 
     int i, j;
     worker_score *ws_record;
-    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
-    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
 
     int start   = 0;
     int ready   = 0;
@@ -543,6 +541,9 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
     int idlek   = 0;
 
     mrb_value hash = mrb_hash_new(mrb);
+
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
+    ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
 
     for (i = 0; i < mruby_server_limit; ++i) {
         for (j = 0; j < mruby_thread_limit; ++j) {

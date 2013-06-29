@@ -420,9 +420,9 @@ mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_set_request_notes(mrb_state *mrb, mrb_value str)
 {
     mrb_value key, val;
+    request_rec *r = ap_mrb_get_request();
 
     mrb_get_args(mrb, "oo", &key, &val);
-    request_rec *r = ap_mrb_get_request();
     apr_table_set(r->notes, RSTRING_PTR(key), RSTRING_PTR(val));
     return val;
 }
@@ -430,10 +430,11 @@ mrb_value ap_mrb_set_request_notes(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_get_request_notes(mrb_state *mrb, mrb_value str)
 {
     mrb_value key;
+    request_rec *r = ap_mrb_get_request();
+    const char *val;
 
     mrb_get_args(mrb, "o", &key);
-    request_rec *r = ap_mrb_get_request();
-    const char *val = apr_table_get(r->notes, RSTRING_PTR(key));
+    val = apr_table_get(r->notes, RSTRING_PTR(key));
     if (val == NULL)
         return mrb_nil_value();
     return mrb_str_new(mrb, val, strlen(val));
@@ -442,9 +443,9 @@ mrb_value ap_mrb_get_request_notes(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
 {
     mrb_value key, val;
+    request_rec *r = ap_mrb_get_request();
 
     mrb_get_args(mrb, "oo", &key, &val);
-    request_rec *r = ap_mrb_get_request();
     apr_table_set(r->headers_in, RSTRING_PTR(key), RSTRING_PTR(val));
     return val;
 }
@@ -452,10 +453,11 @@ mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
 {
     mrb_value key;
+    request_rec *r = ap_mrb_get_request();
+    const char *val;
 
     mrb_get_args(mrb, "o", &key);
-    request_rec *r = ap_mrb_get_request();
-    const char *val = apr_table_get(r->headers_in, RSTRING_PTR(key));
+    val = apr_table_get(r->headers_in, RSTRING_PTR(key));
     if (val == NULL)
         return mrb_nil_value();
     return mrb_str_new(mrb, val, strlen(val));
@@ -481,9 +483,9 @@ mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
 {
     mrb_value key, val;
+    request_rec *r = ap_mrb_get_request();
 
     mrb_get_args(mrb, "oo", &key, &val);
-    request_rec *r = ap_mrb_get_request();
     apr_table_set(r->headers_out, RSTRING_PTR(key), RSTRING_PTR(val));
     return val;
 }
@@ -491,10 +493,11 @@ mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
 {
     mrb_value key;
+    const char *val;
+    request_rec *r = ap_mrb_get_request();
 
     mrb_get_args(mrb, "o", &key);
-    request_rec *r = ap_mrb_get_request();
-    const char *val = apr_table_get(r->headers_out, RSTRING_PTR(key));
+    val = apr_table_get(r->headers_out, RSTRING_PTR(key));
     return mrb_str_new(mrb, val, strlen(val));
 }
 
@@ -563,10 +566,11 @@ mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
 //    struct apr_file_t *filehand;
 //};
     mrb_value key;
+    request_rec *r = ap_mrb_get_request();
+    const char *val;
 
     mrb_get_args(mrb, "o", &key);
-    request_rec *r = ap_mrb_get_request();
-    const char *val = apr_table_get(r->headers_in, RSTRING_PTR(key));
+    val = apr_table_get(r->headers_in, RSTRING_PTR(key));
     if (val == NULL)
         return mrb_nil_value();
     return mrb_str_new(mrb, val, strlen(val));
@@ -774,6 +778,10 @@ mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
 void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
 {
     struct RClass *class_request;
+    struct RClass *class_notes;
+    struct RClass *class_headers_in;
+    struct RClass *class_headers_out;
+    struct RClass *class_finfo;
 
     class_request = mrb_define_class_under(mrb, class_core, "Request", mrb->object_class);
 
@@ -835,24 +843,20 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_request, "no_cache", ap_mrb_get_request_no_cache, ARGS_NONE());
     mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, ARGS_NONE());
 
-    struct RClass *class_notes;
     class_notes = mrb_define_class_under(mrb, class_core, "Notes", mrb->object_class);
     mrb_define_method(mrb, class_notes, "[]=", ap_mrb_set_request_notes, ARGS_ANY());
     mrb_define_method(mrb, class_notes, "[]", ap_mrb_get_request_notes, ARGS_ANY());
 
-    struct RClass *class_headers_in;
     class_headers_in = mrb_define_class_under(mrb, class_core, "Headers_in", mrb->object_class);
     mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "headers_in_hash", ap_mrb_get_request_headers_in_hash, ARGS_ANY());
 
-    struct RClass *class_headers_out;
     class_headers_out = mrb_define_class_under(mrb, class_core, "Headers_out", mrb->object_class);
     mrb_define_method(mrb, class_headers_out, "headers_out=", ap_mrb_set_request_headers_out, ARGS_ANY());
     mrb_define_method(mrb, class_headers_out, "headers_out", ap_mrb_get_request_headers_out, ARGS_ANY());
     mrb_define_method(mrb, class_headers_out, "headers_out_hash", ap_mrb_get_request_headers_out_hash, ARGS_ANY());
 
-    struct RClass *class_finfo;
     class_finfo = mrb_define_class_under(mrb, class_core, "Finfo", mrb->object_class);
     mrb_define_method(mrb, class_finfo, "group",  ap_mrb_get_request_finfo_group,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "user",   ap_mrb_get_request_finfo_user,   ARGS_NONE());
