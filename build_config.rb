@@ -21,18 +21,18 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/iij/mruby-pack.git'
   conf.gem :git => 'git://github.com/iij/mruby-digest.git'
   conf.gem :git => 'git://github.com/mattn/mruby-json.git'
-  #conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-thread.git'
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
+  conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-thread.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-config.git'
 
   # use markdown on mod_mruby
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
 
   # Linux only for mod_mruby
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
 
   # C compiler settings
   conf.cc do |cc|
@@ -41,6 +41,9 @@ MRuby::Build.new do |conf|
       cc.flags = '-fPIC -g3 -Wall -Werror-implicit-function-declaration'
     else
       cc.flags << '-fPIC'
+    end
+    if ENV['BUILD_BIT'] == "64"
+      cc.flags << ' -DMRB_INT64'
     end
   #   cc.include_paths = ["#{root}/include"]
   #   cc.defines = %w(DISABLE_GEMS)
@@ -64,7 +67,7 @@ MRuby::Build.new do |conf|
   #   linker.library_paths = []
   #   linker.option_library = '-l%s'
   #   linker.option_library_path = '-L%s'
-    if ENV['BUILD_BIT'] != "32"
+    if ENV['BUILD_BIT'] == "64"
       linker.flags = '-DMRB_INT64'
     end
   #   linker.link_options = "%{flags} -o %{outfile} %{objs} %{libs}"
