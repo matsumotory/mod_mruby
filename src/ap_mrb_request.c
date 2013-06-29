@@ -515,6 +515,10 @@ mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str)
     return hash;
 }
 
+//
+// Apache::Finfo (r->finfo)
+//
+
 mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
 {
 // TODO
@@ -585,15 +589,31 @@ mrb_value ap_mrb_get_request_finfo_user(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_get_request_finfo_size(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();
-    mrb_int val = (mrb_int)r->finfo.size;
-    return mrb_fixnum_value(val);
+    return mrb_fixnum_value((mrb_int)r->finfo.size);
+}
+
+mrb_value ap_mrb_get_request_finfo_csize(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    return mrb_fixnum_value((mrb_int)r->finfo.csize);
 }
 
 mrb_value ap_mrb_get_request_finfo_atime(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();
-    mrb_int val = (mrb_int)r->finfo.atime;
-    return mrb_fixnum_value(val);
+    return mrb_fixnum_value((mrb_int)r->finfo.atime);
+}
+
+mrb_value ap_mrb_get_request_finfo_ctime(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    return mrb_fixnum_value((mrb_int)r->finfo.ctime);
+}
+
+mrb_value ap_mrb_get_request_finfo_mtime(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    return mrb_fixnum_value((mrb_int)r->finfo.mtime);
 }
 
 mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str)
