@@ -37,7 +37,11 @@ MRuby::Build.new do |conf|
   # C compiler settings
   conf.cc do |cc|
   #   cc.command = ENV['CC'] || 'gcc'
-    cc.flags << '-fPIC -DMRB_INT64'
+    if ENV['BUILD_TYPE'] == "debug"
+      cc.flags = '-fPIC -g3 -Wall -Werror-implicit-function-declaration'
+    else
+      cc.flags << '-fPIC'
+    end
   #   cc.include_paths = ["#{root}/include"]
   #   cc.defines = %w(DISABLE_GEMS)
   #   cc.option_include_path = '-I%s'
@@ -51,7 +55,7 @@ MRuby::Build.new do |conf|
   # end
 
   # Linker settings
-  # conf.linker do |linker|
+  conf.linker do |linker|
   #   linker.command = ENV['LD'] || 'gcc'
   #   linker.flags = [ENV['LDFLAGS'] || []]
   #   linker.flags_before_libraries = []
@@ -60,8 +64,11 @@ MRuby::Build.new do |conf|
   #   linker.library_paths = []
   #   linker.option_library = '-l%s'
   #   linker.option_library_path = '-L%s'
+    if ENV['BUILD_BIT'] != "32"
+      linker.flags = '-DMRB_INT64'
+    end
   #   linker.link_options = "%{flags} -o %{outfile} %{objs} %{libs}"
-  # end
+  end
  
   # Archiver settings
   # conf.archiver do |archiver|

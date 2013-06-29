@@ -19,7 +19,6 @@ WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-g
 MRUBY_REPOS=@MRUBY_REPOS@
 RAKE_PATH=@RAKE_PATH@
 ENABLE_GEMS=@ENABLE_GEMS@
-MRUBY_OPT_CFLAGS=-DMRB_INT64
 
 #   suport mrbgems
 MRUBY_MAK_FILE := $(MRUBY_ROOT)/build/host/lib/libmruby.flags.mak
@@ -32,7 +31,7 @@ else
 endif
 
 APXS_LDFLAGS=@LDFLAGS@
-CFLAGS=$(INC) $(MRUBY_OPT_CFLAGS)
+CFLAGS=$(INC)
 LDFLAGS=$(MRUBY_LDFLAGS)
 LIBS=$(LIB) $(MRUBY_LIBS)
 

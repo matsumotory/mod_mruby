@@ -990,6 +990,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     //struct stat st;
     FILE *mrb_file;
     int ai = 0;
+    jmp_buf mod_mruby_jmp;
 
     if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
         ap_log_error(APLOG_MARK
@@ -1033,7 +1034,6 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     );
 
     ap_mrb_set_status_code(OK);
-    jmp_buf mod_mruby_jmp;
     if (!setjmp(mod_mruby_jmp)) {
         mrb->jmp = &mod_mruby_jmp;
         mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
@@ -1198,6 +1198,7 @@ static int mod_mruby_handler_code(request_rec *r)
 {
 
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    int ai;
 
     if (strcmp(r->handler, "mruby-native-script") != 0)
         return DECLINED;
@@ -1215,7 +1216,7 @@ static int mod_mruby_handler_code(request_rec *r)
         return OK;
     }
     ap_mrb_push_request(r);
-    int ai = mrb_gc_arena_save(mod_mruby_share_state);
+    ai = mrb_gc_arena_save(mod_mruby_share_state);
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
