@@ -39,16 +39,6 @@
 #  include "config.h"
 #endif
 
-/* define ENABLE_XXXX from DISABLE_XXX */
-/*
-#ifndef DISABLE_REDIS
-#define ENABLE_REDIS
-#endif
-#ifndef DISABLE_HELLO
-#define ENABLE_HELLO
-#endif
-*/
-
 #include "mruby.h"
 #include "mruby/string.h"
 

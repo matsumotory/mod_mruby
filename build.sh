@@ -17,7 +17,8 @@ fi
 echo "mruby building ..."
 mv build_config.rb{,.orig}
 cp ../build_config.rb .
-rake CFLAGS="-fPIC"
+#rake CFLAGS="-g3 -fPIC"
+rake
 echo "mruby building ... Done"
 cd ..
 echo "mod_mruby building ..."

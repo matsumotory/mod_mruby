@@ -515,6 +515,87 @@ mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str)
     return hash;
 }
 
+mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
+{
+// TODO
+//struct apr_finfo_t {
+//    /* Allocates memory and closes lingering handles in the specified pool */
+//    apr_pool_t *pool;
+//    /** The bitmask describing valid fields of this apr_finfo_t structure 
+//     *  including all available 'wanted' fields and potentially more */
+//    apr_int32_t valid;
+//    /** The access permissions of the file.  Mimics Unix access rights. */
+//    apr_fileperms_t protection;
+//    /** The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE, 
+//     * APR_LNK or APR_SOCK.  If the type is undetermined, the value is APR_NOFILE.
+//     * If the type cannot be determined, the value is APR_UNKFILE.
+//     */
+//    apr_filetype_e filetype;
+//    /** The user id that owns the file */
+//    apr_uid_t user;
+//    /** The group id that owns the file */
+//    apr_gid_t group;
+//    /** The inode of the file. */
+//    apr_ino_t inode;
+//    /** The id of the device the file is on. */
+//    apr_dev_t device;
+//    /** The number of hard links to the file. */
+//    apr_int32_t nlink;
+//    /** The size of the file */
+//    apr_off_t size;
+//    /** The storage size consumed by the file */
+//    apr_off_t csize;
+//    /** The time the file was last accessed */
+//    apr_time_t atime;
+//    /** The time the file was last modified */
+//    apr_time_t mtime;
+//    /** The time the file was created, or the inode was last changed */
+//    apr_time_t ctime;
+//    /** The pathname of the file (possibly unrooted) */
+//    const char *fname;
+//    /** The file's name (no path) in filesystem case */
+//    const char *name;
+//    /** The file's handle, if accessed (can be submitted to apr_duphandle) */
+//    struct apr_file_t *filehand;
+//};
+    mrb_value key;
+
+    mrb_get_args(mrb, "o", &key);
+    request_rec *r = ap_mrb_get_request();
+    const char *val = apr_table_get(r->headers_in, RSTRING_PTR(key));
+    if (val == NULL)
+        return mrb_nil_value();
+    return mrb_str_new(mrb, val, strlen(val));
+}
+
+mrb_value ap_mrb_get_request_finfo_group(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    mrb_int val = (mrb_int)r->finfo.group;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_finfo_user(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    mrb_int val = (mrb_int)r->finfo.user;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_finfo_size(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    mrb_int val = (mrb_int)r->finfo.size;
+    return mrb_fixnum_value(val);
+}
+
+mrb_value ap_mrb_get_request_finfo_atime(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    mrb_int val = (mrb_int)r->finfo.atime;
+    return mrb_fixnum_value(val);
+}
+
 mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();
@@ -735,23 +816,27 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, ARGS_NONE());
 
     struct RClass *class_notes;
-
     class_notes = mrb_define_class_under(mrb, class_core, "Notes", mrb->object_class);
     mrb_define_method(mrb, class_notes, "[]=", ap_mrb_set_request_notes, ARGS_ANY());
     mrb_define_method(mrb, class_notes, "[]", ap_mrb_get_request_notes, ARGS_ANY());
 
     struct RClass *class_headers_in;
-
     class_headers_in = mrb_define_class_under(mrb, class_core, "Headers_in", mrb->object_class);
     mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "headers_in_hash", ap_mrb_get_request_headers_in_hash, ARGS_ANY());
 
     struct RClass *class_headers_out;
-
     class_headers_out = mrb_define_class_under(mrb, class_core, "Headers_out", mrb->object_class);
     mrb_define_method(mrb, class_headers_out, "headers_out=", ap_mrb_set_request_headers_out, ARGS_ANY());
     mrb_define_method(mrb, class_headers_out, "headers_out", ap_mrb_get_request_headers_out, ARGS_ANY());
     mrb_define_method(mrb, class_headers_out, "headers_out_hash", ap_mrb_get_request_headers_out_hash, ARGS_ANY());
+
+    struct RClass *class_finfo;
+    class_finfo = mrb_define_class_under(mrb, class_core, "Finfo", mrb->object_class);
+    mrb_define_method(mrb, class_finfo, "group",  ap_mrb_get_request_finfo_group,  ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "user",   ap_mrb_get_request_finfo_user,   ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "size",   ap_mrb_get_request_finfo_size,   ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "atime",  ap_mrb_get_request_finfo_atime,  ARGS_NONE());
 }
 

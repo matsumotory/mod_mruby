@@ -15,10 +15,11 @@ MRUBY_ROOT=@MRUBY_ROOT@
 DEFS=@DEFS@
 INC=-I. -I$(MRUBY_ROOT)/src -I$(MRUBY_ROOT)/include
 LIB=@LIBS@ $(MRUBY_ROOT)/build/host/lib/libmruby.a $(MRUBY_ROOT)/build/host/mrblib/mrblib.o
-WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-s
+WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-g
 MRUBY_REPOS=@MRUBY_REPOS@
 RAKE_PATH=@RAKE_PATH@
 ENABLE_GEMS=@ENABLE_GEMS@
+MRUBY_OPT_CFLAGS=-DMRB_INT64
 
 #   suport mrbgems
 MRUBY_MAK_FILE := $(MRUBY_ROOT)/build/host/lib/libmruby.flags.mak
@@ -31,7 +32,7 @@ else
 endif
 
 APXS_LDFLAGS=@LDFLAGS@
-CFLAGS=$(INC)
+CFLAGS=$(INC) $(MRUBY_OPT_CFLAGS)
 LDFLAGS=$(MRUBY_LDFLAGS)
 LIBS=$(LIB) $(MRUBY_LIBS)
 

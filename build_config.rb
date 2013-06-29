@@ -20,9 +20,9 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/iij/mruby-process.git'
   conf.gem :git => 'git://github.com/iij/mruby-pack.git'
   conf.gem :git => 'git://github.com/iij/mruby-digest.git'
-  conf.gem :git => 'git://github.com/mattn/mruby-json.git'
+  #conf.gem :git => 'git://github.com/mattn/mruby-json.git'
   #conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
-  #conf.gem :git => 'git://github.com/mattn/mruby-thread.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-thread.git'
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-config.git'
@@ -35,15 +35,15 @@ MRuby::Build.new do |conf|
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
 
   # C compiler settings
-  # conf.cc do |cc|
+  conf.cc do |cc|
   #   cc.command = ENV['CC'] || 'gcc'
-  #   cc.flags = [ENV['CFLAGS'] || %w()]
+    cc.flags << '-fPIC -DMRB_INT64'
   #   cc.include_paths = ["#{root}/include"]
   #   cc.defines = %w(DISABLE_GEMS)
   #   cc.option_include_path = '-I%s'
   #   cc.option_define = '-D%s'
   #   cc.compile_options = "%{flags} -MMD -o %{outfile} -c %{infile}"
-  # end
+  end
 
   # mrbc settings
   # conf.mrbc do |mrbc|
