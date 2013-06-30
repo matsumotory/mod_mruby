@@ -251,8 +251,15 @@ mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
     return str;
 }
 
+mrb_value ap_mrb_server_name(mrb_state *mrb, mrb_value self)
+{
+    return mrb_str_new_cstr(mrb, AP_SERVER_BASEPRODUCT);
+}
+
 void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
 {
+
+    mrb_define_method(mrb, mrb->kernel_module, "server_name", ap_mrb_server_name, MRB_ARGS_NONE());
 
     mrb_define_const(mrb, class_core, "OK", mrb_fixnum_value(OK));
     mrb_define_const(mrb, class_core, "DECLINED", mrb_fixnum_value(DECLINED));
