@@ -17,7 +17,7 @@ fi
 echo "mruby building ..."
 mv build_config.rb{,.orig}
 cp ../build_config.rb .
-#rake BUILD_BIT='32'
+#rake BUILD_BIT='64'
 rake BUILD_TYPE='debug'
 #rake
 echo "mruby building ... Done"
