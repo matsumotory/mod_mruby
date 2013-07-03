@@ -1171,15 +1171,14 @@ static int mod_mruby_post_config_last(apr_pool_t *p, apr_pool_t *plog, apr_pool_
     return OK;
 }
 
+//
+// inline code functions
+//
 
-static int mod_mruby_handler_inline(request_rec *r)
+static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t *c)
 {
-
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
     int ai;
-
-    if (strcmp(r->handler, "mruby-native-script") != 0)
-        return DECLINED;
+    mrb_value ret;
 
     // mutex lock
     if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
@@ -1194,12 +1193,12 @@ static int mod_mruby_handler_inline(request_rec *r)
         return OK;
     }
     ap_mrb_push_request(r);
-    ai = mrb_gc_arena_save(mod_mruby_share_state);
-    mrb_run(mod_mruby_share_state
-        , mrb_proc_new(mod_mruby_share_state, mod_mruby_share_state->irep[conf->mod_mruby_handler_inline_code->irep_n])
-        , mrb_top_self(mod_mruby_share_state)
+    ai = mrb_gc_arena_save(mrb);
+    ret = mrb_run(mrb
+        , mrb_proc_new(mrb, mrb->irep[c->irep_n])
+        , mrb_top_self(mrb)
     );
-    mrb_gc_arena_restore(mod_mruby_share_state, ai);
+    mrb_gc_arena_restore(mrb, ai);
     // mutex unlock
     if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
         ap_log_error(APLOG_MARK
@@ -1221,10 +1220,20 @@ static int mod_mruby_handler_inline(request_rec *r)
         , MODULE_NAME
         , __func__
     );
-    
+
     return OK;
 }
 
+static int mod_mruby_handler_inline(request_rec *r)
+{
+
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+
+    if (strcmp(r->handler, "mruby-native-script") != 0)
+        return DECLINED;
+
+    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_handler_inline_code);
+}
 
 static int mod_mruby_handler(request_rec *r)
 {
