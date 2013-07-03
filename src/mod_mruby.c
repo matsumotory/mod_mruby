@@ -179,29 +179,7 @@ static const char *set_mod_mruby_handler_code(cmd_parms *cmd, void *mconfig, con
     if (err != NULL)
         return err;
 
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: hoge1: %x"
-            , MODULE_NAME
-            , __func__
-            , conf->mod_mruby_handler_code_inline
-        );
-
     conf->mod_mruby_handler_code_inline = ap_mrb_set_string(cmd->pool, arg);
-
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: hoge2: %x"
-            //, "%s ERROR %s: hoge2: %s %p"
-            , MODULE_NAME
-            , __func__
-            //, conf->mod_mruby_handler_code_inline->code
-            , conf->mod_mruby_handler_code_inline
-        );
 
     return NULL;
 }
