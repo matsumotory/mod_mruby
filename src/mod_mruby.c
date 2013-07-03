@@ -1195,28 +1195,10 @@ static int mod_mruby_handler_code(request_rec *r)
     }
     ap_mrb_push_request(r);
     ai = mrb_gc_arena_save(mod_mruby_share_state);
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: hoge %s %d"
-            , MODULE_NAME
-            , __func__
-            , conf->mod_mruby_handler_code_inline->code
-            , conf->mod_mruby_handler_code_inline->irep_n
-        );
     mrb_run(mod_mruby_share_state
         , mrb_proc_new(mod_mruby_share_state, mod_mruby_share_state->irep[conf->mod_mruby_handler_code_inline->irep_n])
         , mrb_top_self(mod_mruby_share_state)
     );
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: hoge"
-            , MODULE_NAME
-            , __func__
-        );
     mrb_gc_arena_restore(mod_mruby_share_state, ai);
     // mutex unlock
     if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
