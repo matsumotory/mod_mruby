@@ -96,7 +96,7 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
         (mruby_config_t *)apr_pcalloc(p, sizeof(mruby_config_t));
 
     // inlinde core in httpd.conf
-    conf->mod_mruby_handler_code_inline             = NULL;
+    conf->mod_mruby_handler_inline_code             = NULL;
 
     // hook script file
     conf->mod_mruby_handler_code                    = NULL;
@@ -170,7 +170,7 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
 }
 
 // load mruby string
-static const char *set_mod_mruby_handler_code(cmd_parms *cmd, void *mconfig, const char *arg)
+static const char *set_mod_mruby_handler_inline(cmd_parms *cmd, void *mconfig, const char *arg)
 {
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
     mruby_config_t *conf = 
@@ -179,7 +179,7 @@ static const char *set_mod_mruby_handler_code(cmd_parms *cmd, void *mconfig, con
     if (err != NULL)
         return err;
 
-    conf->mod_mruby_handler_code_inline = ap_mrb_set_string(cmd->pool, arg);
+    conf->mod_mruby_handler_inline_code = ap_mrb_set_string(cmd->pool, arg);
 
     return NULL;
 }
@@ -1079,10 +1079,10 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 
     //prctl(PR_SET_KEEPCAPS,1);
 
-    if (conf->mod_mruby_handler_code_inline != NULL) {
+    if (conf->mod_mruby_handler_inline_code != NULL) {
         struct mrb_parser_state* p;
-        p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_handler_code_inline->code, NULL);
-        conf->mod_mruby_handler_code_inline->irep_n = mrb_generate_code(mod_mruby_share_state, p);
+        p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_handler_inline_code->code, NULL);
+        conf->mod_mruby_handler_inline_code->irep_n = mrb_generate_code(mod_mruby_share_state, p);
         mrb_pool_close(p->pool);
     }
 
@@ -1172,7 +1172,7 @@ static int mod_mruby_post_config_last(apr_pool_t *p, apr_pool_t *plog, apr_pool_
 }
 
 
-static int mod_mruby_handler_code(request_rec *r)
+static int mod_mruby_handler_inline(request_rec *r)
 {
 
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
@@ -1196,7 +1196,7 @@ static int mod_mruby_handler_code(request_rec *r)
     ap_mrb_push_request(r);
     ai = mrb_gc_arena_save(mod_mruby_share_state);
     mrb_run(mod_mruby_share_state
-        , mrb_proc_new(mod_mruby_share_state, mod_mruby_share_state->irep[conf->mod_mruby_handler_code_inline->irep_n])
+        , mrb_proc_new(mod_mruby_share_state, mod_mruby_share_state->irep[conf->mod_mruby_handler_inline_code->irep_n])
         , mrb_top_self(mod_mruby_share_state)
     );
     mrb_gc_arena_restore(mod_mruby_share_state, ai);
@@ -2109,7 +2109,7 @@ static const authn_provider authn_mruby_provider = {
 static void register_hooks(apr_pool_t *p)
 {
     // inline code in httpd.conf
-    ap_hook_handler(mod_mruby_handler_code, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_handler(mod_mruby_handler_inline, NULL, NULL, APR_HOOK_MIDDLE);
 
     // hook script file
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
@@ -2168,7 +2168,7 @@ static const command_rec mod_mruby_cmds[] = {
     AP_INIT_TAKE1("mrubyHandlerFIrst", set_mod_mruby_handler_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler first phase."),
     AP_INIT_TAKE1("mrubyHandlerMiddle", set_mod_mruby_handler_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler middle phase."),
     AP_INIT_TAKE1("mrubyHandlerLast", set_mod_mruby_handler_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler last phase."),
-    AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_code, NULL, RSRC_CONF | ACCESS_CONF, "hook code for handler phase."),
+    AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook code for handler phase."),
     AP_INIT_TAKE1("mrubyPostConfigFirst", set_mod_mruby_post_config_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config fast phase."),
     AP_INIT_TAKE1("mrubyPostConfigMiddle", set_mod_mruby_post_config_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config middle phase."),
     AP_INIT_TAKE1("mrubyPostConfigLast", set_mod_mruby_post_config_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config last phase."),

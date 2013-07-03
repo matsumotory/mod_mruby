@@ -31,8 +31,8 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
 
   # Linux only for mod_mruby
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-cgroup.git'
 
   # C compiler settings
   conf.cc do |cc|
