@@ -96,7 +96,8 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
         (mruby_config_t *)apr_pcalloc(p, sizeof(mruby_config_t));
 
     // inlinde core in httpd.conf
-    conf->mod_mruby_handler_inline_code             = NULL;
+    conf->mod_mruby_handler_inline_code                 = NULL;
+    conf->mod_mruby_translate_name_first_inline_code    = NULL;
 
     // hook script file
     conf->mod_mruby_handler_code                    = NULL;
@@ -180,6 +181,21 @@ static const char *set_mod_mruby_handler_inline(cmd_parms *cmd, void *mconfig, c
         return err;
 
     conf->mod_mruby_handler_inline_code = ap_mrb_set_string(cmd->pool, arg);
+
+    return NULL;
+}
+
+// load mruby string
+static const char *set_mod_mruby_translate_name_first_inline(cmd_parms *cmd, void *mconfig, const char *arg)
+{
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
+    mruby_config_t *conf = 
+        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+
+    if (err != NULL)
+        return err;
+
+    conf->mod_mruby_translate_name_first_inline_code = ap_mrb_set_string(cmd->pool, arg);
 
     return NULL;
 }
@@ -1073,6 +1089,7 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 {
 
     mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
+    struct mrb_parser_state* p;
 
     mod_mruby_share_state = mrb_open();
     ap_mruby_class_init(mod_mruby_share_state);
@@ -1080,9 +1097,14 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
     //prctl(PR_SET_KEEPCAPS,1);
 
     if (conf->mod_mruby_handler_inline_code != NULL) {
-        struct mrb_parser_state* p;
         p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_handler_inline_code->code, NULL);
         conf->mod_mruby_handler_inline_code->irep_n = mrb_generate_code(mod_mruby_share_state, p);
+        mrb_pool_close(p->pool);
+    }
+
+    if (conf->mod_mruby_translate_name_first_inline_code != NULL) {
+        p = mrb_parse_string(mod_mruby_share_state, conf->mod_mruby_translate_name_first_inline_code->code, NULL);
+        conf->mod_mruby_translate_name_first_inline_code->irep_n = mrb_generate_code(mod_mruby_share_state, p);
         mrb_pool_close(p->pool);
     }
 
@@ -1092,13 +1114,10 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
         , APLOG_INFO
         , 0
         , pool
-        //, "%s %s: child process (pid=%d) initialized. %d "
         , "%s %s: child process (pid=%d) initialized."
         , MODULE_NAME
         , __func__
         , getpid()
-//        , conf->mod_mruby_handler_code_inline->irep_n
-//        , conf->mod_mruby_handler_code_inline->code
     );
 }
 
@@ -1226,13 +1245,20 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t 
 
 static int mod_mruby_handler_inline(request_rec *r)
 {
-
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
 
     if (strcmp(r->handler, "mruby-native-script") != 0)
         return DECLINED;
 
     return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_handler_inline_code);
+}
+
+static int mod_mruby_translate_name_first_inline(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_translate_name_first_inline_code == NULL)
+        return DECLINED;
+    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_translate_name_first_inline_code);
 }
 
 static int mod_mruby_handler(request_rec *r)
@@ -2119,6 +2145,7 @@ static void register_hooks(apr_pool_t *p)
 {
     // inline code in httpd.conf
     ap_hook_handler(mod_mruby_handler_inline, NULL, NULL, APR_HOOK_MIDDLE);
+    ap_hook_translate_name(mod_mruby_translate_name_first_inline, NULL, NULL, APR_HOOK_FIRST);
 
     // hook script file
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
@@ -2173,11 +2200,13 @@ static void register_hooks(apr_pool_t *p)
 
 static const command_rec mod_mruby_cmds[] = {
 
+    AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for handler phase."),
+    AP_INIT_TAKE1("mrubyTranslateNameFirstCode", set_mod_mruby_translate_name_first_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for translate_name first phase."),
+
     AP_INIT_TAKE1("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
     AP_INIT_TAKE1("mrubyHandlerFIrst", set_mod_mruby_handler_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler first phase."),
     AP_INIT_TAKE1("mrubyHandlerMiddle", set_mod_mruby_handler_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler middle phase."),
     AP_INIT_TAKE1("mrubyHandlerLast", set_mod_mruby_handler_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler last phase."),
-    AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook code for handler phase."),
     AP_INIT_TAKE1("mrubyPostConfigFirst", set_mod_mruby_post_config_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config fast phase."),
     AP_INIT_TAKE1("mrubyPostConfigMiddle", set_mod_mruby_post_config_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config middle phase."),
     AP_INIT_TAKE1("mrubyPostConfigLast", set_mod_mruby_post_config_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config last phase."),

@@ -74,6 +74,7 @@ typedef struct {
 typedef struct {
 
     mod_mruby_code_t *mod_mruby_handler_inline_code;
+    mod_mruby_code_t *mod_mruby_translate_name_first_inline_code;
 
     mod_mruby_code_t *mod_mruby_handler_code;
     mod_mruby_code_t *mod_mruby_handler_first_code;
