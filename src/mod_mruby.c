@@ -986,6 +986,20 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     int ai = 0;
     jmp_buf mod_mruby_jmp;
 
+    // mutex lock
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: mod_mruby_mutex lock failed"
+            , MODULE_NAME
+            , __func__
+        );
+        return DECLINED;
+    }
+    ap_mrb_push_request(r);
+
     if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
         ap_log_error(APLOG_MARK
             , APLOG_ERR
@@ -1274,19 +1288,6 @@ static int mod_mruby_handler(request_rec *r)
     else
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return DECLINED;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_code->path, DECLINED);
 }
 
@@ -1299,19 +1300,6 @@ static int mod_mruby_handler_first(request_rec *r)
     if (conf->mod_mruby_handler_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return DECLINED;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_first_code->path, DECLINED);
 }
 
@@ -1324,19 +1312,6 @@ static int mod_mruby_handler_middle(request_rec *r)
     if (conf->mod_mruby_handler_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return DECLINED;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_middle_code->path, DECLINED);
 }
 
@@ -1349,19 +1324,6 @@ static int mod_mruby_handler_last(request_rec *r)
     if (conf->mod_mruby_handler_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return DECLINED;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_last_code->path, DECLINED);
 }
 
@@ -1371,19 +1333,7 @@ static int mod_mruby_post_read_request_first(request_rec *r)
     mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
     if (conf->mod_mruby_post_read_request_first_code == NULL)
         return DECLINED;
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
+
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_post_read_request_first_code->path, OK);
 }
 
@@ -1394,19 +1344,6 @@ static int mod_mruby_post_read_request_middle(request_rec *r)
     if (conf->mod_mruby_post_read_request_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_post_read_request_middle_code->path, OK);
 }
 
@@ -1417,19 +1354,6 @@ static int mod_mruby_post_read_request_last(request_rec *r)
     if (conf->mod_mruby_post_read_request_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_post_read_request_last_code->path, OK);
 }
 
@@ -1440,19 +1364,6 @@ static int mod_mruby_quick_handler_first(request_rec *r, int lookup)
     if (conf->mod_mruby_quick_handler_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_first_code->path, OK);
 }
 
@@ -1463,19 +1374,6 @@ static int mod_mruby_quick_handler_middle(request_rec *r, int lookup)
     if (conf->mod_mruby_quick_handler_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_middle_code->path, OK);
 }
 
@@ -1486,19 +1384,6 @@ static int mod_mruby_quick_handler_last(request_rec *r, int lookup)
     if (conf->mod_mruby_quick_handler_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_last_code->path, OK);
 }
 
@@ -1509,19 +1394,6 @@ static int mod_mruby_translate_name_first(request_rec *r)
     if (conf->mod_mruby_translate_name_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_first_code->path, OK);
 }
 
@@ -1532,19 +1404,6 @@ static int mod_mruby_translate_name_middle(request_rec *r)
     if (conf->mod_mruby_translate_name_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_middle_code->path, OK);
 }
 
@@ -1555,19 +1414,6 @@ static int mod_mruby_translate_name_last(request_rec *r)
     if (conf->mod_mruby_translate_name_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_last_code->path, OK);
 }
 
@@ -1578,19 +1424,6 @@ static int mod_mruby_map_to_storage_first(request_rec *r)
     if (conf->mod_mruby_map_to_storage_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_map_to_storage_first_code->path, OK);
 }
 
@@ -1601,19 +1434,6 @@ static int mod_mruby_map_to_storage_middle(request_rec *r)
     if (conf->mod_mruby_map_to_storage_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_map_to_storage_middle_code->path, OK);
 }
 
@@ -1624,19 +1444,6 @@ static int mod_mruby_map_to_storage_last(request_rec *r)
     if (conf->mod_mruby_map_to_storage_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_map_to_storage_last_code->path, OK);
 }
 
@@ -1647,19 +1454,6 @@ static int mod_mruby_access_checker_first(request_rec *r)
     if (conf->mod_mruby_access_checker_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_access_checker_first_code->path, OK);
 }
 
@@ -1670,19 +1464,6 @@ static int mod_mruby_access_checker_middle(request_rec *r)
     if (conf->mod_mruby_access_checker_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_access_checker_middle_code->path, OK);
 }
 
@@ -1693,19 +1474,6 @@ static int mod_mruby_access_checker_last(request_rec *r)
     if (conf->mod_mruby_access_checker_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_access_checker_last_code->path, OK);
 }
 
@@ -1716,19 +1484,6 @@ static int mod_mruby_check_user_id_first(request_rec *r)
     if (conf->mod_mruby_check_user_id_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_check_user_id_first_code->path, OK);
 }
 
@@ -1739,19 +1494,6 @@ static int mod_mruby_check_user_id_middle(request_rec *r)
     if (conf->mod_mruby_check_user_id_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_check_user_id_middle_code->path, OK);
 }
 
@@ -1762,19 +1504,6 @@ static int mod_mruby_check_user_id_last(request_rec *r)
     if (conf->mod_mruby_check_user_id_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_check_user_id_last_code->path, OK);
 }
 
@@ -1785,19 +1514,6 @@ static int mod_mruby_auth_checker_first(request_rec *r)
     if (conf->mod_mruby_auth_checker_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_first_code->path, OK);
 }
 
@@ -1808,19 +1524,6 @@ static int mod_mruby_auth_checker_middle(request_rec *r)
     if (conf->mod_mruby_auth_checker_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_middle_code->path, OK);
 }
 
@@ -1831,19 +1534,6 @@ static int mod_mruby_auth_checker_last(request_rec *r)
     if (conf->mod_mruby_auth_checker_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_last_code->path, OK);
 }
 
@@ -1854,19 +1544,6 @@ static int mod_mruby_fixups_first(request_rec *r)
     if (conf->mod_mruby_fixups_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_fixups_first_code->path, OK);
 }
 
@@ -1877,19 +1554,6 @@ static int mod_mruby_fixups_middle(request_rec *r)
     if (conf->mod_mruby_fixups_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_fixups_middle_code->path, OK);
 }
 
@@ -1900,19 +1564,6 @@ static int mod_mruby_fixups_last(request_rec *r)
     if (conf->mod_mruby_fixups_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_fixups_last_code->path, OK);
 }
 
@@ -1923,18 +1574,6 @@ static void mod_mruby_insert_filter_first(request_rec *r)
     if (conf->mod_mruby_insert_filter_first_code == NULL)
         return;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-    }
-    ap_mrb_push_request(r);
     ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_first_code->path, OK);
 }
 
@@ -1945,18 +1584,6 @@ static void mod_mruby_insert_filter_middle(request_rec *r)
     if (conf->mod_mruby_insert_filter_middle_code == NULL)
         return;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-    }
-    ap_mrb_push_request(r);
     ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_middle_code->path, OK);
 }
 
@@ -1967,18 +1594,6 @@ static void mod_mruby_insert_filter_last(request_rec *r)
     if (conf->mod_mruby_insert_filter_last_code == NULL)
         return;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-    }
-    ap_mrb_push_request(r);
     ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_last_code->path, OK);
 }
 
@@ -1989,19 +1604,6 @@ static int mod_mruby_log_transaction_first(request_rec *r)
     if (conf->mod_mruby_log_transaction_first_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_log_transaction_first_code->path, OK);
 }
 
@@ -2012,19 +1614,6 @@ static int mod_mruby_log_transaction_middle(request_rec *r)
     if (conf->mod_mruby_log_transaction_middle_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_log_transaction_middle_code->path, OK);
 }
 
@@ -2035,19 +1624,6 @@ static int mod_mruby_log_transaction_last(request_rec *r)
     if (conf->mod_mruby_log_transaction_last_code == NULL)
         return DECLINED;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_log_transaction_last_code->path, OK);
 }
 
@@ -2059,19 +1635,6 @@ static authn_status mod_mruby_authn_check_password(request_rec *r, const char *u
     if (dir_conf->mod_mruby_authn_check_password_code == NULL)
         return AUTH_GENERAL_ERROR;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     ap_mrb_init_authnprovider_basic(r, user, password);
     return ap_mruby_run(mod_mruby_share_state, r, conf, dir_conf->mod_mruby_authn_check_password_code->path, OK);
 }
@@ -2085,19 +1648,6 @@ static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *u
     if (dir_conf->mod_mruby_authn_get_realm_hash_code == NULL)
         return AUTH_GENERAL_ERROR;
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
     ap_mrb_init_authnprovider_digest(r, user, realm);
     ret = ap_mruby_run(mod_mruby_share_state, r, conf, dir_conf->mod_mruby_authn_get_realm_hash_code->path, OK);
     *rethash = ap_mrb_get_authnprovider_digest_rethash();
@@ -2116,19 +1666,6 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* 
     if (dir_conf->mod_mruby_output_filter_code == NULL)
         return ap_pass_brigade(f->next, bb);
 
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return ap_pass_brigade(f->next, bb);;
-    }
-    ap_mrb_push_request(r);
     ap_mrb_push_filter(f, bb);
     rv = ap_mruby_run(mod_mruby_share_state, r, conf, dir_conf->mod_mruby_output_filter_code->path, OK);
     return ap_pass_brigade(f->next, bb);
