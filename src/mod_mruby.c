@@ -70,7 +70,6 @@
 #include "ap_mrb_filter.h"
 
 mrb_state *mod_mruby_share_state = NULL;
-//apr_global_mutex_t *mod_mruby_mutex;
 apr_thread_mutex_t *mod_mruby_mutex;
 
 module AP_MODULE_DECLARE_DATA mruby_module;
@@ -143,11 +142,12 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
 
     conf->mruby_cache_table_size                    = 0;
 
-    //conf->mod_mruby_handler_code = (mod_mruby_code_t *)apr_pcalloc(p, sizeof(mod_mruby_code_t));
-
     return conf;
 }
 
+//
+// Set code functions
+// 
 static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *arg)
 {
     mod_mruby_code_t *c = 
@@ -170,7 +170,9 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
     return c;
 }
 
-// load mruby string
+//
+// set cmds functions (for Ruby inline code)
+//
 static const char *set_mod_mruby_handler_inline(cmd_parms *cmd, void *mconfig, const char *arg)
 {
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
@@ -185,7 +187,6 @@ static const char *set_mod_mruby_handler_inline(cmd_parms *cmd, void *mconfig, c
     return NULL;
 }
 
-// load mruby string
 static const char *set_mod_mruby_translate_name_first_inline(cmd_parms *cmd, void *mconfig, const char *arg)
 {
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
@@ -200,7 +201,9 @@ static const char *set_mod_mruby_translate_name_first_inline(cmd_parms *cmd, voi
     return NULL;
 }
 
-// load mruby file
+//
+// set cmds functions (for Ruby file path)
+//
 static const char *set_mod_mruby_handler(cmd_parms *cmd, void *mconfig, const char *arg)
 {
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
@@ -829,84 +832,10 @@ static const char *set_mod_mruby_output_filter(cmd_parms *cmd, void *mconfig, co
 
     return NULL;
 }
-/*
-static const char *set_mod_mruby_cache_table_size(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    int table_size = strtol(arg, (char **) NULL, 10);
-    conf->mruby_cache_table_size = table_size;
-    ap_log_perror(APLOG_MARK
-        , APLOG_DEBUG
-        , 0
-        , cmd->pool
-        , "%s %s: mod_mruby cache table enabled. table size %d."
-        , MODULE_NAME
-        , __func__
-        , table_size
-    );
-
-    return NULL;
-}
-*/
 
 //
-// hook functions
+// run mruby core functions
 //
-//
-static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
-{
-    void *data = NULL;
-    const char *userdata_key = "mruby_init";
-
-    apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex, APR_THREAD_MUTEX_DEFAULT, p);
-    if(status != APR_SUCCESS){
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR        
-            , 0                
-            , NULL             
-            , "%s ERROR %s: Error creating thread mutex."
-            , MODULE_NAME
-            , __func__
-        );
-
-        return status;
-    }   
-
-    ap_log_perror(APLOG_MARK
-        , APLOG_INFO
-        , 0                
-        , p
-        , "%s %s: main process / thread (pid=%d) initialized."
-        , MODULE_NAME
-        , __func__
-        , getpid()
-    );  
-
-    apr_pool_userdata_get(&data, userdata_key, p);
-
-    if (!data)
-        apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null, p);
-
-    ap_log_perror(APLOG_MARK
-        , APLOG_NOTICE
-        , 0                
-        , p
-        , "%s %s: %s / %s mechanism enabled."
-        , MODULE_NAME
-        , __func__
-        , MODULE_NAME
-        , MODULE_VERSION
-    );  
-    
-    return DECLINED;
-}
-
 static void ap_mruby_irep_clean(mrb_state *mrb, struct mrb_irep *irep, request_rec *r)
 {
     mrb_irep_free(mrb, irep);
@@ -1093,10 +1022,131 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
     return ap_mrb_get_status_code();
 }
 
+static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t *c)
+{
+    int ai;
+    mrb_value ret;
+
+    // mutex lock
+    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: mod_mruby_mutex lock failed"
+            , MODULE_NAME
+            , __func__
+        );
+        return OK;
+    }
+    ap_mrb_push_request(r);
+    ai = mrb_gc_arena_save(mrb);
+    ret = mrb_run(mrb
+        , mrb_proc_new(mrb, mrb->irep[c->irep_n])
+        , mrb_top_self(mrb)
+    );
+    mrb_gc_arena_restore(mrb, ai);
+    // mutex unlock
+    if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR
+            , 0
+            , NULL
+            , "%s ERROR %s: mod_mruby_mutex unlock failed"
+            , MODULE_NAME
+            , __func__
+        );
+        return OK;
+    }
+
+    ap_log_perror(APLOG_MARK
+        , APLOG_DEBUG
+        , 0
+        , r->pool
+        , "%s NOTICE %s: naitve code execed."
+        , MODULE_NAME
+        , __func__
+    );
+
+    return OK;
+}
+
 static apr_status_t mod_mruby_hook_term(void *data)
 {
     mrb_close(mod_mruby_share_state);
     return APR_SUCCESS;
+}
+
+//
+// hook functions (hook Ruby inline code in httpd.conf)
+//
+static int mod_mruby_handler_inline(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+
+    if (strcmp(r->handler, "mruby-native-script") != 0)
+        return DECLINED;
+
+    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_handler_inline_code);
+}
+
+static int mod_mruby_translate_name_first_inline(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_translate_name_first_inline_code == NULL)
+        return DECLINED;
+    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_translate_name_first_inline_code);
+}
+
+//
+// hook functions (hook Ruby file path)
+//
+static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
+{
+    void *data = NULL;
+    const char *userdata_key = "mruby_init";
+
+    apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex, APR_THREAD_MUTEX_DEFAULT, p);
+    if(status != APR_SUCCESS){
+        ap_log_error(APLOG_MARK
+            , APLOG_ERR        
+            , 0                
+            , NULL             
+            , "%s ERROR %s: Error creating thread mutex."
+            , MODULE_NAME
+            , __func__
+        );
+
+        return status;
+    }   
+
+    ap_log_perror(APLOG_MARK
+        , APLOG_INFO
+        , 0                
+        , p
+        , "%s %s: main process / thread (pid=%d) initialized."
+        , MODULE_NAME
+        , __func__
+        , getpid()
+    );  
+
+    apr_pool_userdata_get(&data, userdata_key, p);
+
+    if (!data)
+        apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null, p);
+
+    ap_log_perror(APLOG_MARK
+        , APLOG_NOTICE
+        , 0                
+        , p
+        , "%s %s: %s / %s mechanism enabled."
+        , MODULE_NAME
+        , __func__
+        , MODULE_NAME
+        , MODULE_VERSION
+    );  
+    
+    return DECLINED;
 }
 
 static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
@@ -1134,7 +1184,6 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
         , getpid()
     );
 }
-
 
 static void mod_mruby_child_init_first(apr_pool_t *pool, server_rec *server)
 {
@@ -1202,77 +1251,6 @@ static int mod_mruby_post_config_last(apr_pool_t *p, apr_pool_t *plog, apr_pool_
 
     ap_mruby_run_nr(conf->mod_mruby_post_config_last_code->path);
     return OK;
-}
-
-//
-// inline code functions
-//
-
-static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t *c)
-{
-    int ai;
-    mrb_value ret;
-
-    // mutex lock
-    if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex lock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-    ap_mrb_push_request(r);
-    ai = mrb_gc_arena_save(mrb);
-    ret = mrb_run(mrb
-        , mrb_proc_new(mrb, mrb->irep[c->irep_n])
-        , mrb_top_self(mrb)
-    );
-    mrb_gc_arena_restore(mrb, ai);
-    // mutex unlock
-    if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mod_mruby_mutex unlock failed"
-            , MODULE_NAME
-            , __func__
-        );
-        return OK;
-    }
-
-    ap_log_perror(APLOG_MARK
-        , APLOG_DEBUG
-        , 0
-        , r->pool
-        , "%s NOTICE %s: naitve code execed."
-        , MODULE_NAME
-        , __func__
-    );
-
-    return OK;
-}
-
-static int mod_mruby_handler_inline(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-
-    if (strcmp(r->handler, "mruby-native-script") != 0)
-        return DECLINED;
-
-    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_handler_inline_code);
-}
-
-static int mod_mruby_translate_name_first_inline(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_translate_name_first_inline_code == NULL)
-        return DECLINED;
-    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_translate_name_first_inline_code);
 }
 
 static int mod_mruby_handler(request_rec *r)
