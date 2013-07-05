@@ -343,13 +343,11 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
 {
 
-    //int i, n;
     int n;
     struct mrb_parser_state* p;
-    //struct stat st;
     FILE *mrb_file;
-    int ai = 0;
     jmp_buf mod_mruby_jmp;
+    int ai;
 
     // mutex lock
     if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
@@ -621,73 +619,41 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
     );
 }
 
-static void mod_mruby_child_init_first(apr_pool_t *pool, server_rec *server)
-{
-    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_child_init_first_code == NULL)
-        return;
-
-    ap_mruby_run_nr(conf->mod_mruby_child_init_first_code->path);
+//
+// register hook func before request phase (nr is not using request_rec)
+//
+#define MOD_MRUBY_REGISTER_HOOK_FUNC_NR_VOID(hook) \
+static void mod_mruby_##hook(apr_pool_t *pool, server_rec *server);                     \
+static void mod_mruby_##hook(apr_pool_t *pool, server_rec *server)                      \
+{                                                                                       \
+    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);  \
+                                                                                        \
+    if (conf->mod_mruby_##hook##_code == NULL)                                          \
+        return;                                                                         \
+                                                                                        \
+    ap_mruby_run_nr(conf->mod_mruby_##hook##_code->path);                               \
 }
 
+MOD_MRUBY_REGISTER_HOOK_FUNC_NR_VOID(child_init_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_NR_VOID(child_init_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_NR_VOID(child_init_last);
 
-static void mod_mruby_child_init_middle(apr_pool_t *pool, server_rec *server)
-{
-    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_child_init_middle_code == NULL)
-        return;
-
-    ap_mruby_run_nr(conf->mod_mruby_child_init_middle_code->path);
+#define MOD_MRUBY_REGISTER_HOOK_FUNC_NR_INT(hook) \
+static int mod_mruby_##hook(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server);                      \
+static int mod_mruby_##hook(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server)                       \
+{                                                                                                                         \
+    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);                                    \
+                                                                                                                          \
+    if (conf->mod_mruby_##hook##_code == NULL)                                                                            \
+        return DECLINED;                                                                                                           \
+                                                                                                                          \
+    ap_mruby_run_nr(conf->mod_mruby_##hook##_code->path);                                                                 \
+    return OK;                                                                                                            \
 }
 
-
-static void mod_mruby_child_init_last(apr_pool_t *pool, server_rec *server)
-{
-    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_child_init_last_code == NULL)
-        return;
-
-    ap_mruby_run_nr(conf->mod_mruby_child_init_last_code->path);
-}
-
-
-static int mod_mruby_post_config_first(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server)
-{
-    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_post_config_first_code == NULL)
-        return DECLINED;
-
-    ap_mruby_run_nr(conf->mod_mruby_post_config_first_code->path);
-    return OK;
-}
-
-
-static int mod_mruby_post_config_middle(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server)
-{
-    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_post_config_middle_code == NULL)
-        return DECLINED;
-
-    ap_mruby_run_nr(conf->mod_mruby_post_config_middle_code->path);
-    return OK;
-}
-
-
-static int mod_mruby_post_config_last(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *server)
-{
-    mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_post_config_last_code == NULL)
-        return DECLINED;
-
-    ap_mruby_run_nr(conf->mod_mruby_post_config_last_code->path);
-    return OK;
-}
+MOD_MRUBY_REGISTER_HOOK_FUNC_NR_INT(post_config_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_NR_INT(post_config_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_NR_INT(post_config_last);
 
 static int mod_mruby_handler(request_rec *r)
 {
