@@ -204,634 +204,122 @@ static const char *set_mod_mruby_translate_name_first_inline(cmd_parms *cmd, voi
 //
 // set cmds functions (for Ruby file path)
 //
-static const char *set_mod_mruby_handler(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_handler_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
+/*
+handler
+handler_first
+handler_middle
+handler_last
+post_config_first
+post_config_middle
+post_config_last
+child_init_first
+child_init_middle
+child_init_last
+post_read_request_first
+post_read_request_middle
+post_read_request_last
+quick_handler_first
+quick_handler_middle
+quick_handler_last
+translate_name_first
+translate_name_middle
+translate_name_last
+map_to_storage_first
+map_to_storage_middle
+map_to_storage_last
+access_checker_first
+access_checker_middle
+access_checker_last
+check_user_id_first
+check_user_id_middle
+check_user_id_last
+auth_checker_first
+auth_checker_middle
+auth_checker_last
+fixups_first
+fixups_middle
+fixups_last
+insert_filter_first
+insert_filter_middle
+insert_filter_last
+log_transaction_first
+log_transaction_middle
+log_transaction_last
+*/
+#define SET_MOD_MRUBY_SERVER_CMDS(hook) \
+static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *arg);                          \
+static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *arg)                           \
+{                                                                                                                 \
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                                     \
+    mruby_config_t *conf = (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);    \
+                                                                                                                  \
+    if (err != NULL)                                                                                              \
+        return err;                                                                                               \
+                                                                                                                  \
+    conf->mod_mruby_##hook##_code = ap_mrb_set_file(cmd->pool, arg);                                              \
+                                                                                                                  \
+    return NULL;                                                                                                  \
 }
 
-static const char *set_mod_mruby_handler_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
+SET_MOD_MRUBY_SERVER_CMDS(handler);
+SET_MOD_MRUBY_SERVER_CMDS(handler_first);
+SET_MOD_MRUBY_SERVER_CMDS(handler_middle);
+SET_MOD_MRUBY_SERVER_CMDS(handler_last);
+SET_MOD_MRUBY_SERVER_CMDS(post_config_first);
+SET_MOD_MRUBY_SERVER_CMDS(post_config_middle);
+SET_MOD_MRUBY_SERVER_CMDS(post_config_last);
+SET_MOD_MRUBY_SERVER_CMDS(child_init_first);
+SET_MOD_MRUBY_SERVER_CMDS(child_init_middle);
+SET_MOD_MRUBY_SERVER_CMDS(child_init_last);
+SET_MOD_MRUBY_SERVER_CMDS(post_read_request_first);
+SET_MOD_MRUBY_SERVER_CMDS(post_read_request_middle);
+SET_MOD_MRUBY_SERVER_CMDS(post_read_request_last);
+SET_MOD_MRUBY_SERVER_CMDS(quick_handler_first);
+SET_MOD_MRUBY_SERVER_CMDS(quick_handler_middle);
+SET_MOD_MRUBY_SERVER_CMDS(quick_handler_last);
+SET_MOD_MRUBY_SERVER_CMDS(translate_name_first);
+SET_MOD_MRUBY_SERVER_CMDS(translate_name_middle);
+SET_MOD_MRUBY_SERVER_CMDS(translate_name_last);
+SET_MOD_MRUBY_SERVER_CMDS(map_to_storage_first);
+SET_MOD_MRUBY_SERVER_CMDS(map_to_storage_middle);
+SET_MOD_MRUBY_SERVER_CMDS(map_to_storage_last);
+SET_MOD_MRUBY_SERVER_CMDS(access_checker_first);
+SET_MOD_MRUBY_SERVER_CMDS(access_checker_middle);
+SET_MOD_MRUBY_SERVER_CMDS(access_checker_last);
+SET_MOD_MRUBY_SERVER_CMDS(check_user_id_first);
+SET_MOD_MRUBY_SERVER_CMDS(check_user_id_middle);
+SET_MOD_MRUBY_SERVER_CMDS(check_user_id_last);
+SET_MOD_MRUBY_SERVER_CMDS(auth_checker_first);
+SET_MOD_MRUBY_SERVER_CMDS(auth_checker_middle);
+SET_MOD_MRUBY_SERVER_CMDS(auth_checker_last);
+SET_MOD_MRUBY_SERVER_CMDS(fixups_first);
+SET_MOD_MRUBY_SERVER_CMDS(fixups_middle);
+SET_MOD_MRUBY_SERVER_CMDS(fixups_last);
+SET_MOD_MRUBY_SERVER_CMDS(insert_filter_first);
+SET_MOD_MRUBY_SERVER_CMDS(insert_filter_middle);
+SET_MOD_MRUBY_SERVER_CMDS(insert_filter_last);
+SET_MOD_MRUBY_SERVER_CMDS(log_transaction_first);
+SET_MOD_MRUBY_SERVER_CMDS(log_transaction_middle);
+SET_MOD_MRUBY_SERVER_CMDS(log_transaction_last);
 
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_handler_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
+#define SET_MOD_MRUBY_DIR_CMDS(hook) \
+static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *arg);                          \
+static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *arg)                           \
+{                                                                                                                 \
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                                     \
+    mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;                                                 \
+                                                                                                                  \
+    if (err != NULL)                                                                                              \
+        return err;                                                                                               \
+                                                                                                                  \
+    dir_conf->mod_mruby_##hook##_code = ap_mrb_set_file(cmd->pool, arg);                                          \
+                                                                                                                  \
+    return NULL;                                                                                                  \
 }
 
-static const char *set_mod_mruby_handler_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_handler_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_handler_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_handler_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_post_config_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_post_config_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_post_config_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_post_config_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_post_config_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_post_config_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_child_init_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_child_init_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_child_init_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_child_init_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_child_init_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_child_init_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_post_read_request_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_post_read_request_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_post_read_request_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_post_read_request_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_post_read_request_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_post_read_request_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_quick_handler_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_quick_handler_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_quick_handler_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_quick_handler_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_quick_handler_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_quick_handler_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_translate_name_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_translate_name_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_translate_name_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_translate_name_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_translate_name_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_translate_name_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_map_to_storage_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_map_to_storage_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_map_to_storage_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_map_to_storage_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_map_to_storage_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_map_to_storage_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_access_checker_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_access_checker_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_access_checker_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_access_checker_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_access_checker_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_access_checker_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_check_user_id_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_check_user_id_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_check_user_id_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_check_user_id_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_check_user_id_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_check_user_id_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_auth_checker_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_auth_checker_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_auth_checker_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_auth_checker_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_auth_checker_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_auth_checker_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_fixups_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_fixups_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_fixups_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_fixups_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_fixups_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_fixups_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_insert_filter_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_insert_filter_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_insert_filter_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_insert_filter_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_insert_filter_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_insert_filter_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_log_transaction_first(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_log_transaction_first_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_log_transaction_middle(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_log_transaction_middle_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_log_transaction_last(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf =
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_log_transaction_last_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-
-static const char *set_mod_mruby_authn_check_password(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;
-
-    if (err != NULL)
-        return err;
-
-    dir_conf->mod_mruby_authn_check_password_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_authn_get_realm_hash(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;
-
-    if (err != NULL)
-        return err;
-
-    dir_conf->mod_mruby_authn_get_realm_hash_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
-
-static const char *set_mod_mruby_output_filter(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;
-
-    if (err != NULL)
-        return err;
-
-    dir_conf->mod_mruby_output_filter_code = ap_mrb_set_file(cmd->pool, arg);
-
-    return NULL;
-}
+SET_MOD_MRUBY_DIR_CMDS(authn_check_password);
+SET_MOD_MRUBY_DIR_CMDS(authn_get_realm_hash);
+SET_MOD_MRUBY_DIR_CMDS(output_filter);
 
 //
 // run mruby core functions
