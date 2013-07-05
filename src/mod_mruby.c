@@ -173,79 +173,27 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
 //
 // set cmds functions (for Ruby inline code)
 //
-static const char *set_mod_mruby_handler_inline(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_handler_inline_code = ap_mrb_set_string(cmd->pool, arg);
-
-    return NULL;
+#define SET_MOD_MRUBY_SERVER_INLINE_CMDS(hook) \
+static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, const char *arg);                 \
+static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, const char *arg)                  \
+{                                                                                                                 \
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                                     \
+    mruby_config_t *conf = (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);    \
+                                                                                                                  \
+    if (err != NULL)                                                                                              \
+        return err;                                                                                               \
+                                                                                                                  \
+    conf->mod_mruby_##hook##_inline_code = ap_mrb_set_string(cmd->pool, arg);                                     \
+                                                                                                                  \
+    return NULL;                                                                                                  \
 }
 
-static const char *set_mod_mruby_translate_name_first_inline(cmd_parms *cmd, void *mconfig, const char *arg)
-{
-    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);
-    mruby_config_t *conf = 
-        (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);
-
-    if (err != NULL)
-        return err;
-
-    conf->mod_mruby_translate_name_first_inline_code = ap_mrb_set_string(cmd->pool, arg);
-
-    return NULL;
-}
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(translate_name_first);
 
 //
 // set cmds functions (for Ruby file path)
 //
-/*
-handler
-handler_first
-handler_middle
-handler_last
-post_config_first
-post_config_middle
-post_config_last
-child_init_first
-child_init_middle
-child_init_last
-post_read_request_first
-post_read_request_middle
-post_read_request_last
-quick_handler_first
-quick_handler_middle
-quick_handler_last
-translate_name_first
-translate_name_middle
-translate_name_last
-map_to_storage_first
-map_to_storage_middle
-map_to_storage_last
-access_checker_first
-access_checker_middle
-access_checker_last
-check_user_id_first
-check_user_id_middle
-check_user_id_last
-auth_checker_first
-auth_checker_middle
-auth_checker_last
-fixups_first
-fixups_middle
-fixups_last
-insert_filter_first
-insert_filter_middle
-insert_filter_last
-log_transaction_first
-log_transaction_middle
-log_transaction_last
-*/
 #define SET_MOD_MRUBY_SERVER_CMDS(hook) \
 static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *arg);                          \
 static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *arg)                           \
