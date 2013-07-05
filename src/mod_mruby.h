@@ -74,7 +74,33 @@ typedef struct {
 typedef struct {
 
     mod_mruby_code_t *mod_mruby_handler_inline_code;
+    mod_mruby_code_t *mod_mruby_handler_first_inline_code;
+    mod_mruby_code_t *mod_mruby_handler_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_handler_last_inline_code;
+    mod_mruby_code_t *mod_mruby_post_read_request_first_inline_code;
+    mod_mruby_code_t *mod_mruby_post_read_request_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_post_read_request_last_inline_code;
     mod_mruby_code_t *mod_mruby_translate_name_first_inline_code;
+    mod_mruby_code_t *mod_mruby_translate_name_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_translate_name_last_inline_code;
+    mod_mruby_code_t *mod_mruby_map_to_storage_first_inline_code;
+    mod_mruby_code_t *mod_mruby_map_to_storage_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_map_to_storage_last_inline_code;
+    mod_mruby_code_t *mod_mruby_access_checker_first_inline_code;
+    mod_mruby_code_t *mod_mruby_access_checker_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_access_checker_last_inline_code;
+    mod_mruby_code_t *mod_mruby_check_user_id_first_inline_code;
+    mod_mruby_code_t *mod_mruby_check_user_id_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_check_user_id_last_inline_code;
+    mod_mruby_code_t *mod_mruby_auth_checker_first_inline_code;
+    mod_mruby_code_t *mod_mruby_auth_checker_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_auth_checker_last_inline_code;
+    mod_mruby_code_t *mod_mruby_fixups_first_inline_code;
+    mod_mruby_code_t *mod_mruby_fixups_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_fixups_last_inline_code;
+    mod_mruby_code_t *mod_mruby_log_transaction_first_inline_code;
+    mod_mruby_code_t *mod_mruby_log_transaction_middle_inline_code;
+    mod_mruby_code_t *mod_mruby_log_transaction_last_inline_code;
 
     mod_mruby_code_t *mod_mruby_handler_code;
     mod_mruby_code_t *mod_mruby_handler_first_code;

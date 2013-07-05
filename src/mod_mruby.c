@@ -96,7 +96,32 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
 
     // inlinde core in httpd.conf
     conf->mod_mruby_handler_inline_code                 = NULL;
-    conf->mod_mruby_translate_name_first_inline_code    = NULL;
+    conf->mod_mruby_handler_first_inline_code              = NULL;
+    conf->mod_mruby_handler_middle_inline_code             = NULL;
+    conf->mod_mruby_handler_last_inline_code               = NULL;
+    conf->mod_mruby_post_read_request_first_inline_code    = NULL;
+    conf->mod_mruby_post_read_request_middle_inline_code   = NULL;
+    conf->mod_mruby_post_read_request_last_inline_code     = NULL;
+    conf->mod_mruby_translate_name_first_inline_code       = NULL;
+    conf->mod_mruby_translate_name_middle_inline_code      = NULL;
+    conf->mod_mruby_translate_name_last_inline_code        = NULL;
+    conf->mod_mruby_map_to_storage_first_inline_code       = NULL;
+    conf->mod_mruby_map_to_storage_middle_inline_code      = NULL;
+    conf->mod_mruby_map_to_storage_last_inline_code        = NULL;
+    conf->mod_mruby_access_checker_first_inline_code       = NULL;
+    conf->mod_mruby_access_checker_middle_inline_code      = NULL;
+    conf->mod_mruby_access_checker_last_inline_code        = NULL;
+    conf->mod_mruby_check_user_id_first_inline_code        = NULL;
+    conf->mod_mruby_check_user_id_middle_inline_code       = NULL;
+    conf->mod_mruby_check_user_id_last_inline_code         = NULL;
+    conf->mod_mruby_auth_checker_first_inline_code         = NULL;
+    conf->mod_mruby_auth_checker_middle_inline_code        = NULL;
+    conf->mod_mruby_auth_checker_last_inline_code          = NULL;
+    conf->mod_mruby_fixups_first_inline_code               = NULL;
+    conf->mod_mruby_fixups_middle_inline_code              = NULL;
+    conf->mod_mruby_fixups_last_inline_code                = NULL;
+    conf->mod_mruby_log_transaction_first_inline_code      = NULL;
+    conf->mod_mruby_log_transaction_middle_inline_code     = NULL;
 
     // hook script file
     conf->mod_mruby_handler_code                    = NULL;
@@ -189,7 +214,33 @@ static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, 
 }
 
 SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler_last);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(post_read_request_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(post_read_request_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(post_read_request_last);
 SET_MOD_MRUBY_SERVER_INLINE_CMDS(translate_name_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(translate_name_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(translate_name_last);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(map_to_storage_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(map_to_storage_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(map_to_storage_last);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(access_checker_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(access_checker_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(access_checker_last);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(check_user_id_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(check_user_id_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(check_user_id_last);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(auth_checker_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(auth_checker_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(auth_checker_last);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(fixups_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(fixups_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(fixups_last);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(log_transaction_first);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(log_transaction_middle);
+SET_MOD_MRUBY_SERVER_INLINE_CMDS(log_transaction_last);
 
 //
 // set cmds functions (for Ruby file path)
@@ -512,27 +563,6 @@ static apr_status_t mod_mruby_hook_term(void *data)
 }
 
 //
-// hook functions (hook Ruby inline code in httpd.conf)
-//
-static int mod_mruby_handler_inline(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-
-    if (strcmp(r->handler, "mruby-native-script") != 0)
-        return DECLINED;
-
-    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_handler_inline_code);
-}
-
-static int mod_mruby_translate_name_first_inline(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_translate_name_first_inline_code == NULL)
-        return DECLINED;
-    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_translate_name_first_inline_code);
-}
-
-//
 // hook functions (hook Ruby file path)
 //
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
@@ -798,11 +828,88 @@ static const authn_provider authn_mruby_provider = {
     &mod_mruby_authn_get_realm_hash
 };
 
+//
+// hook functions (hook Ruby inline code in httpd.conf)
+//
+static int mod_mruby_handler_inline(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+
+    if (strcmp(r->handler, "mruby-native-script") != 0)
+        return DECLINED;
+
+    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_handler_inline_code);
+}
+
+#define MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(hook) \
+static int mod_mruby_##hook##_inline(request_rec *r);                                                   \
+static int mod_mruby_##hook##_inline(request_rec *r)                                                    \
+{                                                                                                       \
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);               \
+                                                                                                        \
+    if (conf->mod_mruby_##hook##_inline_code == NULL)                                                   \
+        return DECLINED;                                                                                \
+                                                                                                        \
+    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_##hook##_inline_code);         \
+}
+
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(handler_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(handler_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(handler_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(post_read_request_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(post_read_request_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(post_read_request_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(translate_name_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(translate_name_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(translate_name_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(map_to_storage_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(map_to_storage_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(map_to_storage_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(access_checker_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(access_checker_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(access_checker_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(check_user_id_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(check_user_id_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(check_user_id_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(auth_checker_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(auth_checker_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(auth_checker_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(fixups_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(fixups_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(fixups_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(log_transaction_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(log_transaction_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(log_transaction_last);
+
+/*
+static int mod_mruby_translate_name_first_inline(request_rec *r)
+{
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    if (conf->mod_mruby_translate_name_first_inline_code == NULL)
+        return DECLINED;
+    return ap_mruby_run_inline(mod_mruby_share_state, r, conf->mod_mruby_translate_name_first_inline_code);
+}
+*/
+
+#define MOD_MRUBY_SET_ALL_REGISTER_INLINE(hook) \
+    ap_hook_##hook(mod_mruby_##hook##_first_inline, NULL, NULL, APR_HOOK_FIRST); \
+    ap_hook_##hook(mod_mruby_##hook##_middle_inline, NULL, NULL, APR_HOOK_MIDDLE); \
+    ap_hook_##hook(mod_mruby_##hook##_last_inline, NULL, NULL, APR_HOOK_LAST); \
+
 static void register_hooks(apr_pool_t *p)
 {
     // inline code in httpd.conf
     ap_hook_handler(mod_mruby_handler_inline, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_translate_name(mod_mruby_translate_name_first_inline, NULL, NULL, APR_HOOK_FIRST);
+    //ap_hook_translate_name(mod_mruby_translate_name_first_inline, NULL, NULL, APR_HOOK_FIRST);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(handler);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(post_read_request);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(translate_name);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(map_to_storage);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(access_checker);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(check_user_id);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(auth_checker);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(fixups);
+    MOD_MRUBY_SET_ALL_REGISTER_INLINE(log_transaction);
 
     // hook script file
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
@@ -854,51 +961,43 @@ static void register_hooks(apr_pool_t *p)
     //ap_register_input_filter( "MODMRUBYFILTER", mod_mruby_input_filter,  NULL, AP_FTYPE_CONTENT_SET);
 }
 
+#define MOD_MRUBY_SET_ALL_CMDS_INLINE(hook, dir_name) \
+    AP_INIT_TAKE1("mruby" #dir_name "FirstCode",  set_mod_mruby_##hook##_first_inline,  NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for ##hook## first phase."), \
+    AP_INIT_TAKE1("mruby" #dir_name "MiddleCode", set_mod_mruby_##hook##_middle_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for ##hook## middle phase."), \
+    AP_INIT_TAKE1("mruby" #dir_name "LastCode",   set_mod_mruby_##hook##_last_inline,   NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for ##hook## last phase."),
+
+#define MOD_MRUBY_SET_ALL_CMDS(hook, dir_name) \
+    AP_INIT_TAKE1("mruby" #dir_name "First",  set_mod_mruby_##hook##_first,  NULL, RSRC_CONF | ACCESS_CONF, "hook Ruby file for " #hook " first phase."), \
+    AP_INIT_TAKE1("mruby" #dir_name "Middle", set_mod_mruby_##hook##_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook Ruby file for " #hook " middle phase."), \
+    AP_INIT_TAKE1("mruby" #dir_name "Last",   set_mod_mruby_##hook##_last,   NULL, RSRC_CONF | ACCESS_CONF, "hook Ruby file for " #hook " last phase."),
+
 static const command_rec mod_mruby_cmds[] = {
 
     AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for handler phase."),
-    AP_INIT_TAKE1("mrubyTranslateNameFirstCode", set_mod_mruby_translate_name_first_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for translate_name first phase."),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(handler, Hadnler)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(post_read_request, PostReadRequest)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(translate_name, TranslateName)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(map_to_storage, MapToStorage)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(access_checker, AcceccChecker)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(check_user_id, CheckUserId)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(auth_checker, AuthChecker)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(fixups, Fixups)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(log_transaction, LogTransaction)
 
     AP_INIT_TAKE1("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
-    AP_INIT_TAKE1("mrubyHandlerFIrst", set_mod_mruby_handler_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler first phase."),
-    AP_INIT_TAKE1("mrubyHandlerMiddle", set_mod_mruby_handler_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler middle phase."),
-    AP_INIT_TAKE1("mrubyHandlerLast", set_mod_mruby_handler_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler last phase."),
-    AP_INIT_TAKE1("mrubyPostConfigFirst", set_mod_mruby_post_config_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config fast phase."),
-    AP_INIT_TAKE1("mrubyPostConfigMiddle", set_mod_mruby_post_config_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config middle phase."),
-    AP_INIT_TAKE1("mrubyPostConfigLast", set_mod_mruby_post_config_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_config last phase."),
-    AP_INIT_TAKE1("mrubyChildInitFirst", set_mod_mruby_child_init_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for child_init first phase."),
-    AP_INIT_TAKE1("mrubyChildInitMiddle", set_mod_mruby_child_init_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for child_init middle phase."),
-    AP_INIT_TAKE1("mrubyChildInitLast", set_mod_mruby_child_init_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for child_init last phase."),
-    AP_INIT_TAKE1("mrubyPostReadRequestFirst", set_mod_mruby_post_read_request_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request first phase."),
-    AP_INIT_TAKE1("mrubyPostReadRequestMiddle", set_mod_mruby_post_read_request_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request middle phase."),
-    AP_INIT_TAKE1("mrubyPostReadRequestLast", set_mod_mruby_post_read_request_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for post_read_request last phase."),
-    AP_INIT_TAKE1("mrubyQuickHandlerFirst", set_mod_mruby_quick_handler_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for quick_handler first phase."),
-    AP_INIT_TAKE1("mrubyQuickHandlerMiddle", set_mod_mruby_quick_handler_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for quick_handler middle phase."),
-    AP_INIT_TAKE1("mrubyQuickHandlerLast", set_mod_mruby_quick_handler_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for quick_handler last phase."),
-    AP_INIT_TAKE1("mrubyTranslateNameFirst", set_mod_mruby_translate_name_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name first phase."),
-    AP_INIT_TAKE1("mrubyTranslateNameMiddle", set_mod_mruby_translate_name_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name middle phase."),
-    AP_INIT_TAKE1("mrubyTranslateNameLast", set_mod_mruby_translate_name_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for translate_name last phase."),
-    AP_INIT_TAKE1("mrubyMapToStorageFirst", set_mod_mruby_map_to_storage_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for map_to_storage first phase."),
-    AP_INIT_TAKE1("mrubyMapToStorageMiddle", set_mod_mruby_map_to_storage_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for map_to_storage middle phase."),
-    AP_INIT_TAKE1("mrubyMapToStorageLast", set_mod_mruby_map_to_storage_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for map_to_storage last phase."),
-    AP_INIT_TAKE1("mrubyAccessCheckerFirst", set_mod_mruby_access_checker_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for access_checker first phase."),
-    AP_INIT_TAKE1("mrubyAccessCheckerMiddle", set_mod_mruby_access_checker_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for access_checker middle phase."),
-    AP_INIT_TAKE1("mrubyAccessCheckerLast", set_mod_mruby_access_checker_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for access_checker last phase."),
-    AP_INIT_TAKE1("mrubyCheckUserIdFirst", set_mod_mruby_check_user_id_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for check_user_id first phase."),
-    AP_INIT_TAKE1("mrubyCheckUserIdMiddle", set_mod_mruby_check_user_id_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for check_user_id middle phase."),
-    AP_INIT_TAKE1("mrubyCheckUserIdLast", set_mod_mruby_check_user_id_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for check_user_id last phase."),
-    AP_INIT_TAKE1("mrubyAuthCheckerFirst", set_mod_mruby_auth_checker_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for auth_checker first phase."),
-    AP_INIT_TAKE1("mrubyAuthCheckerMiddle", set_mod_mruby_auth_checker_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for auth_checker middle phase."),
-    AP_INIT_TAKE1("mrubyAuthCheckerLast", set_mod_mruby_auth_checker_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for auth_checker last phase."),
-    AP_INIT_TAKE1("mrubyFixupsFirst", set_mod_mruby_fixups_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups first phase."),
-    AP_INIT_TAKE1("mrubyFixupsMiddle", set_mod_mruby_fixups_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups middle phase."),
-    AP_INIT_TAKE1("mrubyFixupsLast", set_mod_mruby_fixups_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for fixups last phase."),
-    AP_INIT_TAKE1("mrubyInsertFilterFirst", set_mod_mruby_insert_filter_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for insert_filter first phase."),
-    AP_INIT_TAKE1("mrubyInsertFilterMiddle", set_mod_mruby_insert_filter_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for insert_filter middle phase."),
-    AP_INIT_TAKE1("mrubyInsertFilterLast", set_mod_mruby_insert_filter_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for insert_filter last phase."),
-    AP_INIT_TAKE1("mrubyLogTransactionFirst", set_mod_mruby_log_transaction_first, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction first phase."),
-    AP_INIT_TAKE1("mrubyLogTransactionMiddle", set_mod_mruby_log_transaction_middle, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction middle phase."),
-    AP_INIT_TAKE1("mrubyLogTransactionLast", set_mod_mruby_log_transaction_last, NULL, RSRC_CONF | ACCESS_CONF, "hook for log_transaction last phase."),
+    MOD_MRUBY_SET_ALL_CMDS(handler, Hadnler)
+    MOD_MRUBY_SET_ALL_CMDS(post_config, PostConfig)
+    MOD_MRUBY_SET_ALL_CMDS(child_init, ChildInit)
+    MOD_MRUBY_SET_ALL_CMDS(post_read_request, PostReadRequest)
+    MOD_MRUBY_SET_ALL_CMDS(quick_handler, QuickHandler)
+    MOD_MRUBY_SET_ALL_CMDS(translate_name, TranslateName)
+    MOD_MRUBY_SET_ALL_CMDS(map_to_storage, MapToStorage)
+    MOD_MRUBY_SET_ALL_CMDS(access_checker, AcceccChecker)
+    MOD_MRUBY_SET_ALL_CMDS(check_user_id, CheckUserId)
+    MOD_MRUBY_SET_ALL_CMDS(auth_checker, AuthChecker)
+    MOD_MRUBY_SET_ALL_CMDS(fixups, Fixups)
+    MOD_MRUBY_SET_ALL_CMDS(insert_filter, InsertFilter)
+    MOD_MRUBY_SET_ALL_CMDS(log_transaction, LogTransaction)
     //AP_INIT_TAKE1("mrubyCacheSize", set_mod_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
 
     AP_INIT_TAKE1("mrubyAuthnCheckPassword", set_mod_mruby_authn_check_password, NULL, OR_AUTHCFG, "hook for authn basic."),
