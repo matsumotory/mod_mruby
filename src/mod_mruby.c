@@ -645,7 +645,7 @@ static int mod_mruby_##hook(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, 
     mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);                                    \
                                                                                                                           \
     if (conf->mod_mruby_##hook##_code == NULL)                                                                            \
-        return DECLINED;                                                                                                           \
+        return DECLINED;                                                                                                  \
                                                                                                                           \
     ap_mruby_run_nr(conf->mod_mruby_##hook##_code->path);                                                                 \
     return OK;                                                                                                            \
@@ -671,342 +671,86 @@ static int mod_mruby_handler(request_rec *r)
     return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_code->path, DECLINED);
 }
 
-
-static int mod_mruby_handler_first(request_rec *r)
-{
-
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_handler_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_first_code->path, DECLINED);
+//
+// register hook func
+//
+#define MOD_MRUBY_REGISTER_HOOK_FUNC(hook) \
+static int mod_mruby_##hook(request_rec *r);                                                            \
+static int mod_mruby_##hook(request_rec *r)                                                             \
+{                                                                                                       \
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);               \
+                                                                                                        \
+    if (conf->mod_mruby_##hook##_code == NULL)                                                          \
+        return DECLINED;                                                                                \
+                                                                                                        \
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_##hook##_code->path, OK);       \
 }
 
+MOD_MRUBY_REGISTER_HOOK_FUNC(handler_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(handler_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(handler_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC(post_read_request_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(post_read_request_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(post_read_request_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC(translate_name_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(translate_name_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(translate_name_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC(map_to_storage_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(map_to_storage_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(map_to_storage_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC(access_checker_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(access_checker_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(access_checker_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC(check_user_id_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(check_user_id_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(check_user_id_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC(auth_checker_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(auth_checker_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(auth_checker_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC(fixups_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(fixups_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(fixups_last);
+MOD_MRUBY_REGISTER_HOOK_FUNC(log_transaction_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC(log_transaction_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC(log_transaction_last);
 
-static int mod_mruby_handler_middle(request_rec *r)
-{
-
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_handler_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_middle_code->path, DECLINED);
+//
+// register hook func with lookup
+//
+#define MOD_MRUBY_REGISTER_HOOK_FUNC_LOOKUP(hook) \
+static int mod_mruby_##hook(request_rec *r, int lookup);                                                \
+static int mod_mruby_##hook(request_rec *r, int lookup)                                                 \
+{                                                                                                       \
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);               \
+                                                                                                        \
+    if (conf->mod_mruby_##hook##_code == NULL)                                                          \
+        return DECLINED;                                                                                \
+                                                                                                        \
+    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_##hook##_code->path, OK);       \
 }
 
+MOD_MRUBY_REGISTER_HOOK_FUNC_LOOKUP(quick_handler_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_LOOKUP(quick_handler_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_LOOKUP(quick_handler_last);
 
-static int mod_mruby_handler_last(request_rec *r)
-{
-
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-
-    if (conf->mod_mruby_handler_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_handler_last_code->path, DECLINED);
+//
+// register hook void func
+//
+#define MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(hook) \
+static void mod_mruby_##hook(request_rec *r);                                                           \
+static void mod_mruby_##hook(request_rec *r)                                                            \
+{                                                                                                       \
+    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);               \
+                                                                                                        \
+    if (conf->mod_mruby_##hook##_code == NULL)                                                          \
+        return;                                                                                         \
+                                                                                                        \
+    ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_##hook##_code->path, OK);              \
 }
 
-
-static int mod_mruby_post_read_request_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_post_read_request_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_post_read_request_first_code->path, OK);
-}
-
-
-static int mod_mruby_post_read_request_middle(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_post_read_request_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_post_read_request_middle_code->path, OK);
-}
-
-
-static int mod_mruby_post_read_request_last(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_post_read_request_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_post_read_request_last_code->path, OK);
-}
-
-
-static int mod_mruby_quick_handler_first(request_rec *r, int lookup)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_quick_handler_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_first_code->path, OK);
-}
-
-
-static int mod_mruby_quick_handler_middle(request_rec *r, int lookup)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_quick_handler_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_middle_code->path, OK);
-}
-
-
-static int mod_mruby_quick_handler_last(request_rec *r, int lookup)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_quick_handler_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_quick_handler_last_code->path, OK);
-}
-
-
-static int mod_mruby_translate_name_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_translate_name_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_first_code->path, OK);
-}
-
-
-static int mod_mruby_translate_name_middle(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_translate_name_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_middle_code->path, OK);
-}
-
-
-static int mod_mruby_translate_name_last(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_translate_name_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_translate_name_last_code->path, OK);
-}
-
-
-static int mod_mruby_map_to_storage_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_map_to_storage_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_map_to_storage_first_code->path, OK);
-}
-
-
-static int mod_mruby_map_to_storage_middle(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_map_to_storage_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_map_to_storage_middle_code->path, OK);
-}
-
-
-static int mod_mruby_map_to_storage_last(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_map_to_storage_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_map_to_storage_last_code->path, OK);
-}
-
-
-static int mod_mruby_access_checker_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_access_checker_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_access_checker_first_code->path, OK);
-}
-
-
-static int mod_mruby_access_checker_middle(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_access_checker_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_access_checker_middle_code->path, OK);
-}
-
-
-static int mod_mruby_access_checker_last(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_access_checker_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_access_checker_last_code->path, OK);
-}
-
-
-static int mod_mruby_check_user_id_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_check_user_id_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_check_user_id_first_code->path, OK);
-}
-
-
-static int mod_mruby_check_user_id_middle(request_rec *r)
-{   
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_check_user_id_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_check_user_id_middle_code->path, OK);
-}
-
-
-static int mod_mruby_check_user_id_last(request_rec *r)
-{   
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_check_user_id_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_check_user_id_last_code->path, OK);
-}
-
-
-static int mod_mruby_auth_checker_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_auth_checker_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_first_code->path, OK);
-}
-
-
-static int mod_mruby_auth_checker_middle(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_auth_checker_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_middle_code->path, OK);
-}
-
-
-static int mod_mruby_auth_checker_last(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_auth_checker_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_auth_checker_last_code->path, OK);
-}
-
-
-static int mod_mruby_fixups_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_fixups_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_fixups_first_code->path, OK);
-}
-
-
-static int mod_mruby_fixups_middle(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_fixups_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_fixups_middle_code->path, OK);
-}
-
-
-static int mod_mruby_fixups_last(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_fixups_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_fixups_last_code->path, OK);
-}
-
-
-static void mod_mruby_insert_filter_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_insert_filter_first_code == NULL)
-        return;
-
-    ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_first_code->path, OK);
-}
-
-
-static void mod_mruby_insert_filter_middle(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_insert_filter_middle_code == NULL)
-        return;
-
-    ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_middle_code->path, OK);
-}
-
-
-static void mod_mruby_insert_filter_last(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_insert_filter_last_code == NULL)
-        return;
-
-    ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_insert_filter_last_code->path, OK);
-}
-
-
-static int mod_mruby_log_transaction_first(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_log_transaction_first_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_log_transaction_first_code->path, OK);
-}
-
-
-static int mod_mruby_log_transaction_middle(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_log_transaction_middle_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_log_transaction_middle_code->path, OK);
-}
-
-
-static int mod_mruby_log_transaction_last(request_rec *r)
-{
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
-    if (conf->mod_mruby_log_transaction_last_code == NULL)
-        return DECLINED;
-
-    return ap_mruby_run(mod_mruby_share_state, r, conf, conf->mod_mruby_log_transaction_last_code->path, OK);
-}
-
+MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_first);
+MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_middle);
+MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_last);
 
 static authn_status mod_mruby_authn_check_password(request_rec *r, const char *user, const char *password)
 {
@@ -1018,7 +762,6 @@ static authn_status mod_mruby_authn_check_password(request_rec *r, const char *u
     ap_mrb_init_authnprovider_basic(r, user, password);
     return ap_mruby_run(mod_mruby_share_state, r, conf, dir_conf->mod_mruby_authn_check_password_code->path, OK);
 }
-
 
 static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *user, const char *realm, char **rethash)
 {
@@ -1033,7 +776,6 @@ static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *u
     *rethash = ap_mrb_get_authnprovider_digest_rethash();
     return ret;
 }
-
 
 static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* bb)
 {
@@ -1051,12 +793,10 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* 
     return ap_pass_brigade(f->next, bb);
 }
 
-
 static const authn_provider authn_mruby_provider = {
     &mod_mruby_authn_check_password,
     &mod_mruby_authn_get_realm_hash
 };
-
 
 static void register_hooks(apr_pool_t *p)
 {
@@ -1114,7 +854,6 @@ static void register_hooks(apr_pool_t *p)
     //ap_register_input_filter( "MODMRUBYFILTER", mod_mruby_input_filter,  NULL, AP_FTYPE_CONTENT_SET);
 }
 
-
 static const command_rec mod_mruby_cmds[] = {
 
     AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for handler phase."),
@@ -1170,13 +909,12 @@ static const command_rec mod_mruby_cmds[] = {
     {NULL}
 };
 
-
 module AP_MODULE_DECLARE_DATA mruby_module = {
     STANDARD20_MODULE_STUFF,
     mod_mruby_create_dir_config,    /* dir config creater */
-    NULL,                      /* dir merger */
-    mod_mruby_create_config,   /* server config */
-    NULL,                      /* merge server config */
-    mod_mruby_cmds,            /* command apr_table_t */
-    register_hooks             /* register hooks */
+    NULL,                           /* dir merger */
+    mod_mruby_create_config,        /* server config */
+    NULL,                           /* merge server config */
+    mod_mruby_cmds,                 /* command apr_table_t */
+    register_hooks                  /* register hooks */
 };
