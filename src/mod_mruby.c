@@ -896,6 +896,11 @@ static int mod_mruby_translate_name_first_inline(request_rec *r)
     ap_hook_##hook(mod_mruby_##hook##_middle_inline, NULL, NULL, APR_HOOK_MIDDLE); \
     ap_hook_##hook(mod_mruby_##hook##_last_inline, NULL, NULL, APR_HOOK_LAST); \
 
+#define MOD_MRUBY_SET_ALL_REGISTER(hook) \
+    ap_hook_##hook(mod_mruby_##hook##_first, NULL, NULL, APR_HOOK_FIRST); \
+    ap_hook_##hook(mod_mruby_##hook##_middle, NULL, NULL, APR_HOOK_MIDDLE); \
+    ap_hook_##hook(mod_mruby_##hook##_last, NULL, NULL, APR_HOOK_LAST); \
+
 static void register_hooks(apr_pool_t *p)
 {
     // inline code in httpd.conf
@@ -913,50 +918,22 @@ static void register_hooks(apr_pool_t *p)
 
     // hook script file
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_post_config(mod_mruby_post_config_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_post_config(mod_mruby_post_config_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_post_config(mod_mruby_post_config_last, NULL, NULL, APR_HOOK_LAST);
     ap_hook_child_init(mod_mruby_child_init, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_child_init(mod_mruby_child_init_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_child_init(mod_mruby_child_init_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_child_init(mod_mruby_child_init_last, NULL, NULL, APR_HOOK_LAST);
     ap_hook_handler(mod_mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
-    ap_hook_handler(mod_mruby_handler_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_handler(mod_mruby_handler_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_handler(mod_mruby_handler_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_post_read_request(mod_mruby_post_read_request_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_post_read_request(mod_mruby_post_read_request_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_post_read_request(mod_mruby_post_read_request_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_quick_handler(mod_mruby_quick_handler_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_quick_handler(mod_mruby_quick_handler_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_quick_handler(mod_mruby_quick_handler_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_translate_name(mod_mruby_translate_name_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_translate_name(mod_mruby_translate_name_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_translate_name(mod_mruby_translate_name_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_map_to_storage(mod_mruby_map_to_storage_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_map_to_storage(mod_mruby_map_to_storage_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_map_to_storage(mod_mruby_map_to_storage_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_access_checker(mod_mruby_access_checker_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_access_checker(mod_mruby_access_checker_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_access_checker(mod_mruby_access_checker_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_check_user_id(mod_mruby_check_user_id_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_check_user_id(mod_mruby_check_user_id_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_check_user_id(mod_mruby_check_user_id_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_auth_checker(mod_mruby_auth_checker_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_auth_checker(mod_mruby_auth_checker_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_auth_checker(mod_mruby_auth_checker_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_fixups(mod_mruby_fixups_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_fixups(mod_mruby_fixups_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_fixups(mod_mruby_fixups_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_insert_filter(mod_mruby_insert_filter_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_insert_filter(mod_mruby_insert_filter_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_insert_filter(mod_mruby_insert_filter_last, NULL, NULL, APR_HOOK_LAST);
-    ap_hook_log_transaction(mod_mruby_log_transaction_first, NULL, NULL, APR_HOOK_FIRST);
-    ap_hook_log_transaction(mod_mruby_log_transaction_middle, NULL, NULL, APR_HOOK_MIDDLE);
-    ap_hook_log_transaction(mod_mruby_log_transaction_last, NULL, NULL, APR_HOOK_LAST);
+    MOD_MRUBY_SET_ALL_REGISTER(handler);
+    MOD_MRUBY_SET_ALL_REGISTER(child_init);
+    MOD_MRUBY_SET_ALL_REGISTER(post_read_request);
+    MOD_MRUBY_SET_ALL_REGISTER(quick_handler);
+    MOD_MRUBY_SET_ALL_REGISTER(translate_name);
+    MOD_MRUBY_SET_ALL_REGISTER(map_to_storage);
+    MOD_MRUBY_SET_ALL_REGISTER(access_checker);
+    MOD_MRUBY_SET_ALL_REGISTER(check_user_id);
+    MOD_MRUBY_SET_ALL_REGISTER(auth_checker);
+    MOD_MRUBY_SET_ALL_REGISTER(fixups);
+    MOD_MRUBY_SET_ALL_REGISTER(insert_filter);
+    MOD_MRUBY_SET_ALL_REGISTER(log_transaction);
 
     ap_register_provider(p, AUTHN_PROVIDER_GROUP, "mruby", "0", &authn_mruby_provider);
-
     ap_register_output_filter("mruby", mod_mruby_output_filter, NULL, AP_FTYPE_CONTENT_SET);
     //ap_register_input_filter( "MODMRUBYFILTER", mod_mruby_input_filter,  NULL, AP_FTYPE_CONTENT_SET);
 }
