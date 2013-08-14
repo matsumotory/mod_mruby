@@ -1042,7 +1042,7 @@ static const command_rec mod_mruby_cmds[] = {
     MOD_MRUBY_SET_ALL_CMDS(quick_handler, QuickHandler)
     MOD_MRUBY_SET_ALL_CMDS(translate_name, TranslateName)
     MOD_MRUBY_SET_ALL_CMDS(map_to_storage, MapToStorage)
-    MOD_MRUBY_SET_ALL_CMDS(access_checker, AcceccChecker)
+    MOD_MRUBY_SET_ALL_CMDS(access_checker, AccessChecker)
     MOD_MRUBY_SET_ALL_CMDS(check_user_id, CheckUserId)
     MOD_MRUBY_SET_ALL_CMDS(auth_checker, AuthChecker)
     MOD_MRUBY_SET_ALL_CMDS(fixups, Fixups)
