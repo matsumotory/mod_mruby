@@ -577,6 +577,16 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t 
     }
     ap_mrb_push_request(r);
     ai = mrb_gc_arena_save(mrb);
+    ap_log_rerror(APLOG_MARK
+        , APLOG_DEBUG
+        , 0
+        , r
+        , "%s DEBUG %s: irep[%d] inline core run: inline code = %s"
+        , MODULE_NAME
+        , __func__
+        , c->irep_n
+        , c->code
+    );
     ret = mrb_run(mrb
         , mrb_proc_new(mrb, mrb->irep[c->irep_n])
         , mrb_top_self(mrb)
@@ -584,25 +594,16 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t 
     mrb_gc_arena_restore(mrb, ai);
     // mutex unlock
     if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
-        ap_log_error(APLOG_MARK
+        ap_log_rerror(APLOG_MARK
             , APLOG_ERR
             , 0
-            , NULL
+            , r
             , "%s ERROR %s: mod_mruby_mutex unlock failed"
             , MODULE_NAME
             , __func__
         );
         return OK;
     }
-
-    ap_log_perror(APLOG_MARK
-        , APLOG_DEBUG
-        , 0
-        , r->pool
-        , "%s NOTICE %s: naitve code execed."
-        , MODULE_NAME
-        , __func__
-    );
 
     return OK;
 }
@@ -629,7 +630,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
             , APLOG_ERR        
             , 0                
             , NULL             
-            , "%s ERROR %s: Error creating thread mutex."
+            , APLOGNO(05001) "%s ERROR %s: Error creating thread mutex."
             , MODULE_NAME
             , __func__
         );
@@ -641,7 +642,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         , APLOG_INFO
         , 0                
         , p
-        , "%s %s: main process / thread (pid=%d) initialized."
+        , APLOGNO(05002) "%s %s: main process / thread (pid=%d) initialized."
         , MODULE_NAME
         , __func__
         , getpid()
@@ -656,7 +657,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         , APLOG_NOTICE
         , 0                
         , p
-        , "%s %s: %s / %s mechanism enabled."
+        , APLOGNO(05003) "%s %s: %s / %s mechanism enabled."
         , MODULE_NAME
         , __func__
         , MODULE_NAME
@@ -1012,9 +1013,9 @@ static void register_hooks(apr_pool_t *p)
 }
 
 #define MOD_MRUBY_SET_ALL_CMDS_INLINE(hook, dir_name) \
-    AP_INIT_TAKE1("mruby" #dir_name "FirstCode",  set_mod_mruby_##hook##_first_inline,  NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for ##hook## first phase."), \
-    AP_INIT_TAKE1("mruby" #dir_name "MiddleCode", set_mod_mruby_##hook##_middle_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for ##hook## middle phase."), \
-    AP_INIT_TAKE1("mruby" #dir_name "LastCode",   set_mod_mruby_##hook##_last_inline,   NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for ##hook## last phase."),
+    AP_INIT_TAKE1("mruby" #dir_name "FirstCode",  set_mod_mruby_##hook##_first_inline,  NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for " #hook " first phase."), \
+    AP_INIT_TAKE1("mruby" #dir_name "MiddleCode", set_mod_mruby_##hook##_middle_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for " #hook " middle phase."), \
+    AP_INIT_TAKE1("mruby" #dir_name "LastCode",   set_mod_mruby_##hook##_last_inline,   NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for " #hook " last phase."),
 
 #define MOD_MRUBY_SET_ALL_CMDS(hook, dir_name) \
     AP_INIT_TAKE1("mruby" #dir_name "First",  set_mod_mruby_##hook##_first,  NULL, RSRC_CONF | ACCESS_CONF, "hook Ruby file for " #hook " first phase."), \
