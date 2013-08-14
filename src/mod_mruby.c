@@ -1028,7 +1028,7 @@ static const command_rec mod_mruby_cmds[] = {
     MOD_MRUBY_SET_ALL_CMDS_INLINE(post_read_request, PostReadRequest)
     MOD_MRUBY_SET_ALL_CMDS_INLINE(translate_name, TranslateName)
     MOD_MRUBY_SET_ALL_CMDS_INLINE(map_to_storage, MapToStorage)
-    MOD_MRUBY_SET_ALL_CMDS_INLINE(access_checker, AcceccChecker)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(access_checker, AccessChecker)
     MOD_MRUBY_SET_ALL_CMDS_INLINE(check_user_id, CheckUserId)
     MOD_MRUBY_SET_ALL_CMDS_INLINE(auth_checker, AuthChecker)
     MOD_MRUBY_SET_ALL_CMDS_INLINE(fixups, Fixups)
