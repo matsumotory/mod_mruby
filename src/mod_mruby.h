@@ -51,6 +51,10 @@
     #define __APACHE24__
 #endif
 
+#if (AP_SERVER_MAJORVERSION_NUMBER == 2)
+    #define APLOGNO(n)              "AH" #n ": "
+#endif
+
 enum code_type {
     MOD_MRUBY_STRING,
     MOD_MRUBY_FILE
