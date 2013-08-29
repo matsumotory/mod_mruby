@@ -30,7 +30,7 @@ module ModMruby
       Apache.rputs "- Apache version: #{Apache::server_version}".to_html
       Apache.rputs "- Apache build: #{Apache::server_build}".to_html
       Apache.rputs "- mod_mruby version: #{Apache::mod_mruby_version}".to_html
-      Apache.syslogger 4,"warn", "mod_mruby warning syslogger test."
+      Apache.syslogger "warn", "mod_mruby warning syslogger test."
       Apache.rputs "- syslogger function: OK".to_html
       Apache.errlogger 4, "mod_mruby warning errlogger test."
       Apache.rputs "- errlogger function: OK".to_html
