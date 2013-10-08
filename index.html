@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Mod mruby : mod_mruby - A Web Server Extension Mechanism Using mruby to provide an alternative to mod_lua" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Mod mruby</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/matsumoto-r/mod_mruby">View on GitHub</a>
+
+          <h1 id="project_title">Mod mruby</h1>
+          <h2 id="project_tagline">mod_mruby - A Web Server Extension Mechanism Using mruby to provide an alternative to mod_lua</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/matsumoto-r/mod_mruby/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/matsumoto-r/mod_mruby/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="welcome-to-the-mod_mruby-wiki" class="anchor" href="#welcome-to-the-mod_mruby-wiki"><span class="octicon octicon-link"></span></a>Welcome to the mod_mruby wiki!</h1>
+
+<h2>
+<a name="whats-mod_mruby" class="anchor" href="#whats-mod_mruby"><span class="octicon octicon-link"></span></a>What's mod_mruby</h2>
+
+<p><strong>mod_mruby is to provide an alternative to mod_lua.</strong></p>
+
+<ul>
+<li>Apache modules can be implemeted by mruby scripts on Apache HTTP Server installed mod_mruby.</li>
+<li>Supported Apache Version: <strong>2.0 2.2 2.4 2.5</strong>
+</li>
+<li>Supported Apache MPM: <strong>worker prefork event</strong>
+</li>
+<li>Supported OS: <strong>Linux FreeBSD Windows</strong> and so on.</li>
+</ul><h2>
+<a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to use</h2>
+
+<h3>
+<a name="1-download" class="anchor" href="#1-download"><span class="octicon octicon-link"></span></a>1. Download</h3>
+
+<pre><code>git clone git://github.com/matsumoto-r/mod_mruby.git
+</code></pre>
+
+<h3>
+<a name="2-auto-build" class="anchor" href="#2-auto-build"><span class="octicon octicon-link"></span></a>2. Auto Build</h3>
+
+<pre><code>cd mod_mruby
+sh build.sh
+</code></pre>
+
+<h3>
+<a name="3-test-settings" class="anchor" href="#3-test-settings"><span class="octicon octicon-link"></span></a>3. Test Settings</h3>
+
+<ul>
+<li>
+<p>Add to httpd.conf</p>
+
+<pre><code>LoadModule mruby_module modules/mod_mruby.so
+AddHandler mruby-script .rb
+</code></pre>
+</li>
+<li>
+<p>test.rb copy   </p>
+
+<pre><code>cp -p test/test.rb $(APACHE_DOCMENT_ROOT)/.
+</code></pre>
+</li>
+</ul><h3>
+<a name="4-apache-restart" class="anchor" href="#4-apache-restart"><span class="octicon octicon-link"></span></a>4. Apache Restart</h3>
+
+<pre><code>service httpd restart
+</code></pre>
+
+<h3>
+<a name="5-access-url-by-browser" class="anchor" href="#5-access-url-by-browser"><span class="octicon octicon-link"></span></a>5. Access URL by Browser</h3>
+
+<pre><code>curl http://127.0.0.1/test.rb
+</code></pre>
+
+<h3>
+<a name="manual-build" class="anchor" href="#manual-build"><span class="octicon octicon-link"></span></a>Manual Build</h3>
+
+<ul>
+<li>
+<p>mruby/mruby build</p>
+
+<pre><code>cd mod_mruby
+git submodule init
+git submodule update
+cd mruby
+rake
+cd ..
+</code></pre>
+</li>
+<li>
+<p>configure</p>
+
+<pre><code>./configure
+</code></pre>
+</li>
+<li>
+<p>using mruby/mruby</p>
+
+<pre><code>make
+make install
+</code></pre>
+</li>
+</ul><h2>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h2>
+
+<ul>
+<li>
+<p>Selecting vhost area like mod_vhost_alias(hook on translatename)</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">r</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:Server</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+
+<span class="n">r</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">document_root</span> <span class="o">+</span> <span class="s2">"/"</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">hostname</span> <span class="o">+</span> <span class="s2">"/"</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">uri</span>
+
+<span class="ss">Apache</span><span class="p">:</span><span class="ss">:return</span><span class="p">(</span><span class="ss">Apache</span><span class="p">:</span><span class="ss">:OK</span><span class="p">)</span>
+</pre></div>
+</li>
+<li>
+<p>Proxy balancer like mod_proxy_balancer(hook on translatename)</p>
+
+<div class="highlight highlight-ruby"><pre><span class="n">backends</span> <span class="o">=</span> <span class="o">[</span>
+    <span class="s2">"http://192.168.0.101:8888/"</span><span class="p">,</span>
+    <span class="s2">"http://192.168.0.102:8888/"</span><span class="p">,</span>
+    <span class="s2">"http://192.168.0.103:8888/"</span><span class="p">,</span>
+    <span class="s2">"http://192.168.0.104:8888/"</span><span class="p">,</span>
+<span class="o">]</span>
+
+<span class="c1"># write balancing algorithm here.</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+
+<span class="n">r</span><span class="o">.</span><span class="n">handler</span>  <span class="o">=</span> <span class="s2">"proxy-server"</span>
+<span class="n">r</span><span class="o">.</span><span class="n">proxyreq</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:PROXYREQ_REVERSE</span>
+<span class="n">r</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s2">"proxy:"</span> <span class="o">+</span> <span class="n">backends</span><span class="o">[</span><span class="nb">rand</span><span class="p">(</span><span class="n">backends</span><span class="o">.</span><span class="n">length</span><span class="p">)</span><span class="o">]</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">uri</span>
+
+<span class="ss">Apache</span><span class="p">:</span><span class="ss">:return</span><span class="p">(</span><span class="ss">Apache</span><span class="p">:</span><span class="ss">:OK</span><span class="p">)</span>
+</pre></div>
+</li>
+</ul><h2>
+<a name="functions" class="anchor" href="#functions"><span class="octicon octicon-link"></span></a>Functions</h2>
+
+<ul>
+<li><a href="https://github.com/matsumoto-r/mod_mruby/wiki/Functions">Functions Page</a></li>
+</ul><h2>
+<a name="data-structure" class="anchor" href="#data-structure"><span class="octicon octicon-link"></span></a>Data Structure</h2>
+
+<ul>
+<li><a href="https://github.com/matsumoto-r/mod_mruby/wiki/Data-Structure">Data Structure Page</a></li>
+</ul><h1>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>under the MIT License:</p>
+
+<ul>
+<li><a href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a></li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Mod mruby maintained by <a href="https://github.com/matsumoto-r">matsumoto-r</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
