@@ -92,7 +92,7 @@ module ModMruby
       Apache.rputs "- Accept-Encoding = #{hi['Accept-Encoding'].nil? ? 'nil' : hi['Accept-Encoding']}".to_html
       hi["Accept-Encoding"] = "gzip"
       Apache.rputs "- Accept-Encoding = #{hi["Accept-Encoding"]}".to_html
-      hiall = hi.headers_in_hash
+      hiall = hi.all
       Apache.rputs "- headers_in hash size = #{hiall.size.to_s}".to_html
       hiall.each_key do |key|
         Apache.rputs "- headers_in key = #{key} val = #{hiall[key]}".to_html
@@ -101,7 +101,7 @@ module ModMruby
     def headers_out
       Apache.rputs "## Headers_out Class Test".to_html
       ho = Apache::Headers_out.new()
-      hoall = ho.headers_out_hash
+      hoall = ho.all
       Apache.rputs "- headers_out hash size = #{hoall.size.to_s}".to_html
       hoall.each_key do |key|
         Apache.rputs "- headers_in key = #{key}  val = #{hoall[key]}".to_html

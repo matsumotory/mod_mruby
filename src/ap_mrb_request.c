@@ -888,12 +888,12 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     class_headers_in = mrb_define_class_under(mrb, class_core, "Headers_in", mrb->object_class);
     mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_headers_in, ARGS_ANY());
     mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_headers_in, ARGS_ANY());
-    mrb_define_method(mrb, class_headers_in, "headers_in_hash", ap_mrb_get_request_headers_in_hash, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_in, "all", ap_mrb_get_request_headers_in_hash, ARGS_ANY());
 
     class_headers_out = mrb_define_class_under(mrb, class_core, "Headers_out", mrb->object_class);
-    mrb_define_method(mrb, class_headers_out, "headers_out=", ap_mrb_set_request_headers_out, ARGS_ANY());
-    mrb_define_method(mrb, class_headers_out, "headers_out", ap_mrb_get_request_headers_out, ARGS_ANY());
-    mrb_define_method(mrb, class_headers_out, "headers_out_hash", ap_mrb_get_request_headers_out_hash, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_out, "[]=", ap_mrb_set_request_headers_out, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_out, "[]", ap_mrb_get_request_headers_out, ARGS_ANY());
+    mrb_define_method(mrb, class_headers_out, "all", ap_mrb_get_request_headers_out_hash, ARGS_ANY());
 
     class_finfo = mrb_define_class_under(mrb, class_core, "Finfo", mrb->object_class);
     mrb_define_method(mrb, class_finfo, "group",  ap_mrb_get_request_finfo_group,  ARGS_NONE());
