@@ -68,7 +68,7 @@ module ModMruby
     end
     def note
       Apache.rputs "##Notes Class Test".to_html
-      n = Apache::Notes.new()
+      n = Apache::Request.new.notes
       n["memo"] = "hello"
       Apache.rputs "- memo = #{n['memo']}".to_html
     end
@@ -88,7 +88,7 @@ module ModMruby
     end
     def headers_in
       Apache.rputs "## Headers_in Class Test".to_html
-      hi = Apache::Headers_in.new()
+      hi = Apache::Request.new.headers_in
       Apache.rputs "- Accept-Encoding = #{hi['Accept-Encoding'].nil? ? 'nil' : hi['Accept-Encoding']}".to_html
       hi["Accept-Encoding"] = "gzip"
       Apache.rputs "- Accept-Encoding = #{hi["Accept-Encoding"]}".to_html
@@ -100,7 +100,7 @@ module ModMruby
     end
     def headers_out
       Apache.rputs "## Headers_out Class Test".to_html
-      ho = Apache::Headers_out.new()
+      ho = Apache::Request.new.headers_out
       hoall = ho.all
       Apache.rputs "- headers_out hash size = #{hoall.size.to_s}".to_html
       hoall.each_key do |key|
@@ -132,6 +132,14 @@ module ModMruby
           Apache.rputs "- scoreboard key = #{key} val = #{wc.counter[key].to_s}".to_html
       end
     end
+    def finfo
+      Apache::rputs "## Finfo Class Test".to_html
+      f = Apache::Request.new.finfo
+      Apache.rputs "- user = #{f.user.to_s}".to_html
+      Apache.rputs "- group = #{f.group.to_s}".to_html
+      Apache.rputs "- size = #{f.size.to_s}".to_html
+      Apache.rputs "- atime = #{f.atime.to_s}".to_html
+    end
   end
 end
 
@@ -147,4 +155,5 @@ t.env
 t.headers_in
 t.headers_out
 t.scoreboard
+t.finfo
 t.finish
