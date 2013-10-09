@@ -788,6 +788,21 @@ static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self, char *obj_
     return obj;
 }
 
+static mrb_value ap_mrb_notes_obj(mrb_state *mrb, mrb_value self)
+{   
+    return ap_mrb_get_class_obj(mrb, self, "notes_obj", "Notes");
+}
+
+static mrb_value ap_mrb_headers_in_obj(mrb_state *mrb, mrb_value self)
+{   
+    return ap_mrb_get_class_obj(mrb, self, "headers_in_obj", "Headers_in");
+}
+
+static mrb_value ap_mrb_headers_out_obj(mrb_state *mrb, mrb_value self)
+{   
+    return ap_mrb_get_class_obj(mrb, self, "headers_out_obj", "Headers_out");
+}
+
 static mrb_value ap_mrb_finfo_obj(mrb_state *mrb, mrb_value self)
 {   
     return ap_mrb_get_class_obj(mrb, self, "finfo_obj", "Finfo");
@@ -861,6 +876,9 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_request, "no_cache", ap_mrb_get_request_no_cache, ARGS_NONE());
     mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, ARGS_NONE());
     // method for loading other class object
+    mrb_define_method(mrb, class_request, "notes", ap_mrb_notes_obj, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "headers_in", ap_mrb_headers_in_obj, ARGS_NONE());
+    mrb_define_method(mrb, class_request, "headers_out", ap_mrb_headers_out_obj, ARGS_NONE());
     mrb_define_method(mrb, class_request, "finfo", ap_mrb_finfo_obj, ARGS_NONE());
 
     class_notes = mrb_define_class_under(mrb, class_core, "Notes", mrb->object_class);
