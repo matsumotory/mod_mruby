@@ -256,6 +256,15 @@ mrb_value ap_mrb_server_name(mrb_state *mrb, mrb_value self)
     return mrb_str_new_cstr(mrb, AP_SERVER_BASEPRODUCT);
 }
 
+mrb_value ap_mrb_f_global_remove(mrb_state *mrb, mrb_value self)
+{
+    mrb_sym id;
+    mrb_get_args(mrb, "n", &id);
+    mrb_gv_remove(mrb, id);
+
+    return mrb_f_global_variables(mrb, self);
+}
+
 void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
 {
 
@@ -335,4 +344,5 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_class_method(mrb, class_core, "mod_mruby_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "server_version", ap_mrb_get_server_version, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "server_build", ap_mrb_get_server_build, ARGS_NONE());
+    mrb_define_class_method(mrb, class_core, "global_remove", ap_mrb_f_global_remove, ARGS_REQ(1));
 }

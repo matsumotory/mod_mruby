@@ -12,6 +12,7 @@
 
 #include "http_protocol.h"
 #include "mruby/string.h"
+#include "mruby/variable.h"
 
 
 #define INVALID_PRIORITY    -1
