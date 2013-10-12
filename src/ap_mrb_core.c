@@ -344,5 +344,5 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_class_method(mrb, class_core, "mod_mruby_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "server_version", ap_mrb_get_server_version, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "server_build", ap_mrb_get_server_build, ARGS_NONE());
-    mrb_define_class_method(mrb, class_core, "global_remove", ap_mrb_f_global_remove, ARGS_REQ(1));
+    mrb_define_class_method(mrb, class_core, "remove_global_variable", ap_mrb_f_global_remove, ARGS_REQ(1));
 }
