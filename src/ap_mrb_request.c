@@ -582,6 +582,24 @@ mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, mrb_value str)
     return mrb_fixnum_value((mrb_int)r->finfo.filetype);
 }
 
+mrb_value ap_mrb_get_request_finfo_inode(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    return mrb_fixnum_value((mrb_int)r->finfo.inode);
+}
+
+mrb_value ap_mrb_get_request_finfo_device(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    return mrb_fixnum_value((mrb_int)r->finfo.device);
+}
+
+mrb_value ap_mrb_get_request_finfo_nlink(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    return mrb_fixnum_value((mrb_int)r->finfo.nlink);
+}
+
 mrb_value ap_mrb_get_request_finfo_group(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();
@@ -914,7 +932,11 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_finfo, "filetype",  ap_mrb_get_request_finfo_filetype,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "group",  ap_mrb_get_request_finfo_group,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "user",   ap_mrb_get_request_finfo_user,   ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "device",   ap_mrb_get_request_finfo_device, ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "inode",   ap_mrb_get_request_finfo_inode, ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "nlink",   ap_mrb_get_request_finfo_nlink, ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "size",   ap_mrb_get_request_finfo_size,   ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "cize",   ap_mrb_get_request_finfo_cize, ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "atime",  ap_mrb_get_request_finfo_atime,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "ctime",  ap_mrb_get_request_finfo_ctime,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "mtime",  ap_mrb_get_request_finfo_mtime,  ARGS_NONE());
