@@ -576,6 +576,12 @@ mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
     return mrb_str_new(mrb, val, strlen(val));
 }
 
+mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    return mrb_fixnum_value((mrb_int)r->finfo.filetype);
+}
+
 mrb_value ap_mrb_get_request_finfo_group(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();
@@ -896,6 +902,16 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_headers_out, "all", ap_mrb_get_request_headers_out_hash, ARGS_ANY());
 
     class_finfo = mrb_define_class_under(mrb, class_core, "Finfo", mrb->object_class);
+    mrb_define_const(mrb,  class_finfo, "APR_NOFILE", mrb_fixnum_value(APR_NOFILE));
+    mrb_define_const(mrb,  class_finfo, "APR_REG", mrb_fixnum_value(APR_REG));
+    mrb_define_const(mrb,  class_finfo, "APR_DIR", mrb_fixnum_value(APR_DIR));
+    mrb_define_const(mrb,  class_finfo, "APR_CHR", mrb_fixnum_value(APR_CHR));
+    mrb_define_const(mrb,  class_finfo, "APR_BLK", mrb_fixnum_value(APR_BLK));
+    mrb_define_const(mrb,  class_finfo, "APR_PIPE", mrb_fixnum_value(APR_PIPE));
+    mrb_define_const(mrb,  class_finfo, "APR_LNK", mrb_fixnum_value(APR_LNK));
+    mrb_define_const(mrb,  class_finfo, "APR_SOCK", mrb_fixnum_value(APR_SOCK));
+    mrb_define_const(mrb,  class_finfo, "APR_UNKFILE", mrb_fixnum_value(APR_UNKFILE));
+    mrb_define_method(mrb, class_finfo, "filetype",  ap_mrb_get_request_finfo_filetype,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "group",  ap_mrb_get_request_finfo_group,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "user",   ap_mrb_get_request_finfo_user,   ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "size",   ap_mrb_get_request_finfo_size,   ARGS_NONE());

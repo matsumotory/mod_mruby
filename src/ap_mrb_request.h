@@ -4,6 +4,7 @@
 #include <string.h>
 #include "apr_strings.h"
 #include "http_request.h"
+#include "apr_file_info.h"
 #include "mruby.h"
 #include "mruby/data.h"
 #include "mruby/variable.h"
