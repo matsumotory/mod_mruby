@@ -135,7 +135,7 @@ module ModMruby
     def finfo
       Apache::rputs "## Finfo Class Test".to_html
       f = Apache::Request.new.finfo
-      Apache.rputs "- filetype = #{f.filetype.to_s}".to_html
+      Apache.rputs "- filetype regular file = #{f.filetype == Apache::Finfo::APR_REG}".to_html
       Apache.rputs "- user = #{f.user.to_s}".to_html
       Apache.rputs "- group = #{f.group.to_s}".to_html
       Apache.rputs "- size = #{f.size.to_s}".to_html
