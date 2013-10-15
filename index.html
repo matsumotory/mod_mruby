@@ -4,11 +4,11 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Mod mruby : mod_mruby - A Web Server Extension Mechanism Using mruby to provide an alternative to mod_lua" />
+    <meta name="description" content="mod_mruby : mod_mruby - A Web Server Extension Mechanism Using mruby to provide an alternative to mod_lua" />
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
-    <title>Mod mruby</title>
+    <title>mod_mruby</title>
   </head>
 
   <body>
@@ -46,7 +46,29 @@
 <li>Supported Apache MPM: <strong>worker prefork event</strong>
 </li>
 <li>Supported OS: <strong>Linux FreeBSD Windows</strong> and so on.</li>
-</ul><h2>
+</ul><div class="highlight highlight-ruby"><pre><span class="c1"># Apache httpd.conf</span>
+<span class="c1"># mrubyTranslateNameMiddle "/path/to/proxy.rb"</span>
+<span class="c1">#</span>
+
+<span class="n">backends</span> <span class="o">=</span> <span class="o">[</span>
+  <span class="s2">"http://192.168.0.101:8888/"</span><span class="p">,</span>
+  <span class="s2">"http://192.168.0.102:8888/"</span><span class="p">,</span>
+  <span class="s2">"http://192.168.0.103:8888/"</span><span class="p">,</span>
+  <span class="s2">"http://192.168.0.104:8888/"</span><span class="p">,</span>
+<span class="o">]</span>
+
+<span class="c1"># write balancing algorithm here.</span>
+
+<span class="n">r</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+
+<span class="n">r</span><span class="o">.</span><span class="n">handler</span>  <span class="o">=</span> <span class="s2">"proxy-server"</span>
+<span class="n">r</span><span class="o">.</span><span class="n">proxyreq</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:PROXYREQ_REVERSE</span>
+<span class="n">r</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s2">"proxy:"</span> <span class="o">+</span> <span class="n">backends</span><span class="o">[</span><span class="nb">rand</span><span class="p">(</span><span class="n">backends</span><span class="o">.</span><span class="n">length</span><span class="p">)</span><span class="o">]</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">uri</span>
+
+<span class="ss">Apache</span><span class="p">:</span><span class="ss">:return</span><span class="p">(</span><span class="ss">Apache</span><span class="p">:</span><span class="ss">:OK</span><span class="p">)</span>
+</pre></div>
+
+<h2>
 <a name="how-to-use" class="anchor" href="#how-to-use"><span class="octicon octicon-link"></span></a>How to use</h2>
 
 <h3>
@@ -179,7 +201,7 @@ make install
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p class="copyright">Mod mruby maintained by <a href="https://github.com/matsumoto-r">matsumoto-r</a></p>
+        <p class="copyright">mod_mruby maintained by <a href="https://github.com/matsumoto-r">matsumoto-r</a></p>
         <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
