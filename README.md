@@ -6,6 +6,29 @@ __mod_mruby is to provide an alternative to mod_lua.__
 - Supported Apache MPM: __worker prefork event__
 - Supported OS: __Linux FreeBSD Windows__ and so on.
 
+```ruby
+# Apache httpd.conf
+# mrubyTranslateNameMiddle "/path/to/proxy.rb"
+#
+
+backends = [
+  "http://192.168.0.101:8888/",
+  "http://192.168.0.102:8888/",
+  "http://192.168.0.103:8888/",
+  "http://192.168.0.104:8888/",
+]
+ 
+# write balancing algorithm here.
+
+r = Apache::Request.new()
+
+r.handler  = "proxy-server"
+r.proxyreq = Apache::PROXYREQ_REVERSE
+r.filename = "proxy:" + backends[rand(backends.length)] + r.uri
+
+Apache::return(Apache::OK)
+```
+
 ## How to use
 ### 1. Download
     git clone git://github.com/matsumoto-r/mod_mruby.git
