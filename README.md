@@ -31,7 +31,7 @@ r.filename = "proxy:" + backends[rand(backends.length)] + r.uri
 Apache::return(Apache::OK)
 ```
 
--see [example](https://github.com/matsumoto-r/mod_mruby/tree/master/example)
+- see [example](https://github.com/matsumoto-r/mod_mruby/tree/master/example)
 
 ## Abstract
 
