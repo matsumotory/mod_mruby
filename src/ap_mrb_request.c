@@ -576,6 +576,12 @@ mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
     return mrb_str_new(mrb, val, strlen(val));
 }
 
+mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, mrb_value str)
+{
+    request_rec *r = ap_mrb_get_request();
+    return mrb_fixnum_value((mrb_int)r->finfo.protection);
+}
+
 mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, mrb_value str)
 {
     request_rec *r = ap_mrb_get_request();
@@ -929,6 +935,7 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_const(mrb,  class_finfo, "APR_LNK", mrb_fixnum_value(APR_LNK));
     mrb_define_const(mrb,  class_finfo, "APR_SOCK", mrb_fixnum_value(APR_SOCK));
     mrb_define_const(mrb,  class_finfo, "APR_UNKFILE", mrb_fixnum_value(APR_UNKFILE));
+    mrb_define_method(mrb, class_finfo, "permission",  ap_mrb_get_request_finfo_protection,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "filetype",  ap_mrb_get_request_finfo_filetype,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "group",  ap_mrb_get_request_finfo_group,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "user",   ap_mrb_get_request_finfo_user,   ARGS_NONE());
