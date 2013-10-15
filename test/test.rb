@@ -165,3 +165,4 @@ t.headers_out
 t.scoreboard
 t.finfo
 t.finish
+Apache.errlogger 4, "arena count = #{Apache.count_arena.to_s}"

@@ -457,7 +457,7 @@ mrb_value ap_mrb_get_scoreboard_total_access(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
 {
 
-    int i, j;
+    int i, j, ai;
     worker_score *ws_record;
     mrb_value hash = mrb_hash_new(mrb);
 
@@ -468,7 +468,7 @@ mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
         for (j = 0; j < mruby_thread_limit; ++j) {
 
             ws_record = ap_get_scoreboard_worker(i, j);
-
+            ai = mrb_gc_arena_save(mrb);
             switch (ws_record->status) {
                 case SERVER_BUSY_READ:
                     mrb_hash_set(mrb
@@ -516,6 +516,7 @@ mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
                 default:
                     break;
             }
+            mrb_gc_arena_restore(mrb, ai);
         }
     }
 
@@ -525,7 +526,7 @@ mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
 mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
 {
 
-    int i, j;
+    int i, j, ai;
     worker_score *ws_record;
 
     int start   = 0;
@@ -549,7 +550,7 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
         for (j = 0; j < mruby_thread_limit; ++j) {
 
             ws_record = ap_get_scoreboard_worker(i, j);
-
+            ai = mrb_gc_arena_save(mrb);
             switch (ws_record->status) {
                 case SERVER_READY:
                     ready++;
@@ -587,8 +588,10 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
                 default:
                     break;
             }
+            mrb_gc_arena_restore(mrb, ai);
         }
     }
+    ai = mrb_gc_arena_save(mrb);
     mrb_hash_set(mrb
         , hash
         , mrb_str_new(mrb, "SERVER_READY", strlen("SERVER_READY"))
@@ -644,6 +647,7 @@ mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
         , mrb_str_new(mrb, "SERVER_IDLE_KILL", strlen("SERVER_IDLE_KILL"))
         , mrb_fixnum_value(idlek)
     );
+    mrb_gc_arena_restore(mrb, ai);
 
     return hash;
 }
@@ -652,6 +656,7 @@ void ap_mruby_scoreboard_init(mrb_state *mrb, struct RClass *class_core)
 {
     struct RClass *class_scoreboard;
 
+    int ai = mrb_gc_arena_save(mrb);
     class_scoreboard = mrb_define_class_under(mrb, class_core, "Scoreboard", mrb->object_class);
     mrb_define_method(mrb, class_scoreboard, "status", ap_mrb_get_scoreboard_status, ARGS_NONE());
     mrb_define_method(mrb, class_scoreboard, "counter", ap_mrb_get_scoreboard_counter, ARGS_NONE());
@@ -667,4 +672,5 @@ void ap_mruby_scoreboard_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_scoreboard, "restart_time", ap_mrb_get_scoreboard_restart_time, ARGS_ANY());
     mrb_define_method(mrb, class_scoreboard, "idle_worker", ap_mrb_get_scoreboard_idle_worker, ARGS_ANY());
     mrb_define_method(mrb, class_scoreboard, "busy_worker", ap_mrb_get_scoreboard_process_worker, ARGS_ANY());
+    mrb_gc_arena_restore(mrb, ai);
 }

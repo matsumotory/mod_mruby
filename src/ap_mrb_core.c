@@ -241,12 +241,14 @@ mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
 {
     mrb_value msg;
 
+    int ai = mrb_gc_arena_save(mrb);
     mrb_get_args(mrb, "o", &msg);
     if (mrb_type(msg) == MRB_TT_STRING) {
         ap_rputs(RSTRING_PTR(msg), ap_mrb_get_request());
     } else {
         ap_rputs("not string", ap_mrb_get_request());
     }
+    mrb_gc_arena_restore(mrb, ai);
 
     return str;
 }
@@ -263,6 +265,11 @@ mrb_value ap_mrb_f_global_remove(mrb_state *mrb, mrb_value self)
     mrb_gv_remove(mrb, id);
 
     return mrb_f_global_variables(mrb, self);
+}
+
+mrb_value ap_mrb_f_count_arena(mrb_state *mrb, mrb_value self)
+{
+    return mrb_fixnum_value(mrb_gc_arena_save(mrb));
 }
 
 void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
@@ -345,4 +352,5 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_class_method(mrb, class_core, "server_version", ap_mrb_get_server_version, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "server_build", ap_mrb_get_server_build, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "remove_global_variable", ap_mrb_f_global_remove, ARGS_REQ(1));
+    mrb_define_class_method(mrb, class_core, "count_arena", ap_mrb_f_count_arena, ARGS_NONE());
 }
