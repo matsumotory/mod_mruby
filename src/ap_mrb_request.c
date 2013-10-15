@@ -936,7 +936,7 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_finfo, "inode",   ap_mrb_get_request_finfo_inode, ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "nlink",   ap_mrb_get_request_finfo_nlink, ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "size",   ap_mrb_get_request_finfo_size,   ARGS_NONE());
-    mrb_define_method(mrb, class_finfo, "cize",   ap_mrb_get_request_finfo_cize, ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "csize",   ap_mrb_get_request_finfo_csize, ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "atime",  ap_mrb_get_request_finfo_atime,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "ctime",  ap_mrb_get_request_finfo_ctime,  ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "mtime",  ap_mrb_get_request_finfo_mtime,  ARGS_NONE());

@@ -138,8 +138,14 @@ module ModMruby
       Apache.rputs "- filetype regular file = #{f.filetype == Apache::Finfo::APR_REG}".to_html
       Apache.rputs "- user = #{f.user.to_s}".to_html
       Apache.rputs "- group = #{f.group.to_s}".to_html
+      Apache.rputs "- device = #{f.device.to_s}".to_html
+      Apache.rputs "- inode = #{f.inode.to_s}".to_html
+      Apache.rputs "- nlink = #{f.nlink.to_s}".to_html
       Apache.rputs "- size = #{f.size.to_s}".to_html
+      Apache.rputs "- csize = #{f.csize.to_s}".to_html
       Apache.rputs "- atime = #{f.atime.to_s}".to_html
+      Apache.rputs "- mtime = #{f.mtime.to_s}".to_html
+      Apache.rputs "- ctime = #{f.ctime.to_s}".to_html
     end
   end
 end
