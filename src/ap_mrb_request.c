@@ -916,5 +916,7 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_method(mrb, class_finfo, "user",   ap_mrb_get_request_finfo_user,   ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "size",   ap_mrb_get_request_finfo_size,   ARGS_NONE());
     mrb_define_method(mrb, class_finfo, "atime",  ap_mrb_get_request_finfo_atime,  ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "ctime",  ap_mrb_get_request_finfo_ctime,  ARGS_NONE());
+    mrb_define_method(mrb, class_finfo, "mtime",  ap_mrb_get_request_finfo_mtime,  ARGS_NONE());
 }
 
