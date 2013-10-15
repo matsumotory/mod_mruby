@@ -2,8 +2,8 @@
 ## What's mod_mruby
 __mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd.__
 
-You can implement Apache modules by Ruby script. mod_mruby is to provide an alternative to mod_lua.
 - You can implement Apache modules by Ruby script on Apache HTTP Server with mod_mruby.
+- mod_mruby is to provide an alternative to mod_lua or [ngx_mruby of nginx](http://matsumoto-r.github.io/ngx_mruby/).
 - Supported Apache Version: __2.0 2.2 2.4 2.5__
 - Supported Apache MPM: __worker prefork event__
 - Supported OS: __Linux FreeBSD Windows__ and so on.
