@@ -1,6 +1,7 @@
 # Welcome to the mod_mruby wiki!
 ## What's mod_mruby
-__mod_mruby is to provide an alternative to mod_lua.__
+__mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd__
+mod_mruby is to provide an alternative to mod_lua.
 - Apache modules can be implemeted by mruby scripts on Apache HTTP Server installed mod_mruby.
 - Supported Apache Version: __2.0 2.2 2.4 2.5__
 - Supported Apache MPM: __worker prefork event__
