@@ -377,6 +377,10 @@ SET_MOD_MRUBY_DIR_CMDS(output_filter);
 static void ap_mruby_irep_clean(mrb_state *mrb, struct mrb_irep *irep, request_rec *r)
 {
     mrb_irep_free(mrb, irep);
+}
+
+static void ap_mruby_state_clean(mrb_state *mrb)
+{
     mrb->exc = 0;
 }
 
@@ -542,6 +546,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         );
         ap_mruby_irep_clean(mrb, mrb->irep[i], r);
     }
+    ap_mruby_state_clean(mrb);
 
     // mutex unlock
     if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
