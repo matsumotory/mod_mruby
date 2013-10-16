@@ -445,11 +445,10 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
 {
 
-    int n;
+    int n, ai, i, last_idx;
     struct mrb_parser_state* p;
     FILE *mrb_file;
     jmp_buf mod_mruby_jmp;
-    int ai;
 
     // mutex lock
     if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
@@ -529,18 +528,20 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         , ap_mrb_get_status_code()
         , mruby_code_file
     );
-
+    last_idx = mrb->irep_len;
     mrb->irep_len = n;
-    ap_log_rerror(APLOG_MARK
-        , APLOG_DEBUG
-        , 0
-        , r
-        , "%s DEBUG %s: irep[%d] cleaning"
-        , MODULE_NAME
-        , __func__
-        , n
-    );
-    ap_mruby_irep_clean(mrb, mrb->irep[n], r);
+    for (i = n; i < last_idx; i++) {
+        ap_log_rerror(APLOG_MARK
+            , APLOG_DEBUG
+            , 0
+            , r
+            , "%s DEBUG %s: irep[%d] cleaning"
+            , MODULE_NAME
+            , __func__
+            , i
+        );
+        ap_mruby_irep_clean(mrb, mrb->irep[i], r);
+    }
 
     // mutex unlock
     if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
