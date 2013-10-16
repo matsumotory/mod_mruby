@@ -3,6 +3,7 @@
 __mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd.__
 
 - You can implement Apache modules by Ruby on Apache httpd.
+- Unified Ruby Code between Apache(mod_mruby), nginx(ngx_mruby) and other Web server software(plan) for Web server extensions.
 - mod_mruby is to provide an alternative to mod_lua or [ngx_mruby of nginx](http://matsumoto-r.github.io/ngx_mruby/).
 - Supported Apache Version: __2.0 2.2 2.4 2.5__
 - Supported Apache MPM: __worker prefork event__
@@ -32,6 +33,34 @@ Apache::return(Apache::OK)
 ```
 
 - see [example](https://github.com/matsumoto-r/mod_mruby/tree/master/example)
+- __Sample of Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby) for Web server extensions__
+
+```ruby
+# Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby) for Web server extensions.
+#
+# Apache httpd.conf by mod_mruby
+# 
+# <Location /mruby>
+#     mrubyHandlerMiddle "/path/to/unified_hello.rb"
+# </Location>
+#
+# nginx ngxin.conf by ngx_mruby
+#
+# location /mruby {
+#     mruby_content_handler "/path/to/unified_hello.rb";
+# }
+#
+
+if server_name == "NGINX"
+  Server = Nginx
+elsif server_name == "Apache"
+  Server = Apache
+end
+
+Server::rputs "Hello #{Server::module_name}/#{Server::module_version} world!"
+# mod_mruby => "Hello mod_mruby/0.9.3 world!"
+# ngx_mruby => "Hello ngx_mruby/0.0.1 world!"
+```
 
 ## Abstract
 
