@@ -38,7 +38,8 @@ Apache::return(Apache::OK)
 - You can implement some Web server software extensions by same Ruby code (as possible) 
 
 ```ruby
-# Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby) for Web server extensions.
+# Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby)
+# for Web server extensions.
 #
 # Apache httpd.conf by mod_mruby
 # 
