@@ -125,6 +125,11 @@ mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
     return self;
 }
 
+mrb_value ap_mrb_get_mod_mruby_name(mrb_state *mrb, mrb_value str)
+{
+    return mrb_str_new(mrb, MODULE_NAME, strlen(MODULE_NAME));
+}
+
 mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
 {
     return mrb_str_new(mrb, MODULE_VERSION, strlen(MODULE_VERSION));
@@ -348,7 +353,8 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
     mrb_define_class_method(mrb, class_core, "errlogger", ap_mrb_errlogger, ARGS_ANY());
     mrb_define_class_method(mrb, class_core, "syslogger", ap_mrb_syslogger, ARGS_ANY());
     //mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
-    mrb_define_class_method(mrb, class_core, "mod_mruby_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
+    mrb_define_class_method(mrb, class_core, "module_name", ap_mrb_get_mod_mruby_name, ARGS_NONE());
+    mrb_define_class_method(mrb, class_core, "module_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "server_version", ap_mrb_get_server_version, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "server_build", ap_mrb_get_server_build, ARGS_NONE());
     mrb_define_class_method(mrb, class_core, "remove_global_variable", ap_mrb_f_global_remove, ARGS_REQ(1));

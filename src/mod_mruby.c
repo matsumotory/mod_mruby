@@ -1031,7 +1031,7 @@ static void register_hooks(apr_pool_t *p)
 static const command_rec mod_mruby_cmds[] = {
 
     AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for handler phase."),
-    MOD_MRUBY_SET_ALL_CMDS_INLINE(handler, Hadnler)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(handler, Handler)
     MOD_MRUBY_SET_ALL_CMDS_INLINE(post_read_request, PostReadRequest)
     MOD_MRUBY_SET_ALL_CMDS_INLINE(translate_name, TranslateName)
     MOD_MRUBY_SET_ALL_CMDS_INLINE(map_to_storage, MapToStorage)
@@ -1042,7 +1042,7 @@ static const command_rec mod_mruby_cmds[] = {
     MOD_MRUBY_SET_ALL_CMDS_INLINE(log_transaction, LogTransaction)
 
     AP_INIT_TAKE1("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
-    MOD_MRUBY_SET_ALL_CMDS(handler, Hadnler)
+    MOD_MRUBY_SET_ALL_CMDS(handler, Handler)
     MOD_MRUBY_SET_ALL_CMDS(post_config, PostConfig)
     MOD_MRUBY_SET_ALL_CMDS(child_init, ChildInit)
     MOD_MRUBY_SET_ALL_CMDS(post_read_request, PostReadRequest)
