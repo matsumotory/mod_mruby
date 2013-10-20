@@ -67,6 +67,7 @@ typedef struct {
     };
     int irep_n;
     enum code_type type;
+    unsigned int cache;
 } mod_mruby_code_t;
 
 typedef struct {
