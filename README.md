@@ -80,9 +80,25 @@ As the increase of large-scale and complex Web services, not only a development 
 ### 3. Test Settings
 * Add to httpd.conf
 
-        LoadModule mruby_module modules/mod_mruby.so
-        AddHandler mruby-script .rb
-
+    ```apache
+    LoadModule mruby_module modules/mod_mruby.so
+    AddHandler mruby-script .rb  
+    ```
+or hook from a handler phase
+    ```apache
+    LoadModule mruby_module modules/mod_mruby.so
+    <Location /mruby-test>
+        mrubyHandlerMiddle /path/to/test.rb
+    </Location>
+    ```
+or cache enabled
+    ```apache
+    LoadModule mruby_module modules/mod_mruby.so
+    <Location /mruby-test>
+        mrubyHandlerMiddle /path/to/test.rb cache
+    </Location>
+    ```
+        
 * test.rb copy   
 
         cp -p test/test.rb $(APACHE_DOCMENT_ROOT)/.
@@ -91,7 +107,13 @@ As the increase of large-scale and complex Web services, not only a development 
     service httpd restart
 
 ### 5. Access URL by Browser
-    curl http://127.0.0.1/test.rb
+```
+curl http://127.0.0.1/test.rb
+```
+or
+```
+curl http://127.0.0.1/mruby-test
+```
 
 ### Manual Build      
 * mruby/mruby build
