@@ -29,7 +29,7 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'
 
   # use markdown on mod_mruby
-  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
 
   # Linux only for mod_mruby
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
