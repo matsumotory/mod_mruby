@@ -138,9 +138,25 @@ sh build.sh
 <li>
 <p>Add to httpd.conf</p>
 
-<pre><code>LoadModule mruby_module modules/mod_mruby.so
-AddHandler mruby-script .rb
-</code></pre>
+<div class="highlight highlight-apache"><pre><span class="nb">LoadModule</span> mruby_module modules/mod_mruby.so
+<span class="nb">AddHandler</span> mruby-script .rb  
+</pre></div>
+
+<p>or hook from a handler phase</p>
+
+<div class="highlight highlight-apache"><pre><span class="nb">LoadModule</span> mruby_module modules/mod_mruby.so
+<span class="nt">&lt;Location</span> <span class="s">/mruby-test</span><span class="nt">&gt;</span>
+    <span class="nb">mrubyHandlerMiddle</span> <span class="sx">/path/to/test.rb</span>
+<span class="nt">&lt;/Location&gt;</span>
+</pre></div>
+
+<p>or cache enabled</p>
+
+<div class="highlight highlight-apache"><pre><span class="nb">LoadModule</span> mruby_module modules/mod_mruby.so
+<span class="nt">&lt;Location</span> <span class="s">/mruby-test</span><span class="nt">&gt;</span>
+    <span class="nb">mrubyHandlerMiddle</span> <span class="sx">/path/to/test.rb</span> cache
+<span class="nt">&lt;/Location&gt;</span>
+</pre></div>
 </li>
 <li>
 <p>test.rb copy   </p>
@@ -158,6 +174,11 @@ AddHandler mruby-script .rb
 <a name="5-access-url-by-browser" class="anchor" href="#5-access-url-by-browser"><span class="octicon octicon-link"></span></a>5. Access URL by Browser</h3>
 
 <pre><code>curl http://127.0.0.1/test.rb
+</code></pre>
+
+<p>or</p>
+
+<pre><code>curl http://127.0.0.1/mruby-test
 </code></pre>
 
 <h3>
