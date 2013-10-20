@@ -75,7 +75,8 @@ module AP_MODULE_DECLARE_DATA mruby_module;
 
 int ap_mruby_class_init(mrb_state *mrb);
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s);
-static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status);
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, mod_mruby_code_t *code, int module_status);
+static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool_t *pool);
 
 static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
 {
@@ -446,12 +447,10 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
     return APR_SUCCESS;
 }
 
-static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, const char *mruby_code_file, int module_status)
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, mod_mruby_code_t *code, int module_status)
 {
 
-    int n, ai, i, last_idx;
-    struct mrb_parser_state* p;
-    FILE *mrb_file;
+    int ai, i, last_idx;
     jmp_buf mod_mruby_jmp;
 
     // mutex lock
@@ -466,39 +465,10 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         );
         return DECLINED;
     }
+
     ap_mrb_push_request(r);
-
-    if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
-        ap_log_error(APLOG_MARK
-            , APLOG_ERR
-            , 0
-            , NULL
-            , "%s ERROR %s: mrb file oepn failed: %s"
-            , MODULE_NAME
-            , __func__
-            , mruby_code_file
-        );
-        return DECLINED;
-    }
-
-   ap_log_rerror(APLOG_MARK
-       , APLOG_DEBUG
-       , 0
-       , r
-       , "%s DEBUG %s: cache nothing on pid %d, compile code: %s"
-       , MODULE_NAME
-       , __func__
-       , getpid()
-       , mruby_code_file
-   );
-
+    mod_mruby_compile_code(mrb, code, r->pool);
     ai = mrb_gc_arena_save(mrb);
-    p = mrb_parse_file(mrb, mrb_file, NULL);
-    fclose(mrb_file);
-    n = mrb_generate_code(mrb, p);
-
-    mrb_pool_close(p->pool);
-
     ap_log_rerror(APLOG_MARK
         , APLOG_DEBUG
         , 0
@@ -506,35 +476,35 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, co
         , "%s DEBUG %s: run mruby code: %s"
         , MODULE_NAME
         , __func__
-        , mruby_code_file
+        , code->path
     );
 
     ap_mrb_set_status_code(OK);
     if (!setjmp(mod_mruby_jmp)) {
         mrb->jmp = &mod_mruby_jmp;
-        mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
+        mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[code->irep_n]), mrb_top_self(mrb));
     }
 
     mrb->jmp = 0;
     mrb_gc_arena_restore(mrb, ai);
 
     if (mrb->exc)
-        ap_mrb_raise_file_error(mrb, mrb_obj_value(mrb->exc), r, mruby_code_file);
+        ap_mrb_raise_file_error(mrb, mrb_obj_value(mrb->exc), r, code->path);
 
     ap_log_rerror(APLOG_MARK
         , APLOG_DEBUG
         , 0
         , r
-        , "%s DEBUG %s: n=%d return mruby code(%d): %s"
+        , "%s DEBUG %s: irep_idx=%d return mruby code(%d): %s"
         , MODULE_NAME
         , __func__
-        , n
+        , code->irep_n
         , ap_mrb_get_status_code()
-        , mruby_code_file
+        , code->path
     );
     last_idx = mrb->irep_len;
-    mrb->irep_len = n;
-    for (i = n; i < last_idx; i++) {
+    mrb->irep_len = code->irep_n;
+    for (i = code->irep_n; i < last_idx; i++) {
         ap_log_rerror(APLOG_MARK
             , APLOG_DEBUG
             , 0
@@ -673,13 +643,54 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     return DECLINED;
 }
 
-static void mod_mruby_compile_inline_code(mrb_state *mrb, mod_mruby_code_t *c)
+static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool_t *pool)
 {
     struct mrb_parser_state* p;
+    FILE *mrb_file;
 
     if (c != NULL) {
-        p = mrb_parse_string(mrb, c->code, NULL);
-        c->irep_n = mrb_generate_code(mrb, p);
+        if (c->type == MOD_MRUBY_STRING) {
+            p = mrb_parse_string(mrb, c->code, NULL);
+            c->irep_n = mrb_generate_code(mrb, p);
+            ap_log_perror(APLOG_MARK
+                , APLOG_DEBUG
+                , 0
+                , pool
+                , "%s DEBUG %s: mruby code string compiled: string=[%s] irep_idx=[%d]"
+                , MODULE_NAME
+                , __func__
+                , c->code
+                , c->irep_n
+            );
+        } else if (c->type == MOD_MRUBY_FILE) {
+            if ((mrb_file = fopen(c->path, "r")) == NULL) {
+                ap_log_perror(APLOG_MARK
+                    , APLOG_ERR
+                    , 0
+                    , pool
+                    , "%s ERROR %s: mrb file oepn failed: %s"
+                    , MODULE_NAME
+                    , __func__
+                    , c->path
+                );
+                return;
+            }
+            p = mrb_parse_file(mrb, mrb_file, NULL);
+            fclose(mrb_file);
+            c->irep_n = mrb_generate_code(mrb, p);
+            ap_log_perror(APLOG_MARK
+                , APLOG_DEBUG
+                , 0
+                , pool
+                , "%s DEBUG %s: mruby code file compiled: path=[%s] irep_idx=[%d]"
+                , MODULE_NAME
+                , __func__
+                , c->path
+                , c->irep_n
+            );
+        } else {
+            return;
+        }
         mrb_pool_close(p->pool);
     }
 }
@@ -695,34 +706,34 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 
     //prctl(PR_SET_KEEPCAPS,1);
 
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_handler_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_handler_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_handler_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_handler_last_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_post_read_request_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_post_read_request_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_post_read_request_last_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_translate_name_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_translate_name_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_translate_name_last_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_map_to_storage_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_map_to_storage_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_map_to_storage_last_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_access_checker_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_access_checker_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_access_checker_last_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_check_user_id_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_check_user_id_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_check_user_id_last_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_auth_checker_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_auth_checker_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_auth_checker_last_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_fixups_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_fixups_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_fixups_last_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_log_transaction_first_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_log_transaction_middle_inline_code);
-    mod_mruby_compile_inline_code(mrb, conf->mod_mruby_log_transaction_last_inline_code);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_handler_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_handler_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_handler_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_handler_last_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_post_read_request_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_post_read_request_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_post_read_request_last_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_translate_name_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_translate_name_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_translate_name_last_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_map_to_storage_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_map_to_storage_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_map_to_storage_last_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_access_checker_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_access_checker_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_access_checker_last_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_check_user_id_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_check_user_id_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_check_user_id_last_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_auth_checker_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_auth_checker_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_auth_checker_last_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_fixups_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_fixups_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_fixups_last_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_log_transaction_first_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_log_transaction_middle_inline_code, pool);
+    mod_mruby_compile_code(mrb, conf->mod_mruby_log_transaction_last_inline_code, pool);
 
     //apr_pool_cleanup_register(pool, NULL, mod_mruby_hook_term, apr_pool_cleanup_null);
  
@@ -788,7 +799,7 @@ static int mod_mruby_handler(request_rec *r)
     else
         return DECLINED;
 
-    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_handler_code->path, DECLINED);
+    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_handler_code, DECLINED);
 }
 
 //
@@ -803,7 +814,7 @@ static int mod_mruby_##hook(request_rec *r)                                     
     if (conf->mod_mruby_##hook##_code == NULL)                                                          \
         return DECLINED;                                                                                \
                                                                                                         \
-    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code->path, OK);       \
+    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code, OK);       \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC(handler_first);
@@ -846,7 +857,7 @@ static int mod_mruby_##hook(request_rec *r, int lookup)                         
     if (conf->mod_mruby_##hook##_code == NULL)                                                          \
         return DECLINED;                                                                                \
                                                                                                         \
-    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code->path, OK);       \
+    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code, OK);       \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC_LOOKUP(quick_handler_first);
@@ -865,7 +876,7 @@ static void mod_mruby_##hook(request_rec *r)                                    
     if (conf->mod_mruby_##hook##_code == NULL)                                                          \
         return;                                                                                         \
                                                                                                         \
-    ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code->path, OK);              \
+    ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code, OK);              \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_first);
@@ -880,7 +891,7 @@ static authn_status mod_mruby_authn_check_password(request_rec *r, const char *u
         return AUTH_GENERAL_ERROR;
 
     ap_mrb_init_authnprovider_basic(r, user, password);
-    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_authn_check_password_code->path, OK);
+    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_authn_check_password_code, OK);
 }
 
 static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *user, const char *realm, char **rethash)
@@ -892,7 +903,7 @@ static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *u
         return AUTH_GENERAL_ERROR;
 
     ap_mrb_init_authnprovider_digest(r, user, realm);
-    ret = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_authn_get_realm_hash_code->path, OK);
+    ret = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_authn_get_realm_hash_code, OK);
     *rethash = ap_mrb_get_authnprovider_digest_rethash();
     return ret;
 }
@@ -909,7 +920,7 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* 
         return ap_pass_brigade(f->next, bb);
 
     ap_mrb_push_filter(f, bb);
-    rv = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_output_filter_code->path, OK);
+    rv = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_output_filter_code, OK);
     return ap_pass_brigade(f->next, bb);
 }
 
