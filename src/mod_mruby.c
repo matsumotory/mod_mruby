@@ -700,10 +700,10 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool
             p = mrb_parse_file(mrb, mrb_file, NULL);
             fclose(mrb_file);
             c->irep_idx_start = mrb_generate_code(mrb, p);
-            ap_log_perror(APLOG_MARK
-                , APLOG_DEBUG
+            ap_log_error(APLOG_MARK
+                , APLOG_INFO
                 , 0
-                , pool
+                , ap_server_conf
                 , "%s DEBUG %s: mruby code file compiled: path=[%s] irep_idx=[%d]"
                 , MODULE_NAME
                 , __func__
@@ -1124,7 +1124,11 @@ static const command_rec mod_mruby_cmds[] = {
     {NULL}
 };
 
+#ifdef __APACHE24__
+AP_DECLARE_MODULE(mruby) = {
+#else
 module AP_MODULE_DECLARE_DATA mruby_module = {
+#endif
     STANDARD20_MODULE_STUFF,
     mod_mruby_create_dir_config,    /* dir config creater */
     NULL,                           /* dir merger */

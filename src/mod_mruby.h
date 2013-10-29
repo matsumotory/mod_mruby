@@ -46,6 +46,7 @@
 #include "http_request.h"
 #include "http_log.h"
 #include "ap_release.h"
+#include "http_main.h"
 
 #if (AP_SERVER_MINORVERSION_NUMBER > 2)
     #define __APACHE24__
