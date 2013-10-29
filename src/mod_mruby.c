@@ -237,11 +237,11 @@ static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path, const 
     c->path = apr_pstrdup(p, path);
     if (cache_opt && !strcmp(cache_opt, "cache")) {
         c->cache = CACHE_ENABLE;
-        ap_log_perror(APLOG_MARK
-            , APLOG_NOTICE
+        ap_log_error(APLOG_MARK
+            , APLOG_DEBUG
             , 0                
-            , p
-            , "%s NOTICE %s: Ruby code file cache enabled: file=[%s]"
+            , ap_server_conf
+            , "%s DEBUG %s: Ruby code file cache enabled: file=[%s]"
             , MODULE_NAME
             , __func__
             , c->path
@@ -636,10 +636,10 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         return status;
     }   
 
-    ap_log_perror(APLOG_MARK
+    ap_log_error(APLOG_MARK
         , APLOG_INFO
         , 0                
-        , p
+        , ap_server_conf
         , APLOGNO(05002) "%s %s: main process / thread (pid=%d) initialized."
         , MODULE_NAME
         , __func__
@@ -651,10 +651,10 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     if (!data)
         apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null, p);
 
-    ap_log_perror(APLOG_MARK
+    ap_log_error(APLOG_MARK
         , APLOG_NOTICE
         , 0                
-        , p
+        , ap_server_conf
         , APLOGNO(05003) "%s %s: %s / %s mechanism enabled."
         , MODULE_NAME
         , __func__
@@ -674,22 +674,24 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool
         if (c->type == MOD_MRUBY_STRING) {
             p = mrb_parse_string(mrb, c->code, NULL);
             c->irep_idx_start = mrb_generate_code(mrb, p);
-            ap_log_perror(APLOG_MARK
+            c->irep_idx_end = mrb->irep_len;
+            ap_log_error(APLOG_MARK
                 , APLOG_DEBUG
                 , 0
-                , pool
-                , "%s DEBUG %s: mruby code string compiled: string=[%s] irep_idx=[%d]"
+                , ap_server_conf
+                , "%s DEBUG %s: mruby code string compiled: string=[%s] from irep_idx_start=[%d] to irep_idx_end=[%d]"
                 , MODULE_NAME
                 , __func__
                 , c->code
                 , c->irep_idx_start
+                , c->irep_idx_end
             );
         } else if (c->type == MOD_MRUBY_FILE) {
             if ((mrb_file = fopen(c->path, "r")) == NULL) {
-                ap_log_perror(APLOG_MARK
+                ap_log_error(APLOG_MARK
                     , APLOG_ERR
                     , 0
-                    , pool
+                    , ap_server_conf
                     , "%s ERROR %s: mrb file oepn failed: %s"
                     , MODULE_NAME
                     , __func__
@@ -700,15 +702,17 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool
             p = mrb_parse_file(mrb, mrb_file, NULL);
             fclose(mrb_file);
             c->irep_idx_start = mrb_generate_code(mrb, p);
+            c->irep_idx_end = mrb->irep_len;
             ap_log_error(APLOG_MARK
-                , APLOG_INFO
+                , APLOG_DEBUG
                 , 0
                 , ap_server_conf
-                , "%s DEBUG %s: mruby code file compiled: path=[%s] irep_idx=[%d]"
+                , "%s DEBUG %s: mruby code file compiled: path=[%s]from irep_idx_start=[%d] to irep_idx_end=[%d]"
                 , MODULE_NAME
                 , __func__
                 , c->path
                 , c->irep_idx_start
+                , c->irep_idx_end
             );
         } else {
             return;
@@ -788,10 +792,10 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
  
     ap_mrb_set_mrb_state(server->process->pool, mrb);
 
-    ap_log_perror(APLOG_MARK
+    ap_log_error(APLOG_MARK
         , APLOG_INFO
         , 0
-        , pool
+        , ap_server_conf
         , "%s %s: child process (pid=%d) initialized."
         , MODULE_NAME
         , __func__
