@@ -65,7 +65,8 @@ typedef struct {
         char *path;
         char *code;
     };
-    int irep_n;
+    int irep_idx_start;
+    int irep_idx_end;
     enum code_type type;
     unsigned int cache;
 } mod_mruby_code_t;
