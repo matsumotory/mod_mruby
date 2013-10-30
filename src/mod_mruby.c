@@ -70,7 +70,6 @@
 
 apr_thread_mutex_t *mod_mruby_mutex;
 module AP_MODULE_DECLARE_DATA mruby_module;
-unsigned int initialized = 0;
 
 int ap_mruby_class_init(mrb_state *mrb);
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s);
@@ -82,6 +81,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
 //
 static mrb_state *ap_mrb_create_mrb_state()
 {
+    TRACER;
     mrb_state *mrb = mrb_open();
     ap_mruby_class_init(mrb);
     return mrb;
@@ -89,6 +89,7 @@ static mrb_state *ap_mrb_create_mrb_state()
 
 static apr_status_t cleanup_mrb_state(void *p)
 {
+    TRACER;
     mrb_close((mrb_state *)p);
     return APR_SUCCESS;
 }
@@ -158,6 +159,7 @@ static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path, const 
 {
     mod_mruby_code_t *c = 
         (mod_mruby_code_t *)apr_pcalloc(p, sizeof(mod_mruby_code_t));
+    TRACER;
 
     c->type = MOD_MRUBY_FILE;
     c->path = apr_pstrdup(p, path);
@@ -183,6 +185,7 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
 {
     mod_mruby_code_t *c = 
         (mod_mruby_code_t *)apr_pcalloc(p, sizeof(mod_mruby_code_t));
+    TRACER;
 
     c->type = MOD_MRUBY_STRING;
     c->code = apr_pstrdup(p, arg);
@@ -200,7 +203,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
         if (c->type == MOD_MRUBY_STRING) {
             p = mrb_parse_string(mrb, c->code, NULL);
             c->irep_idx_start = mrb_generate_code(mrb, p);
-            c->irep_idx_end = mrb->irep_len;
+            c->irep_idx_end = mrb->irep_len - 1;
             ap_log_error(APLOG_MARK
                 , APLOG_DEBUG
                 , 0
@@ -228,7 +231,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
             p = mrb_parse_file(mrb, mrb_file, NULL);
             fclose(mrb_file);
             c->irep_idx_start = mrb_generate_code(mrb, p);
-            c->irep_idx_end = mrb->irep_len;
+            c->irep_idx_end = mrb->irep_len - 1;
             ap_log_error(APLOG_MARK
                 , APLOG_DEBUG
                 , 0
@@ -251,6 +254,8 @@ static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
 {
     mruby_dir_config_t *dir_conf = 
         (mruby_dir_config_t *)apr_pcalloc(p, sizeof(*dir_conf));
+    TRACER;
+
     // inlinde core in httpd.conf
     dir_conf->mod_mruby_handler_inline_code                 = NULL;
     dir_conf->mod_mruby_handler_first_inline_code              = NULL;
@@ -314,7 +319,6 @@ static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
     dir_conf->mod_mruby_authn_check_password_code   = NULL;
     dir_conf->mod_mruby_authn_get_realm_hash_code   = NULL;
     dir_conf->mod_mruby_output_filter_code          = NULL;
-    TRACER;
 
     return dir_conf;
 }
@@ -496,11 +500,13 @@ SET_MOD_MRUBY_DIR_INLINE_CMDS(log_transaction_last);
 //
 static void ap_mruby_irep_clean(mrb_state *mrb, struct mrb_irep *irep, request_rec *r)
 {
+    TRACER;
     mrb_irep_free(mrb, irep);
 }
 
 static void ap_mruby_state_clean(mrb_state *mrb)
 {
+    TRACER;
     mrb->exc = 0;
 }
 
@@ -571,6 +577,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
 
     int ai, i, last_idx;
     jmp_buf mod_mruby_jmp;
+    TRACER;
 
     // mutex lock
     if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
@@ -729,9 +736,6 @@ static int mod_mruby_preinit(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp)
 
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
 {
-    if (initialized) {
-        return OK;
-    }
     apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex, APR_THREAD_MUTEX_DEFAULT, p);
     TRACER;
     if(status != APR_SUCCESS){
@@ -774,7 +778,6 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         , MODULE_NAME
         , MODULE_VERSION
     );  
-    initialized = 1;
     
     return DECLINED;
 }
@@ -836,8 +839,8 @@ MOD_MRUBY_REGISTER_HOOK_FUNC_NR_INT(post_config_last);
 
 static int mod_mruby_handler(request_rec *r)
 {
-
     mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
+    TRACER;
 
     if (!r->handler)
         return DECLINED;
@@ -858,6 +861,7 @@ static int mod_mruby_##hook(request_rec *r);                                    
 static int mod_mruby_##hook(request_rec *r)                                                             \
 {                                                                                                       \
     mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);               \
+    TRACER; \
                                                                                                         \
     if (dir_conf->mod_mruby_##hook##_code == NULL)                                                          \
         return DECLINED;                                                                                \
@@ -1039,6 +1043,7 @@ MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(log_transaction_last);
 
 static void register_hooks(apr_pool_t *p)
 {
+    TRACER;
     // inline code in httpd.conf
     ap_hook_handler(mod_mruby_handler_inline, NULL, NULL, APR_HOOK_MIDDLE);
     //ap_hook_translate_name(mod_mruby_translate_name_first_inline, NULL, NULL, APR_HOOK_FIRST);
