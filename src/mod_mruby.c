@@ -73,114 +73,29 @@
 #define CACHE_ENABLE  1
 
 apr_thread_mutex_t *mod_mruby_mutex;
-
 module AP_MODULE_DECLARE_DATA mruby_module;
+unsigned int initialized = 0;
 
 int ap_mruby_class_init(mrb_state *mrb);
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s);
-static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, mod_mruby_code_t *code, int module_status);
-static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool_t *pool);
-
-static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
-{
-    mruby_dir_config_t *dir_conf = 
-        (mruby_dir_config_t *)apr_pcalloc(p, sizeof(*dir_conf));
-    dir_conf->mod_mruby_authn_check_password_code   = NULL;
-    dir_conf->mod_mruby_authn_get_realm_hash_code   = NULL;
-    dir_conf->mod_mruby_output_filter_code          = NULL;
-
-    return dir_conf;
-}
-
-static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
-{
-    mruby_config_t *conf = 
-        (mruby_config_t *)apr_pcalloc(p, sizeof(mruby_config_t));
-
-    // inlinde core in httpd.conf
-    conf->mod_mruby_handler_inline_code                 = NULL;
-    conf->mod_mruby_handler_first_inline_code              = NULL;
-    conf->mod_mruby_handler_middle_inline_code             = NULL;
-    conf->mod_mruby_handler_last_inline_code               = NULL;
-    conf->mod_mruby_post_read_request_first_inline_code    = NULL;
-    conf->mod_mruby_post_read_request_middle_inline_code   = NULL;
-    conf->mod_mruby_post_read_request_last_inline_code     = NULL;
-    conf->mod_mruby_translate_name_first_inline_code       = NULL;
-    conf->mod_mruby_translate_name_middle_inline_code      = NULL;
-    conf->mod_mruby_translate_name_last_inline_code        = NULL;
-    conf->mod_mruby_map_to_storage_first_inline_code       = NULL;
-    conf->mod_mruby_map_to_storage_middle_inline_code      = NULL;
-    conf->mod_mruby_map_to_storage_last_inline_code        = NULL;
-    conf->mod_mruby_access_checker_first_inline_code       = NULL;
-    conf->mod_mruby_access_checker_middle_inline_code      = NULL;
-    conf->mod_mruby_access_checker_last_inline_code        = NULL;
-    conf->mod_mruby_check_user_id_first_inline_code        = NULL;
-    conf->mod_mruby_check_user_id_middle_inline_code       = NULL;
-    conf->mod_mruby_check_user_id_last_inline_code         = NULL;
-    conf->mod_mruby_auth_checker_first_inline_code         = NULL;
-    conf->mod_mruby_auth_checker_middle_inline_code        = NULL;
-    conf->mod_mruby_auth_checker_last_inline_code          = NULL;
-    conf->mod_mruby_fixups_first_inline_code               = NULL;
-    conf->mod_mruby_fixups_middle_inline_code              = NULL;
-    conf->mod_mruby_fixups_last_inline_code                = NULL;
-    conf->mod_mruby_log_transaction_first_inline_code      = NULL;
-    conf->mod_mruby_log_transaction_middle_inline_code     = NULL;
-
-    // hook script file
-    conf->mod_mruby_handler_code                    = NULL;
-    conf->mod_mruby_post_config_first_code          = NULL;
-    conf->mod_mruby_post_config_middle_code         = NULL;
-    conf->mod_mruby_post_config_last_code           = NULL;
-    conf->mod_mruby_child_init_first_code           = NULL;
-    conf->mod_mruby_child_init_middle_code          = NULL;
-    conf->mod_mruby_child_init_last_code            = NULL;
-    conf->mod_mruby_handler_first_code              = NULL;
-    conf->mod_mruby_handler_middle_code             = NULL;
-    conf->mod_mruby_handler_last_code               = NULL;
-    conf->mod_mruby_post_read_request_first_code    = NULL;
-    conf->mod_mruby_post_read_request_middle_code   = NULL;
-    conf->mod_mruby_post_read_request_last_code     = NULL;
-    conf->mod_mruby_quick_handler_first_code        = NULL;
-    conf->mod_mruby_quick_handler_middle_code       = NULL;
-    conf->mod_mruby_quick_handler_last_code         = NULL;
-    conf->mod_mruby_translate_name_first_code       = NULL;
-    conf->mod_mruby_translate_name_middle_code      = NULL;
-    conf->mod_mruby_translate_name_last_code        = NULL;
-    conf->mod_mruby_map_to_storage_first_code       = NULL;
-    conf->mod_mruby_map_to_storage_middle_code      = NULL;
-    conf->mod_mruby_map_to_storage_last_code        = NULL;
-    conf->mod_mruby_access_checker_first_code       = NULL;
-    conf->mod_mruby_access_checker_middle_code      = NULL;
-    conf->mod_mruby_access_checker_last_code        = NULL;
-    conf->mod_mruby_check_user_id_first_code        = NULL;
-    conf->mod_mruby_check_user_id_middle_code       = NULL;
-    conf->mod_mruby_check_user_id_last_code         = NULL;
-    conf->mod_mruby_auth_checker_first_code         = NULL;
-    conf->mod_mruby_auth_checker_middle_code        = NULL;
-    conf->mod_mruby_auth_checker_last_code          = NULL;
-    conf->mod_mruby_fixups_first_code               = NULL;
-    conf->mod_mruby_fixups_middle_code              = NULL;
-    conf->mod_mruby_fixups_last_code                = NULL;
-    conf->mod_mruby_insert_filter_first_code        = NULL;
-    conf->mod_mruby_insert_filter_middle_code       = NULL;
-    conf->mod_mruby_insert_filter_last_code         = NULL;
-    conf->mod_mruby_log_transaction_first_code      = NULL;
-    conf->mod_mruby_log_transaction_middle_code     = NULL;
-    conf->mod_mruby_log_transaction_last_code       = NULL;
-
-    conf->mruby_cache_table_size                    = 0;
-
-    return conf;
-}
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, int module_status);
+static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_rec *s);
 
 //
 // Set/Get/Cleanup functions for mrb_state
 //
+static mrb_state *ap_mrb_create_mrb_state()
+{
+    mrb_state *mrb = mrb_open();
+    ap_mruby_class_init(mrb);
+    return mrb;
+}
+
 static apr_status_t cleanup_mrb_state(void *p)
 {
     mrb_close((mrb_state *)p);
     return APR_SUCCESS;
-}   
+}
 
 static void ap_mrb_set_mrb_state(apr_pool_t *pool, mrb_state *mrb)
 {
@@ -188,36 +103,51 @@ static void ap_mrb_set_mrb_state(apr_pool_t *pool, mrb_state *mrb)
     ap_log_error(APLOG_MARK
         , APLOG_DEBUG
         , 0
-        , NULL
-        , "%s DEBUG %s: set mrb_state"
+        , ap_server_conf
+        , "%s DEBUG %s: set mrb_state to mod_mruby_state key: %x"
         , MODULE_NAME
         , __func__
+        , mrb
     );
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
 }
 
 static mrb_state *ap_mrb_get_mrb_state(apr_pool_t *pool)
 {
     mrb_state *mrb = NULL;
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
     if (apr_pool_userdata_get((void **)&mrb, "mod_mruby_state", pool) == APR_SUCCESS) {
         if (mrb == NULL) {
             ap_log_error(APLOG_MARK
-                , APLOG_ERR
+                , APLOG_DEBUG
                 , 0
-                , NULL
-                , "%s ERROR %s: get mrb_state is NULL"
+                , ap_server_conf
+                , "%s DEBUG %s: get mrb_state is NULL, reopen mrb_state"
                 , MODULE_NAME
                 , __func__
             );
-            return NULL;
+            mrb = mrb_open();
+            ap_mruby_class_init(mrb);
+            ap_mrb_set_mrb_state(pool, mrb);
+            return mrb;
         } else {
+            ap_log_error(APLOG_MARK
+                , APLOG_DEBUG
+                , 0
+                , ap_server_conf
+                , "%s DEBUG %s: mrb_state found from mod_mruby_state key: %x"
+                , MODULE_NAME
+                , __func__
+                , mrb
+            );
             return mrb;
         }
     }
     ap_log_error(APLOG_MARK
         , APLOG_ERR
         , 0
-        , NULL
-        , "%s ERROR %s: apr_pool_userdata_get mod_mruby_state fialed"
+        , ap_server_conf
+        , "%s ERROR %s: apr_pool_userdata_get mod_mruby_state faled"
         , MODULE_NAME
         , __func__
     );
@@ -264,6 +194,102 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
     return c;
 }
 
+static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
+{
+    mruby_dir_config_t *dir_conf = 
+        (mruby_dir_config_t *)apr_pcalloc(p, sizeof(*dir_conf));
+    // inlinde core in httpd.conf
+    dir_conf->mod_mruby_handler_inline_code                 = NULL;
+    dir_conf->mod_mruby_handler_first_inline_code              = NULL;
+    dir_conf->mod_mruby_handler_middle_inline_code             = NULL;
+    dir_conf->mod_mruby_handler_last_inline_code               = NULL;
+    dir_conf->mod_mruby_post_read_request_first_inline_code    = NULL;
+    dir_conf->mod_mruby_post_read_request_middle_inline_code   = NULL;
+    dir_conf->mod_mruby_post_read_request_last_inline_code     = NULL;
+    dir_conf->mod_mruby_translate_name_first_inline_code       = NULL;
+    dir_conf->mod_mruby_translate_name_middle_inline_code      = NULL;
+    dir_conf->mod_mruby_translate_name_last_inline_code        = NULL;
+    dir_conf->mod_mruby_map_to_storage_first_inline_code       = NULL;
+    dir_conf->mod_mruby_map_to_storage_middle_inline_code      = NULL;
+    dir_conf->mod_mruby_map_to_storage_last_inline_code        = NULL;
+    dir_conf->mod_mruby_access_checker_first_inline_code       = NULL;
+    dir_conf->mod_mruby_access_checker_middle_inline_code      = NULL;
+    dir_conf->mod_mruby_access_checker_last_inline_code        = NULL;
+    dir_conf->mod_mruby_check_user_id_first_inline_code        = NULL;
+    dir_conf->mod_mruby_check_user_id_middle_inline_code       = NULL;
+    dir_conf->mod_mruby_check_user_id_last_inline_code         = NULL;
+    dir_conf->mod_mruby_auth_checker_first_inline_code         = NULL;
+    dir_conf->mod_mruby_auth_checker_middle_inline_code        = NULL;
+    dir_conf->mod_mruby_auth_checker_last_inline_code          = NULL;
+    dir_conf->mod_mruby_fixups_first_inline_code               = NULL;
+    dir_conf->mod_mruby_fixups_middle_inline_code              = NULL;
+    dir_conf->mod_mruby_fixups_last_inline_code                = NULL;
+    dir_conf->mod_mruby_log_transaction_first_inline_code      = NULL;
+    dir_conf->mod_mruby_log_transaction_middle_inline_code     = NULL;
+    dir_conf->mod_mruby_log_transaction_last_inline_code       = NULL;
+
+    // hook script file
+    dir_conf->mod_mruby_handler_code                    = NULL;
+    dir_conf->mod_mruby_handler_first_code              = NULL;
+    dir_conf->mod_mruby_handler_middle_code             = NULL;
+    dir_conf->mod_mruby_handler_last_code               = NULL;
+    dir_conf->mod_mruby_post_read_request_first_code    = NULL;
+    dir_conf->mod_mruby_post_read_request_middle_code   = NULL;
+    dir_conf->mod_mruby_post_read_request_last_code     = NULL;
+    dir_conf->mod_mruby_translate_name_first_code       = NULL;
+    dir_conf->mod_mruby_translate_name_middle_code      = NULL;
+    dir_conf->mod_mruby_translate_name_last_code        = NULL;
+    dir_conf->mod_mruby_map_to_storage_first_code       = NULL;
+    dir_conf->mod_mruby_map_to_storage_middle_code      = NULL;
+    dir_conf->mod_mruby_map_to_storage_last_code        = NULL;
+    dir_conf->mod_mruby_access_checker_first_code       = NULL;
+    dir_conf->mod_mruby_access_checker_middle_code      = NULL;
+    dir_conf->mod_mruby_access_checker_last_code        = NULL;
+    dir_conf->mod_mruby_check_user_id_first_code        = NULL;
+    dir_conf->mod_mruby_check_user_id_middle_code       = NULL;
+    dir_conf->mod_mruby_check_user_id_last_code         = NULL;
+    dir_conf->mod_mruby_auth_checker_first_code         = NULL;
+    dir_conf->mod_mruby_auth_checker_middle_code        = NULL;
+    dir_conf->mod_mruby_auth_checker_last_code          = NULL;
+    dir_conf->mod_mruby_fixups_first_code               = NULL;
+    dir_conf->mod_mruby_fixups_middle_code              = NULL;
+    dir_conf->mod_mruby_fixups_last_code                = NULL;
+    dir_conf->mod_mruby_log_transaction_first_code      = NULL;
+    dir_conf->mod_mruby_log_transaction_middle_code     = NULL;
+    dir_conf->mod_mruby_log_transaction_last_code       = NULL;
+    dir_conf->mod_mruby_authn_check_password_code   = NULL;
+    dir_conf->mod_mruby_authn_get_realm_hash_code   = NULL;
+    dir_conf->mod_mruby_output_filter_code          = NULL;
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
+
+    return dir_conf;
+}
+
+static void *mod_mruby_create_config(apr_pool_t *p, server_rec *s)
+{
+    mrb_state *mrb = ap_mrb_create_mrb_state();
+    ap_mrb_set_mrb_state(s->process->pool, mrb);
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
+    mruby_config_t *conf = 
+        (mruby_config_t *)apr_pcalloc(p, sizeof(mruby_config_t));
+    conf->mod_mruby_child_init_first_code           = NULL;
+    conf->mod_mruby_child_init_middle_code          = NULL;
+    conf->mod_mruby_child_init_last_code            = NULL;
+    conf->mod_mruby_post_config_first_code          = NULL;
+    conf->mod_mruby_post_config_middle_code         = NULL;
+    conf->mod_mruby_post_config_last_code           = NULL;
+    conf->mod_mruby_quick_handler_first_code        = NULL;
+    conf->mod_mruby_quick_handler_middle_code       = NULL;
+    conf->mod_mruby_quick_handler_last_code         = NULL;
+    conf->mod_mruby_insert_filter_first_code        = NULL;
+    conf->mod_mruby_insert_filter_middle_code       = NULL;
+    conf->mod_mruby_insert_filter_last_code         = NULL;
+
+    conf->mruby_cache_table_size                    = 0;
+
+    return conf;
+}
+
 //
 // set cmds functions (for Ruby inline code)
 //
@@ -278,38 +304,10 @@ static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, 
         return err;                                                                                               \
                                                                                                                   \
     conf->mod_mruby_##hook##_inline_code = ap_mrb_set_string(cmd->pool, arg);                                     \
+    mod_mruby_compile_code(ap_mrb_get_mrb_state(cmd->server->process->pool), conf->mod_mruby_##hook##_inline_code,  cmd->server); \
                                                                                                                   \
     return NULL;                                                                                                  \
 }
-
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(handler_last);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(post_read_request_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(post_read_request_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(post_read_request_last);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(translate_name_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(translate_name_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(translate_name_last);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(map_to_storage_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(map_to_storage_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(map_to_storage_last);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(access_checker_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(access_checker_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(access_checker_last);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(check_user_id_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(check_user_id_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(check_user_id_last);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(auth_checker_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(auth_checker_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(auth_checker_last);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(fixups_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(fixups_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(fixups_last);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(log_transaction_first);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(log_transaction_middle);
-SET_MOD_MRUBY_SERVER_INLINE_CMDS(log_transaction_last);
 
 //
 // set cmds functions (for Ruby file path)
@@ -320,55 +318,29 @@ static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const cha
 {                                                                                                                 \
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                                     \
     mruby_config_t *conf = (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);    \
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__); \
                                                                                                                   \
     if (err != NULL)                                                                                              \
         return err;                                                                                               \
                                                                                                                   \
     conf->mod_mruby_##hook##_code = ap_mrb_set_file(cmd->pool, path, cache_opt);                                  \
+    mod_mruby_compile_code(ap_mrb_get_mrb_state(cmd->server->process->pool), conf->mod_mruby_##hook##_code,  cmd->server); \
                                                                                                                   \
     return NULL;                                                                                                  \
 }
 
-SET_MOD_MRUBY_SERVER_CMDS(handler);
-SET_MOD_MRUBY_SERVER_CMDS(handler_first);
-SET_MOD_MRUBY_SERVER_CMDS(handler_middle);
-SET_MOD_MRUBY_SERVER_CMDS(handler_last);
 SET_MOD_MRUBY_SERVER_CMDS(post_config_first);
 SET_MOD_MRUBY_SERVER_CMDS(post_config_middle);
 SET_MOD_MRUBY_SERVER_CMDS(post_config_last);
 SET_MOD_MRUBY_SERVER_CMDS(child_init_first);
 SET_MOD_MRUBY_SERVER_CMDS(child_init_middle);
 SET_MOD_MRUBY_SERVER_CMDS(child_init_last);
-SET_MOD_MRUBY_SERVER_CMDS(post_read_request_first);
-SET_MOD_MRUBY_SERVER_CMDS(post_read_request_middle);
-SET_MOD_MRUBY_SERVER_CMDS(post_read_request_last);
 SET_MOD_MRUBY_SERVER_CMDS(quick_handler_first);
 SET_MOD_MRUBY_SERVER_CMDS(quick_handler_middle);
 SET_MOD_MRUBY_SERVER_CMDS(quick_handler_last);
-SET_MOD_MRUBY_SERVER_CMDS(translate_name_first);
-SET_MOD_MRUBY_SERVER_CMDS(translate_name_middle);
-SET_MOD_MRUBY_SERVER_CMDS(translate_name_last);
-SET_MOD_MRUBY_SERVER_CMDS(map_to_storage_first);
-SET_MOD_MRUBY_SERVER_CMDS(map_to_storage_middle);
-SET_MOD_MRUBY_SERVER_CMDS(map_to_storage_last);
-SET_MOD_MRUBY_SERVER_CMDS(access_checker_first);
-SET_MOD_MRUBY_SERVER_CMDS(access_checker_middle);
-SET_MOD_MRUBY_SERVER_CMDS(access_checker_last);
-SET_MOD_MRUBY_SERVER_CMDS(check_user_id_first);
-SET_MOD_MRUBY_SERVER_CMDS(check_user_id_middle);
-SET_MOD_MRUBY_SERVER_CMDS(check_user_id_last);
-SET_MOD_MRUBY_SERVER_CMDS(auth_checker_first);
-SET_MOD_MRUBY_SERVER_CMDS(auth_checker_middle);
-SET_MOD_MRUBY_SERVER_CMDS(auth_checker_last);
-SET_MOD_MRUBY_SERVER_CMDS(fixups_first);
-SET_MOD_MRUBY_SERVER_CMDS(fixups_middle);
-SET_MOD_MRUBY_SERVER_CMDS(fixups_last);
 SET_MOD_MRUBY_SERVER_CMDS(insert_filter_first);
 SET_MOD_MRUBY_SERVER_CMDS(insert_filter_middle);
 SET_MOD_MRUBY_SERVER_CMDS(insert_filter_last);
-SET_MOD_MRUBY_SERVER_CMDS(log_transaction_first);
-SET_MOD_MRUBY_SERVER_CMDS(log_transaction_middle);
-SET_MOD_MRUBY_SERVER_CMDS(log_transaction_last);
 
 #define SET_MOD_MRUBY_DIR_CMDS(hook) \
 static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *path, const char *cache_opt);                          \
@@ -376,18 +348,93 @@ static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const cha
 {                                                                                                                 \
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                                     \
     mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;                                                 \
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__); \
                                                                                                                   \
     if (err != NULL)                                                                                              \
         return err;                                                                                               \
                                                                                                                   \
     dir_conf->mod_mruby_##hook##_code = ap_mrb_set_file(cmd->pool, path, cache_opt);                                          \
+    mod_mruby_compile_code(ap_mrb_get_mrb_state(cmd->server->process->pool), dir_conf->mod_mruby_##hook##_code,  cmd->server); \
                                                                                                                   \
     return NULL;                                                                                                  \
 }
 
+SET_MOD_MRUBY_DIR_CMDS(handler);
+SET_MOD_MRUBY_DIR_CMDS(handler_first);
+SET_MOD_MRUBY_DIR_CMDS(handler_middle);
+SET_MOD_MRUBY_DIR_CMDS(handler_last);
+SET_MOD_MRUBY_DIR_CMDS(post_read_request_first);
+SET_MOD_MRUBY_DIR_CMDS(post_read_request_middle);
+SET_MOD_MRUBY_DIR_CMDS(post_read_request_last);
+SET_MOD_MRUBY_DIR_CMDS(translate_name_first);
+SET_MOD_MRUBY_DIR_CMDS(translate_name_middle);
+SET_MOD_MRUBY_DIR_CMDS(translate_name_last);
+SET_MOD_MRUBY_DIR_CMDS(map_to_storage_first);
+SET_MOD_MRUBY_DIR_CMDS(map_to_storage_middle);
+SET_MOD_MRUBY_DIR_CMDS(map_to_storage_last);
+SET_MOD_MRUBY_DIR_CMDS(access_checker_first);
+SET_MOD_MRUBY_DIR_CMDS(access_checker_middle);
+SET_MOD_MRUBY_DIR_CMDS(access_checker_last);
+SET_MOD_MRUBY_DIR_CMDS(check_user_id_first);
+SET_MOD_MRUBY_DIR_CMDS(check_user_id_middle);
+SET_MOD_MRUBY_DIR_CMDS(check_user_id_last);
+SET_MOD_MRUBY_DIR_CMDS(auth_checker_first);
+SET_MOD_MRUBY_DIR_CMDS(auth_checker_middle);
+SET_MOD_MRUBY_DIR_CMDS(auth_checker_last);
+SET_MOD_MRUBY_DIR_CMDS(fixups_first);
+SET_MOD_MRUBY_DIR_CMDS(fixups_middle);
+SET_MOD_MRUBY_DIR_CMDS(fixups_last);
+SET_MOD_MRUBY_DIR_CMDS(log_transaction_first);
+SET_MOD_MRUBY_DIR_CMDS(log_transaction_middle);
+SET_MOD_MRUBY_DIR_CMDS(log_transaction_last);
 SET_MOD_MRUBY_DIR_CMDS(authn_check_password);
 SET_MOD_MRUBY_DIR_CMDS(authn_get_realm_hash);
 SET_MOD_MRUBY_DIR_CMDS(output_filter);
+
+#define SET_MOD_MRUBY_DIR_INLINE_CMDS(hook) \
+static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, const char *arg);                          \
+static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, const char *arg)                           \
+{                                                                                                                 \
+    const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                                     \
+    mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;                                                 \
+                                                                                                                  \
+    if (err != NULL)                                                                                              \
+        return err;                                                                                               \
+                                                                                                                  \
+    dir_conf->mod_mruby_##hook##_inline_code = ap_mrb_set_string(cmd->pool, arg);                                          \
+    mod_mruby_compile_code(ap_mrb_get_mrb_state(cmd->server->process->pool), dir_conf->mod_mruby_##hook##_inline_code,  cmd->server); \
+                                                                                                                  \
+    return NULL;                                                                                                  \
+}
+
+SET_MOD_MRUBY_DIR_INLINE_CMDS(handler);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(handler_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(handler_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(handler_last);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(post_read_request_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(post_read_request_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(post_read_request_last);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(translate_name_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(translate_name_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(translate_name_last);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(map_to_storage_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(map_to_storage_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(map_to_storage_last);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(access_checker_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(access_checker_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(access_checker_last);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(check_user_id_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(check_user_id_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(check_user_id_last);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(auth_checker_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(auth_checker_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(auth_checker_last);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(fixups_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(fixups_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(fixups_last);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(log_transaction_first);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(log_transaction_middle);
+SET_MOD_MRUBY_DIR_INLINE_CMDS(log_transaction_last);
 
 //
 // run mruby core functions
@@ -416,7 +463,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
         ap_log_error(APLOG_MARK
             , APLOG_ERR
             , 0
-            , NULL
+            , ap_server_conf
             , "%s ERROR %s: mrb file oepn failed: %s"
             , MODULE_NAME
             , __func__
@@ -429,7 +476,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
    ap_log_error(APLOG_MARK
        , APLOG_DEBUG
        , 0
-       , NULL
+       , ap_server_conf
        , "%s DEBUG %s: cache nothing on pid %d, compile code: %s"
        , MODULE_NAME
        , __func__
@@ -446,7 +493,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
     ap_log_error(APLOG_MARK
         , APLOG_DEBUG
         , 0
-        , NULL
+        , ap_server_conf
         , "%s DEBUG %s: run mruby code: %s"
         , MODULE_NAME
         , __func__
@@ -464,7 +511,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
     return APR_SUCCESS;
 }
 
-static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, mod_mruby_code_t *code, int module_status)
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, int module_status)
 {
 
     int ai, i, last_idx;
@@ -472,10 +519,10 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, mo
 
     // mutex lock
     if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
+        ap_log_rerror(APLOG_MARK
             , APLOG_ERR
             , 0
-            , NULL
+            , r
             , "%s ERROR %s: mod_mruby_mutex lock failed"
             , MODULE_NAME
             , __func__
@@ -485,17 +532,20 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, mo
 
     ap_mrb_push_request(r);
     if (code->cache == CACHE_DISABLE) {
-        mod_mruby_compile_code(mrb, code, r->pool);
+        mod_mruby_compile_code(mrb, code, r->server);
     }
     ai = mrb_gc_arena_save(mrb);
     ap_log_rerror(APLOG_MARK
         , APLOG_DEBUG
         , 0
         , r
-        , "%s DEBUG %s: run mruby code: %s"
+        , "%s DEBUG %s: run mruby code: path=[%s] irep_idx=[%d]~[%d] cache=[%d]"
         , MODULE_NAME
         , __func__
         , code->path
+        , code->irep_idx_start
+        , code->irep_idx_end
+        , code->cache
     );
 
     ap_mrb_set_status_code(OK);
@@ -541,10 +591,10 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mruby_config_t *conf, mo
 
     // mutex unlock
     if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
-        ap_log_error(APLOG_MARK
+        ap_log_rerror(APLOG_MARK
             , APLOG_ERR
             , 0
-            , NULL
+            , r
             , "%s ERROR %s: mod_mruby_mutex unlock failed"
             , MODULE_NAME
             , __func__
@@ -562,10 +612,10 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t 
 
     // mutex lock
     if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
-        ap_log_error(APLOG_MARK
+        ap_log_rerror(APLOG_MARK
             , APLOG_ERR
             , 0
-            , NULL
+            , r
             , "%s ERROR %s: mod_mruby_mutex lock failed"
             , MODULE_NAME
             , __func__
@@ -617,24 +667,32 @@ static apr_status_t mod_mruby_hook_term(void *data)
 //
 // hook functions (hook Ruby file path)
 //
+static int mod_mruby_preinit(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp)
+{
+    return OK;
+}
+
 static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, server_rec *s)
 {
-    void *data = NULL;
-    const char *userdata_key = "mruby_init";
-
+    if (initialized) {
+        return OK;
+    }
     apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex, APR_THREAD_MUTEX_DEFAULT, p);
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__); 
     if(status != APR_SUCCESS){
         ap_log_error(APLOG_MARK
             , APLOG_ERR        
             , 0                
-            , NULL             
+            , ap_server_conf             
             , APLOGNO(05001) "%s ERROR %s: Error creating thread mutex."
             , MODULE_NAME
             , __func__
         );
-
-        return status;
+        return DECLINED;
     }   
+
+    void *data = NULL;
+    const char *userdata_key = "mruby_init";
 
     ap_log_error(APLOG_MARK
         , APLOG_INFO
@@ -661,14 +719,16 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         , MODULE_NAME
         , MODULE_VERSION
     );  
+    initialized = 1;
     
     return DECLINED;
 }
 
-static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool_t *pool)
+static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_rec *s)
 {
     struct mrb_parser_state* p;
     FILE *mrb_file;
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
 
     if (c != NULL) {
         if (c->type == MOD_MRUBY_STRING) {
@@ -678,7 +738,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool
             ap_log_error(APLOG_MARK
                 , APLOG_DEBUG
                 , 0
-                , ap_server_conf
+                , s
                 , "%s DEBUG %s: mruby code string compiled: string=[%s] from irep_idx_start=[%d] to irep_idx_end=[%d]"
                 , MODULE_NAME
                 , __func__
@@ -691,7 +751,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool
                 ap_log_error(APLOG_MARK
                     , APLOG_ERR
                     , 0
-                    , ap_server_conf
+                    , s
                     , "%s ERROR %s: mrb file oepn failed: %s"
                     , MODULE_NAME
                     , __func__
@@ -706,7 +766,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool
             ap_log_error(APLOG_MARK
                 , APLOG_DEBUG
                 , 0
-                , ap_server_conf
+                , s
                 , "%s DEBUG %s: mruby code file compiled: path=[%s]from irep_idx_start=[%d] to irep_idx_end=[%d]"
                 , MODULE_NAME
                 , __func__
@@ -723,14 +783,15 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, apr_pool
 
 static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 {
-
     mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
     struct mrb_parser_state* p;
+    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__); 
 
-    mrb_state *mrb = mrb_open();
-    ap_mruby_class_init(mrb);
+    mrb_state *mrb = ap_mrb_get_mrb_state(server->process->pool);
+    //ap_mruby_class_init(mrb);
 
     //prctl(PR_SET_KEEPCAPS,1);
+    /*
     mod_mruby_compile_code(mrb, conf->mod_mruby_handler_code,                  pool);
     mod_mruby_compile_code(mrb, conf->mod_mruby_handler_first_code,            pool);
     mod_mruby_compile_code(mrb, conf->mod_mruby_handler_middle_code,           pool);
@@ -758,7 +819,9 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
     mod_mruby_compile_code(mrb, conf->mod_mruby_fixups_last_code,              pool);
     mod_mruby_compile_code(mrb, conf->mod_mruby_log_transaction_first_code,    pool);
     mod_mruby_compile_code(mrb, conf->mod_mruby_log_transaction_middle_code,   pool);
+    */
 
+    /*
     mod_mruby_compile_code(mrb, conf->mod_mruby_handler_inline_code,                  pool);
     mod_mruby_compile_code(mrb, conf->mod_mruby_handler_first_inline_code,            pool);
     mod_mruby_compile_code(mrb, conf->mod_mruby_handler_middle_inline_code,           pool);
@@ -787,10 +850,11 @@ static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
     mod_mruby_compile_code(mrb, conf->mod_mruby_log_transaction_first_inline_code,    pool);
     mod_mruby_compile_code(mrb, conf->mod_mruby_log_transaction_middle_inline_code,   pool);
     mod_mruby_compile_code(mrb, conf->mod_mruby_log_transaction_last_inline_code,     pool);
+    */
 
     //apr_pool_cleanup_register(pool, NULL, mod_mruby_hook_term, apr_pool_cleanup_null);
  
-    ap_mrb_set_mrb_state(server->process->pool, mrb);
+    //ap_mrb_set_mrb_state(server->process->pool, mrb);
 
     ap_log_error(APLOG_MARK
         , APLOG_INFO
@@ -842,17 +906,17 @@ MOD_MRUBY_REGISTER_HOOK_FUNC_NR_INT(post_config_last);
 static int mod_mruby_handler(request_rec *r)
 {
 
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
 
     if (!r->handler)
         return DECLINED;
 
     if (strcmp(r->handler, "mruby-script") == 0)
-        conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename, NULL);
+        dir_conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename, NULL);
     else
         return DECLINED;
 
-    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_handler_code, DECLINED);
+    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, dir_conf->mod_mruby_handler_code, DECLINED);
 }
 
 //
@@ -862,12 +926,12 @@ static int mod_mruby_handler(request_rec *r)
 static int mod_mruby_##hook(request_rec *r);                                                            \
 static int mod_mruby_##hook(request_rec *r)                                                             \
 {                                                                                                       \
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);               \
+    mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);               \
                                                                                                         \
-    if (conf->mod_mruby_##hook##_code == NULL)                                                          \
+    if (dir_conf->mod_mruby_##hook##_code == NULL)                                                          \
         return DECLINED;                                                                                \
                                                                                                         \
-    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code, OK);       \
+    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, dir_conf->mod_mruby_##hook##_code, OK);       \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC(handler_first);
@@ -910,7 +974,7 @@ static int mod_mruby_##hook(request_rec *r, int lookup)                         
     if (conf->mod_mruby_##hook##_code == NULL)                                                          \
         return DECLINED;                                                                                \
                                                                                                         \
-    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code, OK);       \
+    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf->mod_mruby_##hook##_code, OK);       \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC_LOOKUP(quick_handler_first);
@@ -929,7 +993,7 @@ static void mod_mruby_##hook(request_rec *r)                                    
     if (conf->mod_mruby_##hook##_code == NULL)                                                          \
         return;                                                                                         \
                                                                                                         \
-    ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, conf->mod_mruby_##hook##_code, OK);              \
+    ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf->mod_mruby_##hook##_code, OK);              \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_first);
@@ -938,25 +1002,23 @@ MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_last);
 
 static authn_status mod_mruby_authn_check_password(request_rec *r, const char *user, const char *password)
 {
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
     mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
     if (dir_conf->mod_mruby_authn_check_password_code == NULL)
         return AUTH_GENERAL_ERROR;
 
     ap_mrb_init_authnprovider_basic(r, user, password);
-    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_authn_check_password_code, OK);
+    return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, dir_conf->mod_mruby_authn_check_password_code, OK);
 }
 
 static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *user, const char *realm, char **rethash)
 {
     authn_status ret;
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
     mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
     if (dir_conf->mod_mruby_authn_get_realm_hash_code == NULL)
         return AUTH_GENERAL_ERROR;
 
     ap_mrb_init_authnprovider_digest(r, user, realm);
-    ret = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_authn_get_realm_hash_code, OK);
+    ret = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, dir_conf->mod_mruby_authn_get_realm_hash_code, OK);
     *rethash = ap_mrb_get_authnprovider_digest_rethash();
     return ret;
 }
@@ -966,14 +1028,13 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* 
     apr_status_t rv;
     request_rec *r = f->r;
 
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
     mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
 
     if (dir_conf->mod_mruby_output_filter_code == NULL)
         return ap_pass_brigade(f->next, bb);
 
     ap_mrb_push_filter(f, bb);
-    rv = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, conf, dir_conf->mod_mruby_output_filter_code, OK);
+    rv = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pool), r, dir_conf->mod_mruby_output_filter_code, OK);
     return ap_pass_brigade(f->next, bb);
 }
 
@@ -987,24 +1048,24 @@ static const authn_provider authn_mruby_provider = {
 //
 static int mod_mruby_handler_inline(request_rec *r)
 {
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);
+    mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
 
     if (strcmp(r->handler, "mruby-native-script") != 0)
         return DECLINED;
 
-    return ap_mruby_run_inline(ap_mrb_get_mrb_state(r->server->process->pool), r, conf->mod_mruby_handler_inline_code);
+    return ap_mruby_run_inline(ap_mrb_get_mrb_state(r->server->process->pool), r, dir_conf->mod_mruby_handler_inline_code);
 }
 
 #define MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(hook) \
 static int mod_mruby_##hook##_inline(request_rec *r);                                                   \
 static int mod_mruby_##hook##_inline(request_rec *r)                                                    \
 {                                                                                                       \
-    mruby_config_t *conf = ap_get_module_config(r->server->module_config, &mruby_module);               \
+    mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);               \
                                                                                                         \
-    if (conf->mod_mruby_##hook##_inline_code == NULL)                                                   \
+    if (dir_conf->mod_mruby_##hook##_inline_code == NULL)                                                   \
         return DECLINED;                                                                                \
                                                                                                         \
-    return ap_mruby_run_inline(ap_mrb_get_mrb_state(r->server->process->pool), r, conf->mod_mruby_##hook##_inline_code);         \
+    return ap_mruby_run_inline(ap_mrb_get_mrb_state(r->server->process->pool), r, dir_conf->mod_mruby_##hook##_inline_code);         \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC_INLINE(handler_first);
@@ -1061,6 +1122,7 @@ static void register_hooks(apr_pool_t *p)
     MOD_MRUBY_SET_ALL_REGISTER_INLINE(log_transaction);
 
     // hook script file
+    ap_hook_pre_config(mod_mruby_preinit, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_post_config(mod_mruby_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_child_init(mod_mruby_child_init, NULL, NULL, APR_HOOK_MIDDLE);
     ap_hook_handler(mod_mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
