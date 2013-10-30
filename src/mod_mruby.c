@@ -155,7 +155,7 @@ static mrb_state *ap_mrb_get_mrb_state(apr_pool_t *pool)
 //
 // Set code functions
 // 
-static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path, const char *cache_opt)
+static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path, const char *cache_opt, const char *phase)
 {
     mod_mruby_code_t *c = 
         (mod_mruby_code_t *)apr_pcalloc(p, sizeof(mod_mruby_code_t));
@@ -169,9 +169,10 @@ static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path, const 
             , APLOG_NOTICE
             , 0                
             , ap_server_conf
-            , "%s NOTICE %s: file=[%s] cache enabled"
+            , "%s NOTICE %s: phase=[%s] file=[%s] cache enabled"
             , MODULE_NAME
             , __func__
+            , phase
             , c->path
         );  
     } else {
@@ -382,7 +383,7 @@ static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const cha
     if (err != NULL)                                                                                              \
         return err;                                                                                               \
                                                                                                                   \
-    conf->mod_mruby_##hook##_code = ap_mrb_set_file(cmd->pool, path, cache_opt);                                  \
+    conf->mod_mruby_##hook##_code = ap_mrb_set_file(cmd->pool, path, cache_opt, "" #hook "");                                  \
     mod_mruby_compile_code(ap_mrb_get_mrb_state(cmd->server->process->pconf), conf->mod_mruby_##hook##_code,  cmd->server); \
                                                                                                                   \
     return NULL;                                                                                                  \
@@ -412,7 +413,7 @@ static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const cha
     if (err != NULL)                                                                                              \
         return err;                                                                                               \
                                                                                                                   \
-    dir_conf->mod_mruby_##hook##_code = ap_mrb_set_file(cmd->pool, path, cache_opt);                                          \
+    dir_conf->mod_mruby_##hook##_code = ap_mrb_set_file(cmd->pool, path, cache_opt, "" #hook "");                                          \
     mod_mruby_compile_code(ap_mrb_get_mrb_state(cmd->server->process->pconf), dir_conf->mod_mruby_##hook##_code,  cmd->server); \
                                                                                                                   \
     return NULL;                                                                                                  \
@@ -846,7 +847,7 @@ static int mod_mruby_handler(request_rec *r)
         return DECLINED;
 
     if (strcmp(r->handler, "mruby-script") == 0)
-        dir_conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename, NULL);
+        dir_conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename, NULL, "mruby-script");
     else
         return DECLINED;
 
