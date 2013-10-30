@@ -61,6 +61,13 @@
 #define CACHE_DISABLE 0
 #define CACHE_ENABLE  1
 
+
+#ifdef __MOD_MRUBY_DEBUG__
+#define TRACER ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__)
+#else
+#define TRACER 
+#endif
+
 apr_thread_mutex_t *mod_mruby_mutex;
 module AP_MODULE_DECLARE_DATA mruby_module;
 unsigned int initialized = 0;
@@ -88,6 +95,7 @@ static apr_status_t cleanup_mrb_state(void *p)
 
 static void ap_mrb_set_mrb_state(apr_pool_t *pool, mrb_state *mrb)
 {
+    TRACER;
     apr_pool_userdata_set(mrb, "mod_mruby_state", cleanup_mrb_state, pool);
     ap_log_error(APLOG_MARK
         , APLOG_DEBUG
@@ -98,13 +106,12 @@ static void ap_mrb_set_mrb_state(apr_pool_t *pool, mrb_state *mrb)
         , __func__
         , mrb
     );
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
 }
 
 static mrb_state *ap_mrb_get_mrb_state(apr_pool_t *pool)
 {
     mrb_state *mrb = NULL;
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
+    TRACER;
     if (apr_pool_userdata_get((void **)&mrb, "mod_mruby_state", pool) == APR_SUCCESS) {
         if (mrb == NULL) {
             ap_log_error(APLOG_MARK
@@ -157,10 +164,10 @@ static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path, const 
     if (cache_opt && !strcmp(cache_opt, "cache")) {
         c->cache = CACHE_ENABLE;
         ap_log_error(APLOG_MARK
-            , APLOG_DEBUG
+            , APLOG_NOTICE
             , 0                
             , ap_server_conf
-            , "%s DEBUG %s: Ruby code file cache enabled: file=[%s]"
+            , "%s NOTICE %s: file=[%s] cache enabled"
             , MODULE_NAME
             , __func__
             , c->path
@@ -181,6 +188,63 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
     c->code = apr_pstrdup(p, arg);
 
     return c;
+}
+
+static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_rec *s)
+{
+    struct mrb_parser_state* p;
+    FILE *mrb_file;
+    TRACER;
+
+    if (c != NULL) {
+        if (c->type == MOD_MRUBY_STRING) {
+            p = mrb_parse_string(mrb, c->code, NULL);
+            c->irep_idx_start = mrb_generate_code(mrb, p);
+            c->irep_idx_end = mrb->irep_len;
+            ap_log_error(APLOG_MARK
+                , APLOG_DEBUG
+                , 0
+                , s
+                , "%s DEBUG %s: mruby code string compiled: string=[%s] from irep_idx_start=[%d] to irep_idx_end=[%d]"
+                , MODULE_NAME
+                , __func__
+                , c->code
+                , c->irep_idx_start
+                , c->irep_idx_end
+            );
+        } else if (c->type == MOD_MRUBY_FILE) {
+            if ((mrb_file = fopen(c->path, "r")) == NULL) {
+                ap_log_error(APLOG_MARK
+                    , APLOG_ERR
+                    , 0
+                    , s
+                    , "%s ERROR %s: mrb file oepn failed: %s"
+                    , MODULE_NAME
+                    , __func__
+                    , c->path
+                );
+                return;
+            }
+            p = mrb_parse_file(mrb, mrb_file, NULL);
+            fclose(mrb_file);
+            c->irep_idx_start = mrb_generate_code(mrb, p);
+            c->irep_idx_end = mrb->irep_len;
+            ap_log_error(APLOG_MARK
+                , APLOG_DEBUG
+                , 0
+                , s
+                , "%s DEBUG %s: mruby code file compiled: path=[%s]from irep_idx_start=[%d] to irep_idx_end=[%d]"
+                , MODULE_NAME
+                , __func__
+                , c->path
+                , c->irep_idx_start
+                , c->irep_idx_end
+            );
+        } else {
+            return;
+        }
+        mrb_pool_close(p->pool);
+    }
 }
 
 static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
@@ -250,7 +314,7 @@ static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
     dir_conf->mod_mruby_authn_check_password_code   = NULL;
     dir_conf->mod_mruby_authn_get_realm_hash_code   = NULL;
     dir_conf->mod_mruby_output_filter_code          = NULL;
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
+    TRACER;
 
     return dir_conf;
 }
@@ -259,7 +323,7 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *server)
 {
     mrb_state *mrb = ap_mrb_create_mrb_state();
     ap_mrb_set_mrb_state(server->process->pconf, mrb);
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
+    TRACER;
 
     mruby_config_t *conf = 
         (mruby_config_t *)apr_pcalloc(p, sizeof(mruby_config_t));
@@ -309,7 +373,7 @@ static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const cha
 {                                                                                                                 \
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                                     \
     mruby_config_t *conf = (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);    \
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__); \
+    TRACER; \
                                                                                                                   \
     if (err != NULL)                                                                                              \
         return err;                                                                                               \
@@ -339,7 +403,7 @@ static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const cha
 {                                                                                                                 \
     const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                                     \
     mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;                                                 \
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__); \
+    TRACER; \
                                                                                                                   \
     if (err != NULL)                                                                                              \
         return err;                                                                                               \
@@ -669,7 +733,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
         return OK;
     }
     apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex, APR_THREAD_MUTEX_DEFAULT, p);
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__); 
+    TRACER;
     if(status != APR_SUCCESS){
         ap_log_error(APLOG_MARK
             , APLOG_ERR        
@@ -715,68 +779,11 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
     return DECLINED;
 }
 
-static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_rec *s)
-{
-    struct mrb_parser_state* p;
-    FILE *mrb_file;
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__);
-
-    if (c != NULL) {
-        if (c->type == MOD_MRUBY_STRING) {
-            p = mrb_parse_string(mrb, c->code, NULL);
-            c->irep_idx_start = mrb_generate_code(mrb, p);
-            c->irep_idx_end = mrb->irep_len;
-            ap_log_error(APLOG_MARK
-                , APLOG_DEBUG
-                , 0
-                , s
-                , "%s DEBUG %s: mruby code string compiled: string=[%s] from irep_idx_start=[%d] to irep_idx_end=[%d]"
-                , MODULE_NAME
-                , __func__
-                , c->code
-                , c->irep_idx_start
-                , c->irep_idx_end
-            );
-        } else if (c->type == MOD_MRUBY_FILE) {
-            if ((mrb_file = fopen(c->path, "r")) == NULL) {
-                ap_log_error(APLOG_MARK
-                    , APLOG_ERR
-                    , 0
-                    , s
-                    , "%s ERROR %s: mrb file oepn failed: %s"
-                    , MODULE_NAME
-                    , __func__
-                    , c->path
-                );
-                return;
-            }
-            p = mrb_parse_file(mrb, mrb_file, NULL);
-            fclose(mrb_file);
-            c->irep_idx_start = mrb_generate_code(mrb, p);
-            c->irep_idx_end = mrb->irep_len;
-            ap_log_error(APLOG_MARK
-                , APLOG_DEBUG
-                , 0
-                , s
-                , "%s DEBUG %s: mruby code file compiled: path=[%s]from irep_idx_start=[%d] to irep_idx_end=[%d]"
-                , MODULE_NAME
-                , __func__
-                , c->path
-                , c->irep_idx_start
-                , c->irep_idx_end
-            );
-        } else {
-            return;
-        }
-        mrb_pool_close(p->pool);
-    }
-}
-
 static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 {
     mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
     struct mrb_parser_state* p;
-    ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__); 
+    TRACER;
 
     mrb_state *mrb = ap_mrb_get_mrb_state(server->process->pconf);
 
