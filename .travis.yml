@@ -10,5 +10,4 @@ before_script:
   - make
   - make install
   - cd ../mod_mruby
-script:
-  - APXS_PATH='../apache246/bin/apxs' APACHECTL_PATH='../apache246/bin/apachectl' sh build.sh
+script: "APXS_PATH='../apache246/bin/apxs' APACHECTL_PATH='../apache246/bin/apachectl' sh build.sh"
