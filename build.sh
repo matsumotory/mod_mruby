@@ -1,5 +1,8 @@
 #!/bin/sh
 
+APXS_PATH='--with-apxs=/usr/local/apache/bin/apxs'
+APACHECTL_PATH='--with-apachectl=/usr/local/apache/bin/apachectl'
+
 set -e
 
 if [ ! -d "./mruby/src" ]; then
@@ -23,11 +26,10 @@ rake BUILD_TYPE='debug'
 echo "mruby building ... Done"
 cd ..
 echo "mod_mruby building ..."
-./configure --with-apxs=/usr/local/apache/bin/apxs --with-apachectl=/usr/local/apache/bin/apachectl
-#./configure
+./configure $APXS_PATH $APACHECTL_PATH
 make
-sudo make install
 echo "mod_mruby building ... Done"
 echo "build.sh ... successful"
 
+#sudo make install
 #make restart
