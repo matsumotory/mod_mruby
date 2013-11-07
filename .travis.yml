@@ -6,7 +6,7 @@ before_script:
   - wget http://ftp.kddilabs.jp/infosystems/apache//httpd/httpd-2.4.6.tar.gz
   - tar xvf httpd-2.4.6.tar.gz
   - cd httpd-2.4.6
-  - ./configure --prefix=apache246 --enable-modules=all --enable-mods-shared=all --enable-mpms-shared='prefork worker event'
+  - ./configure --prefix=`pwd`/apache246 --enable-modules=all --enable-mods-shared=all --enable-mpms-shared='prefork worker event'
   - make
   - make install
   - cd ../mod_mruby
