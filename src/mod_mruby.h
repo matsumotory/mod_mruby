@@ -46,7 +46,6 @@
 #include "http_request.h"
 #include "http_log.h"
 #include "ap_release.h"
-#include "http_main.h"
 
 #if (AP_SERVER_MINORVERSION_NUMBER > 2)
     #define __APACHE24__
@@ -54,6 +53,12 @@
 
 #if (AP_SERVER_MAJORVERSION_NUMBER == 2)
     #define APLOGNO(n)              "AH" #n ": "
+#endif
+
+#ifdef __APACHE24__
+    #include "http_main.h"
+#else
+    extern server_rec *ap_server_conf;
 #endif
 
 enum code_type {
