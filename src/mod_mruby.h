@@ -47,6 +47,15 @@
 #include "http_log.h"
 #include "ap_release.h"
 
+#define CACHE_DISABLE 0
+#define CACHE_ENABLE  1
+
+#ifdef __MOD_MRUBY_DEBUG__
+#define TRACER ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__)
+#else
+#define TRACER 
+#endif
+
 #if (AP_SERVER_MINORVERSION_NUMBER > 2)
     #define __APACHE24__
 #endif

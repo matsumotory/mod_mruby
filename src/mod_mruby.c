@@ -58,16 +58,6 @@
 #include "ap_mrb_core.h"
 #include "ap_mrb_filter.h"
 
-#define CACHE_DISABLE 0
-#define CACHE_ENABLE  1
-
-
-#ifdef __MOD_MRUBY_DEBUG__
-#define TRACER ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__)
-#else
-#define TRACER 
-#endif
-
 apr_thread_mutex_t *mod_mruby_mutex;
 module AP_MODULE_DECLARE_DATA mruby_module;
 
