@@ -14,7 +14,7 @@ fi
 cd mruby
 if [ -d "./build" ]; then
     echo "mruby Cleaning ..."
-    rake clean
+    ./minirake clean
     echo "mruby Cleaning ... Done"
 fi
 echo "mruby building ..."
