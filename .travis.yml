@@ -1,6 +1,8 @@
 language: c
 compiler:
   - gcc
+install:
+  - sudo apt-get -q install apr apr-utils
 before_script:
   - cd ../
   - wget http://ftp.kddilabs.jp/infosystems/apache//httpd/httpd-2.4.6.tar.gz
