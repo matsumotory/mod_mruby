@@ -1,9 +1,18 @@
 #!/bin/sh
 
-APXS_PATH='--with-apxs=/usr/local/apache/bin/apxs'
-APACHECTL_PATH='--with-apachectl=/usr/local/apache/bin/apachectl'
-
 set -e
+
+APXS_PATH='--with-apxs=/usr/local/apache/bin/apxs'
+if [ $APXS_PATH_ENV ]; then
+    APXS_PATH=$APXS_PATH_ENV
+fi
+
+APACHECTL_PATH='--with-apachectl=/usr/local/apache/bin/apachectl'
+if [ $APACHECTL_PATH_ENV ]; then
+    APACHECTL_PATH=$APACHECTL_PATH_ENV
+fi
+
+echo "apxs="$APXS_PATH "apachectl="$APACHECTL_PATH
 
 if [ ! -d "./mruby/src" ]; then
     echo "mruby Downloading ..."

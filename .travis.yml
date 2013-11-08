@@ -2,8 +2,8 @@ language: c
 compiler:
   - gcc
 before_install:
-    - sudo apt-get update
-    - sudo apt-get -q install apache2 apache2-prefork-dev rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
+    - sudo apt-get -qq update
+    - sudo apt-get -qq install apache2 apache2-prefork-dev rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
 before_script:
   - cd ../
   - wget http://ftp.kddilabs.jp/infosystems/apache//httpd/httpd-2.4.6.tar.gz
@@ -21,5 +21,5 @@ before_script:
   - make install
   - cd ../mod_mruby
 script: 
-  - APXS_PATH='../httpd-2.4.6/apache246/bin/apxs' APACHECTL_PATH='../httpd-2.4.6/apache246/bin/apachectl' sh build.sh
-  - APXS_PATH='apxs' APACHECTL_PATH='apachectl' sh build.sh
+  - APXS_PATH_ENV='../httpd-2.4.6/apache246/bin/apxs' APACHECTL_PATH_ENV='../httpd-2.4.6/apache246/bin/apachectl' sh build.sh
+  - APXS_PATH_ENV='apxs' APACHECTL_PATH_ENV='apachectl' sh build.sh
