@@ -1,15 +1,21 @@
 language: c
 compiler:
   - gcc
-install:
-  - sudo apt-get -q install apr apr-utils
 before_script:
   - cd ../
   - wget http://ftp.kddilabs.jp/infosystems/apache//httpd/httpd-2.4.6.tar.gz
-  - tar xvf httpd-2.4.6.tar.gz
-  - cd httpd-2.4.6
-  - ./configure --prefix=`pwd`/apache246 --enable-modules=all --enable-mods-shared=all --enable-mpms-shared='prefork worker event'
+  - tar xf httpd-2.4.6.tar.gz
+  - cd httpd-2.4.6/srclib
+  - wget http://ftp.kddilabs.jp/infosystems/apache//apr/apr-1.4.8.tar.gz
+  - wget http://ftp.kddilabs.jp/infosystems/apache//apr/apr-util-1.5.2.tar.gz
+  - tar xf apr-1.4.8.tar.gz
+  - tar xf apr-util-1.5.2.tar.gz
+  - ln -s apr-1.4.8 apr
+  - ln -s apr-util-1.5.2 apr-util
+  - cd ..
+  - ./configure --prefix=`pwd`/apache246 --with-included-apr --enable-modules=all --enable-mods-shared=all --enable-mpms-shared='prefork worker event'
   - make
   - make install
   - cd ../mod_mruby
-script: "APXS_PATH='../httpd-2.4.6/apache246/bin/apxs' APACHECTL_PATH='../httpd-2.4.6/apache246/bin/apachectl' sh build.sh"
+script: 
+  - APXS_PATH='../httpd-2.4.6/apache246/bin/apxs' APACHECTL_PATH='../httpd-2.4.6/apache246/bin/apachectl' sh build.sh
