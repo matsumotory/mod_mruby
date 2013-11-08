@@ -24,3 +24,11 @@ before_script:
 script: 
   - APXS_PATH_ENV='../httpd-2.4.6/apache246/bin/apxs' APACHECTL_PATH_ENV='../httpd-2.4.6/apache246/bin/apachectl' sh build.sh
   - APXS_PATH_ENV='apxs' APACHECTL_PATH_ENV='apachectl' sh build.sh
+notifications:
+  irc:
+    channels:
+      - "irc.media.kyoto-u.ac.jp#mod_mruby"
+    on_success: always
+    on_failure: always
+    template:
+      - "%{message} by @%{author}: See %{build_url}"
