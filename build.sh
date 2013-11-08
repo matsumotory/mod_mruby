@@ -2,12 +2,14 @@
 
 set -e
 
-APXS_PATH='--with-apxs=/usr/local/apache/bin/apxs'
+#APXS_PATH='--with-apxs=/usr/local/apache/bin/apxs'
+APXS_PATH=''
 if [ $APXS_PATH_ENV ]; then
     APXS_PATH=$APXS_PATH_ENV
 fi
 
-APACHECTL_PATH='--with-apachectl=/usr/local/apache/bin/apachectl'
+#APACHECTL_PATH='--with-apachectl=/usr/local/apache/bin/apachectl'
+APACHECTL_PATH=''
 if [ $APACHECTL_PATH_ENV ]; then
     APACHECTL_PATH=$APACHECTL_PATH_ENV
 fi

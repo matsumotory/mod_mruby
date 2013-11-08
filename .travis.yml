@@ -22,8 +22,10 @@ before_script:
   - make install
   - cd ../mod_mruby
 script: 
+  # for 2.4.x
   - APXS_PATH_ENV='--with-apxs=../httpd-2.4.6/apache246/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.6/apache246/bin/apachectl' sh build.sh
-  - APXS_PATH_ENV='--with-apxs=apxs' APACHECTL_PATH_ENV='--with-apachectl=apachectl' sh build.sh
+  # for 2.2.x
+  - sh build.sh
 notifications:
   irc:
     channels:
