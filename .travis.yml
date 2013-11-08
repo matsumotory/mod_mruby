@@ -27,7 +27,7 @@ script:
 notifications:
   irc:
     channels:
-      - "irc.media.kyoto-u.ac.jp#mod_mruby"
+      - "irc.freenode.org#mod_mruby"
     on_success: always
     on_failure: always
     template:
