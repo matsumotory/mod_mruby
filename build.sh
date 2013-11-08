@@ -18,7 +18,7 @@ if [ -d "./build" ]; then
     echo "mruby Cleaning ... Done"
 fi
 echo "mruby building ..."
-mv build_config.rb{,.orig}
+mv build_config.rb build_config.rb.orig
 cp ../build_config.rb .
 #rake BUILD_BIT='64'
 rake BUILD_TYPE='debug'
