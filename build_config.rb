@@ -24,6 +24,7 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-thread.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-vedis.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-config.git'
   conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'

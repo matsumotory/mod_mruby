@@ -34,4 +34,5 @@ notifications:
     on_success: always
     on_failure: always
     template:
-      - "%{message} by @%{author}: See %{build_url}"
+      - "%{repository} (%{commit}) : %{message} by @%{author}: See %{build_url}"
+
