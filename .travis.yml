@@ -30,9 +30,11 @@ script:
 notifications:
   irc:
     channels:
-      - "irc.freenode.org#mod_mruby"
+      - "irc.freenode.org#backdoor-log"
     on_success: always
     on_failure: always
+    use_notice: true
+    skip_join: true
     template:
-      - "%{repository} (%{commit}) : %{message} by @%{author}: See %{build_url}"
+        - "[%{message}] %{repository} (%{commit}) by %{author}: See %{build_url}"
 
