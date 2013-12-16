@@ -17,20 +17,20 @@ MRuby::Build.new do |conf|
   #
   # Recommended for mod_mruby
   #
-  conf.gem :git => 'git://github.com/iij/mruby-process.git'
-  conf.gem :git => 'git://github.com/iij/mruby-pack.git'
-  conf.gem :git => 'git://github.com/iij/mruby-digest.git'
-  conf.gem :git => 'git://github.com/mattn/mruby-json.git'
-  conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-thread.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-vedis.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-config.git'
-  conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'
+  #conf.gem :git => 'git://github.com/iij/mruby-process.git'
+  #conf.gem :git => 'git://github.com/iij/mruby-pack.git'
+  #conf.gem :git => 'git://github.com/iij/mruby-digest.git'
+  #conf.gem :git => 'git://github.com/mattn/mruby-json.git'
+  #conf.gem :git => 'git://github.com/mattn/mruby-curl.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-thread.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-redis.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-vedis.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-config.git'
+  #conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'
 
   # use markdown on mod_mruby
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
+  #conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
 
   # Linux only for mod_mruby
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-capability.git'
