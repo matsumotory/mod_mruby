@@ -808,12 +808,12 @@ static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self, char *obj_
     mrb_value obj;
     struct RClass *obj_class, *apache_class;
 
-    obj = mrb_iv_get(mrb, self, mrb_intern(mrb, obj_id));
+    obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb, obj_id));
     if (mrb_nil_p(obj)) {
         apache_class = mrb_class_get(mrb, "Apache");
         obj_class = (struct RClass*)mrb_class_ptr(mrb_const_get(mrb, mrb_obj_value(apache_class), mrb_intern_cstr(mrb, class_name)));
         obj = mrb_obj_new(mrb, obj_class, 0, NULL);
-        mrb_iv_set(mrb, self, mrb_intern(mrb, obj_id), obj);
+        mrb_iv_set(mrb, self, mrb_intern_cstr(mrb, obj_id), obj);
     }
     return obj;
 }

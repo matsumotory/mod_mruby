@@ -193,8 +193,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
     if (c != NULL) {
         if (c->type == MOD_MRUBY_STRING) {
             p = mrb_parse_string(mrb, c->code, NULL);
-            c->irep_idx_start = mrb_generate_code(mrb, p);
-            c->irep_idx_end = mrb->irep_len - 1;
+            c->proc = mrb_generate_code(mrb, p);
             ap_log_error(APLOG_MARK
                 , APLOG_DEBUG
                 , 0
@@ -221,8 +220,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
             }
             p = mrb_parse_file(mrb, mrb_file, NULL);
             fclose(mrb_file);
-            c->irep_idx_start = mrb_generate_code(mrb, p);
-            c->irep_idx_end = mrb->irep_len - 1;
+            c->proc = mrb_generate_code(mrb, p);
             ap_log_error(APLOG_MARK
                 , APLOG_DEBUG
                 , 0
@@ -489,10 +487,10 @@ SET_MOD_MRUBY_DIR_INLINE_CMDS(log_transaction_last);
 //
 // run mruby core functions
 //
-static void ap_mruby_irep_clean(mrb_state *mrb, struct mrb_irep *irep, request_rec *r)
+static void ap_mruby_irep_clean(mrb_state *mrb, struct RProc *proc, request_rec *r)
 {
     TRACER;
-    mrb_irep_free(mrb, irep);
+    mrb_irep_decref(mrb, proc->body.irep);
 }
 
 static void ap_mruby_state_clean(mrb_state *mrb)
@@ -505,7 +503,7 @@ static void ap_mruby_state_clean(mrb_state *mrb)
 static int ap_mruby_run_nr(const char *mruby_code_file)
 {
 
-    int n;
+    struct RProc *proc;
     struct mrb_parser_state* p;
     FILE *mrb_file;
     mrb_state *mrb = mrb_open();
@@ -538,7 +536,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
 
     p = mrb_parse_file(mrb, mrb_file, NULL);
     fclose(mrb_file);
-    n = mrb_generate_code(mrb, p);
+    proc = mrb_generate_code(mrb, p);
 
     mrb_pool_close(p->pool);
 
@@ -553,7 +551,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
     );
 
     ap_mrb_set_status_code(OK);
-    mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[n]), mrb_top_self(mrb));
+    mrb_run(mrb, proc, mrb_top_self(mrb));
 
     if (mrb->exc)
         ap_mrb_raise_file_error_nr(mrb, mrb_obj_value(mrb->exc), mruby_code_file);
@@ -604,7 +602,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
     ap_mrb_set_status_code(OK);
     if (!setjmp(mod_mruby_jmp)) {
         mrb->jmp = &mod_mruby_jmp;
-        mrb_run(mrb, mrb_proc_new(mrb, mrb->irep[code->irep_idx_start]), mrb_top_self(mrb));
+        mrb_run(mrb, code->proc, mrb_top_self(mrb));
     }
 
     mrb->jmp = 0;
@@ -625,20 +623,15 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
         , code->path
     );
     if (code->cache == CACHE_DISABLE) {
-        last_idx = mrb->irep_len;
-        mrb->irep_len = code->irep_idx_start;
-        for (i = code->irep_idx_start; i < last_idx; i++) {
-            ap_log_rerror(APLOG_MARK
-                , APLOG_DEBUG
-                , 0
-                , r
-                , "%s DEBUG %s: irep[%d] cleaning"
-                , MODULE_NAME
-                , __func__
-                , i
-            );
-            ap_mruby_irep_clean(mrb, mrb->irep[i], r);
-        }
+      ap_log_rerror(APLOG_MARK
+          , APLOG_DEBUG
+          , 0
+          , r
+          , "%s DEBUG %s: irep cleaning"
+          , MODULE_NAME
+          , __func__
+          );
+      ap_mruby_irep_clean(mrb, code->proc, r);
     }
     ap_mruby_state_clean(mrb);
 
@@ -688,7 +681,7 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t 
         , c->code
     );
     ret = mrb_run(mrb
-        , mrb_proc_new(mrb, mrb->irep[c->irep_idx_start])
+        , c->proc
         , mrb_top_self(mrb)
     );
     mrb_gc_arena_restore(mrb, ai);

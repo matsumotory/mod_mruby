@@ -80,6 +80,7 @@ typedef struct {
         char *path;
         char *code;
     };
+    struct RProc *proc;
     int irep_idx_start;
     int irep_idx_end;
     enum code_type type;
