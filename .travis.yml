@@ -8,15 +8,15 @@ install:
     - sudo apt-get -qq install apache2 apache2-prefork-dev rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
 before_script:
   - cd ../
-  - wget http://ftp.kddilabs.jp/infosystems/apache//httpd/httpd-2.4.6.tar.gz
-  - tar xf httpd-2.4.6.tar.gz
-  - cd httpd-2.4.6/srclib
-  - wget http://ftp.kddilabs.jp/infosystems/apache//apr/apr-1.4.8.tar.gz
-  - wget http://ftp.kddilabs.jp/infosystems/apache//apr/apr-util-1.5.2.tar.gz
-  - tar xf apr-1.4.8.tar.gz
-  - tar xf apr-util-1.5.2.tar.gz
-  - ln -s apr-1.4.8 apr
-  - ln -s apr-util-1.5.2 apr-util
+  - wget http://ftp.riken.jp/net/apache//httpd/httpd-2.4.7.tar.gz
+  - tar xf httpd-2.4.7.tar.gz
+  - cd httpd-2.4.7/srclib
+  - wget http://ftp.riken.jp/net/apache//apr/apr-1.5.0.tar.gz
+  - wget http://ftp.riken.jp/net/apache//apr/apr-util-1.5.3.tar.gz
+  - tar xf apr-1.5.0.tar.gz
+  - tar xf apr-util-1.5.3.tar.gz
+  - ln -s apr-1.5.0 apr
+  - ln -s apr-util-1.5.3 apr-util
   - cd ..
   - ./configure --prefix=`pwd`/apache246 --with-included-apr 
   - make
@@ -24,7 +24,7 @@ before_script:
   - cd ../mod_mruby
 script: 
   # for 2.4.x using source installed binary
-  - APXS_PATH_ENV='--with-apxs=../httpd-2.4.6/apache246/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.6/apache246/bin/apachectl' sh build.sh
+  - APXS_PATH_ENV='--with-apxs=../httpd-2.4.7/apache247/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.7/apache247/bin/apachectl' sh build.sh
   # for 2.2.x using apt-get apache2 package
   - sh build.sh
 notifications:
