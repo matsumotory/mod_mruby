@@ -67,7 +67,7 @@
 #ifdef __APACHE24__
     #include "http_main.h"
 #else
-    extern server_rec *ap_server_conf;
+    #define ap_server_conf          NULL
 #endif
 
 enum code_type {
