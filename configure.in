@@ -69,7 +69,7 @@ if test -z "${APXS_PATH}"; then
         /usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache2/bin)
 fi
 if test "$APXS_PATH" = no; then
-    AC_MSG_ERROR([apxs2 and apsx not found.])
+    AC_MSG_ERROR([neither apxs2 or apxs not found.])
 fi
 
 AC_ARG_WITH(apachectl, AC_HELP_STRING([--with-apachectl=FILE],
