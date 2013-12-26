@@ -42,6 +42,8 @@
 <a name="welcome-to-mod_mruby-pages--" class="anchor" href="#welcome-to-mod_mruby-pages--"><span class="octicon octicon-link"></span></a>Welcome to mod_mruby Pages  <a href="https://travis-ci.org/matsumoto-r/mod_mruby"><img src="https://travis-ci.org/matsumoto-r/mod_mruby.png?branch=master" alt="Build Status"></a>
 </h1>
 
+<p><a href="http://blog.matsumoto-r.jp/?p=3974"><img src="http://blog.matsumoto-r.jp/wp-content/uploads/2013/12/performance_20131226.png" alt="ngx_mruby mod_mruby performance"></a></p>
+
 <h2>
 <a name="whats-mod_mruby" class="anchor" href="#whats-mod_mruby"><span class="octicon octicon-link"></span></a>What's mod_mruby</h2>
 
@@ -70,13 +72,13 @@
 
 <span class="c1"># write balancing algorithm here.</span>
 
-<span class="n">r</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="n">r</span> <span class="o">=</span> <span class="no">Apache</span><span class="o">::</span><span class="no">Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
 
 <span class="n">r</span><span class="o">.</span><span class="n">handler</span>  <span class="o">=</span> <span class="s2">"proxy-server"</span>
-<span class="n">r</span><span class="o">.</span><span class="n">proxyreq</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:PROXYREQ_REVERSE</span>
+<span class="n">r</span><span class="o">.</span><span class="n">proxyreq</span> <span class="o">=</span> <span class="no">Apache</span><span class="o">::</span><span class="no">PROXYREQ_REVERSE</span>
 <span class="n">r</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s2">"proxy:"</span> <span class="o">+</span> <span class="n">backends</span><span class="o">[</span><span class="nb">rand</span><span class="p">(</span><span class="n">backends</span><span class="o">.</span><span class="n">length</span><span class="p">)</span><span class="o">]</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">uri</span>
 
-<span class="ss">Apache</span><span class="p">:</span><span class="ss">:return</span><span class="p">(</span><span class="ss">Apache</span><span class="p">:</span><span class="ss">:OK</span><span class="p">)</span>
+<span class="no">Apache</span><span class="o">::</span><span class="k">return</span><span class="p">(</span><span class="no">Apache</span><span class="o">::</span><span class="no">OK</span><span class="p">)</span>
 </pre></div>
 
 <ul>
@@ -106,7 +108,7 @@
   <span class="no">Server</span> <span class="o">=</span> <span class="no">Apache</span>
 <span class="k">end</span>
 
-<span class="ss">Server</span><span class="p">:</span><span class="ss">:rputs</span> <span class="s2">"Hello </span><span class="si">#{</span><span class="ss">Server</span><span class="p">:</span><span class="ss">:module_name</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="ss">Server</span><span class="p">:</span><span class="ss">:module_version</span><span class="si">}</span><span class="s2"> world!"</span>
+<span class="no">Server</span><span class="o">::</span><span class="n">rputs</span> <span class="s2">"Hello </span><span class="si">#{</span><span class="no">Server</span><span class="o">::</span><span class="n">module_name</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="no">Server</span><span class="o">::</span><span class="n">module_version</span><span class="si">}</span><span class="s2"> world!"</span>
 <span class="c1"># mod_mruby =&gt; "Hello mod_mruby/0.9.3 world!"</span>
 <span class="c1"># ngx_mruby =&gt; "Hello ngx_mruby/0.0.1 world!"</span>
 </pre></div>
@@ -217,12 +219,12 @@ make install
 <li>
 <p>Selecting vhost area like mod_vhost_alias(hook on translatename)</p>
 
-<div class="highlight highlight-ruby"><pre><span class="n">r</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
-<span class="n">s</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:Server</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<div class="highlight highlight-ruby"><pre><span class="n">r</span> <span class="o">=</span> <span class="no">Apache</span><span class="o">::</span><span class="no">Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="n">s</span> <span class="o">=</span> <span class="no">Apache</span><span class="o">::</span><span class="no">Server</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
 
 <span class="n">r</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">document_root</span> <span class="o">+</span> <span class="s2">"/"</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">hostname</span> <span class="o">+</span> <span class="s2">"/"</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">uri</span>
 
-<span class="ss">Apache</span><span class="p">:</span><span class="ss">:return</span><span class="p">(</span><span class="ss">Apache</span><span class="p">:</span><span class="ss">:OK</span><span class="p">)</span>
+<span class="no">Apache</span><span class="o">::</span><span class="k">return</span><span class="p">(</span><span class="no">Apache</span><span class="o">::</span><span class="no">OK</span><span class="p">)</span>
 </pre></div>
 </li>
 <li>
@@ -237,13 +239,13 @@ make install
 
 <span class="c1"># write balancing algorithm here.</span>
 
-<span class="n">r</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+<span class="n">r</span> <span class="o">=</span> <span class="no">Apache</span><span class="o">::</span><span class="no">Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
 
 <span class="n">r</span><span class="o">.</span><span class="n">handler</span>  <span class="o">=</span> <span class="s2">"proxy-server"</span>
-<span class="n">r</span><span class="o">.</span><span class="n">proxyreq</span> <span class="o">=</span> <span class="ss">Apache</span><span class="p">:</span><span class="ss">:PROXYREQ_REVERSE</span>
+<span class="n">r</span><span class="o">.</span><span class="n">proxyreq</span> <span class="o">=</span> <span class="no">Apache</span><span class="o">::</span><span class="no">PROXYREQ_REVERSE</span>
 <span class="n">r</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s2">"proxy:"</span> <span class="o">+</span> <span class="n">backends</span><span class="o">[</span><span class="nb">rand</span><span class="p">(</span><span class="n">backends</span><span class="o">.</span><span class="n">length</span><span class="p">)</span><span class="o">]</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">uri</span>
 
-<span class="ss">Apache</span><span class="p">:</span><span class="ss">:return</span><span class="p">(</span><span class="ss">Apache</span><span class="p">:</span><span class="ss">:OK</span><span class="p">)</span>
+<span class="no">Apache</span><span class="o">::</span><span class="k">return</span><span class="p">(</span><span class="no">Apache</span><span class="o">::</span><span class="no">OK</span><span class="p">)</span>
 </pre></div>
 </li>
 </ul><h2>
