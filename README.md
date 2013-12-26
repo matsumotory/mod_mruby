@@ -1,4 +1,7 @@
 # Welcome to mod_mruby Pages  [![Build Status](https://travis-ci.org/matsumoto-r/mod_mruby.png?branch=master)](https://travis-ci.org/matsumoto-r/mod_mruby)
+
+[![ngx_mruby mod_mruby performance](http://blog.matsumoto-r.jp/wp-content/uploads/2013/12/performance_20131226.png)](http://blog.matsumoto-r.jp/?p=3974)
+
 ## What's mod_mruby
 __mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd.__
 
