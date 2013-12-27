@@ -14,14 +14,13 @@
 #include "mruby/string.h"
 #include "mruby/variable.h"
 
-
-#define INVALID_PRIORITY    -1
+#define INVALID_PRIORITY  -1
 
 //int mod_mruby_return_code;
 
 typedef struct _code {
-    char    *c_name;
-    int c_val;
+  char *c_name;
+  int c_val;
 } CODE;
 
 int ap_mrb_get_status_code();
