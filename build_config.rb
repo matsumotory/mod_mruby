@@ -27,7 +27,7 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-vedis.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-config.git'
-  #conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'
+  conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'
 
   # use markdown on mod_mruby
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
