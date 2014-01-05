@@ -277,10 +277,22 @@ mrb_value ap_mrb_f_count_arena(mrb_state *mrb, mrb_value self)
   return mrb_fixnum_value(mrb_gc_arena_save(mrb));
 }
 
+#define AP_MRB_DEFINE_CORE_CONST_FIXNUM(val)  mrb_define_const(mrb, class_core, #val, mrb_fixnum_value(val));
+
 void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
 {
 
   mrb_define_method(mrb, mrb->kernel_module, "server_name", ap_mrb_server_name, ARGS_NONE());
+
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_EMERG);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_ALERT);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_CRIT);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_ERR);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_WARNING);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_NOTICE);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_NOTICE);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_INFO);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_DEBUG);
 
   mrb_define_const(mrb, class_core, "OK", mrb_fixnum_value(OK));
   mrb_define_const(mrb, class_core, "DECLINED", mrb_fixnum_value(DECLINED));
