@@ -188,6 +188,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
 {
   struct mrb_parser_state* p;
   FILE *mrb_file;
+  c->ctx = mrbc_context_new(mrb);
   TRACER;
 
   if (c != NULL) {
@@ -218,7 +219,8 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
         );
         return;
       }
-      p = mrb_parse_file(mrb, mrb_file, NULL);
+      mrbc_filename(mrb, c->ctx, c->path);
+      p = mrb_parse_file(mrb, mrb_file, c->ctx);
       fclose(mrb_file);
       c->proc = mrb_generate_code(mrb, p);
       ap_log_error(APLOG_MARK
@@ -487,10 +489,11 @@ SET_MOD_MRUBY_DIR_INLINE_CMDS(log_transaction_last);
 //
 // run mruby core functions
 //
-static void ap_mruby_irep_clean(mrb_state *mrb, struct RProc *proc, request_rec *r)
+static void ap_mruby_code_clean(mrb_state *mrb, struct RProc *proc, mod_mruby_code_t *code, request_rec *r)
 {
   TRACER;
   mrb_irep_decref(mrb, proc->body.irep);
+  mrbc_context_free(mrb, code->ctx);
 }
 
 static void ap_mruby_state_clean(mrb_state *mrb)
@@ -631,7 +634,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
       , MODULE_NAME
       , __func__
       );
-    ap_mruby_irep_clean(mrb, code->proc, r);
+    ap_mruby_code_clean(mrb, code->proc, code, r);
   }
   ap_mruby_state_clean(mrb);
 

@@ -41,6 +41,7 @@
 
 #include "mruby.h"
 #include "mruby/string.h"
+#include "mruby/compile.h"
 
 #undef HAVE_UNISTD_H
 #include "http_request.h"
@@ -81,6 +82,7 @@ typedef struct {
     char *code;
   };
   struct RProc *proc;
+  mrbc_context *ctx;
   int irep_idx_start;
   int irep_idx_end;
   enum code_type type;
