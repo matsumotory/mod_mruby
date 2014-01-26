@@ -46,72 +46,40 @@ int ap_mrb_set_status_code(int val)
   return 0;
 }
 
-void ap_mrb_raise_file_error(mrb_state *mrb, mrb_value obj, request_rec *r, const char *file)
+void ap_mrb_raise_error(mrb_state *mrb, mrb_value obj, mod_mruby_code_t *code)
 {
-   struct RString *str;
-   char *err_out;
+  struct RString *str;
+  char *err_out, *cache, *type;
 
-   obj = mrb_funcall(mrb, obj, "inspect", 0);
+  obj = mrb_funcall(mrb, obj, "inspect", 0);
 
-   if (mrb_type(obj) == MRB_TT_STRING) {
-     str = mrb_str_ptr(obj);
-     err_out = str->ptr;
-     ap_log_error(APLOG_MARK
-       , APLOG_ERR
-       , 0
-       , NULL 
-       , "%s ERROR %s: mrb_run failed. file: %s error: %s"
-       , MODULE_NAME
-       , __func__
-       , file
-       , err_out
-     );
-   }
-}
-
-void ap_mrb_raise_file_error_nr(mrb_state *mrb, mrb_value obj, const char *file)
-{
-   struct RString *str;
-   char *err_out;
-
-   obj = mrb_funcall(mrb, obj, "inspect", 0);
-
-   if (mrb_type(obj) == MRB_TT_STRING) {
-     str = mrb_str_ptr(obj);
-     err_out = str->ptr;
-     ap_log_error(APLOG_MARK
-       , APLOG_ERR
-       , 0
-       , NULL 
-       , "%s ERROR %s: mrb_run failed. file: %s error: %s"
-       , MODULE_NAME
-       , __func__
-       , file
-       , err_out
-     );
-   }
-}
-
-void ap_mrb_raise_error(mrb_state *mrb, mrb_value obj, request_rec *r)
-{
-   struct RString *str;
-   char *err_out;
-
-   obj = mrb_funcall(mrb, obj, "inspect", 0);
-
-   if (mrb_type(obj) == MRB_TT_STRING) {
-     str = mrb_str_ptr(obj);
-     err_out = str->ptr;
-     ap_log_error(APLOG_MARK
-       , APLOG_ERR
-       , 0
-       , NULL
-       , "%s ERROR %s: mrb_run failed. error: %s"
-       , MODULE_NAME
-       , __func__
-       , err_out
-     );
-   }
+  if (mrb_type(obj) == MRB_TT_STRING) {
+    str = mrb_str_ptr(obj);
+    err_out = str->ptr;
+    if (code->type == MOD_MRUBY_STRING) {
+      type = "STRING";
+    }
+    else {
+      type = "FILE";
+    }
+    if (code->cache == CACHE_ENABLE) {
+      cache = "ENABLE";
+    }
+    else {
+      cache = "DISABLE";
+    }
+    ap_log_error(APLOG_MARK
+      , APLOG_ERR
+      , 0
+      , NULL
+      , "%s ERROR %s: mrb_run failed: [TYPE: %s] [CACHED: %s] mruby raise: %s"
+      , MODULE_NAME
+      , __func__
+      , type 
+      , cache
+      , err_out
+    );
+  }
 }
 
 mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)

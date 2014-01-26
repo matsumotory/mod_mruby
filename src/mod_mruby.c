@@ -193,7 +193,8 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
 
   if (c != NULL) {
     if (c->type == MOD_MRUBY_STRING) {
-      p = mrb_parse_string(mrb, c->code, NULL);
+      mrbc_filename(mrb, c->ctx, "inline_conf");
+      p = mrb_parse_string(mrb, c->code, c->ctx);
       c->proc = mrb_generate_code(mrb, p);
       ap_log_error(APLOG_MARK
         , APLOG_DEBUG
@@ -503,7 +504,7 @@ static void ap_mruby_state_clean(mrb_state *mrb)
 }
 
 // mruby_run for not request phase.
-static int ap_mruby_run_nr(const char *mruby_code_file)
+static int ap_mruby_run_nr(mod_mruby_code_t *code)
 {
 
   struct RProc *proc;
@@ -512,7 +513,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
   mrb_state *mrb = mrb_open();
   ap_mruby_class_init(mrb);
 
-  if ((mrb_file = fopen(mruby_code_file, "r")) == NULL) {
+  if ((mrb_file = fopen(code->path, "r")) == NULL) {
     ap_log_error(APLOG_MARK
       , APLOG_ERR
       , 0
@@ -520,7 +521,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
       , "%s ERROR %s: mrb file oepn failed: %s"
       , MODULE_NAME
       , __func__
-      , mruby_code_file
+      , code->path
     );
     mrb_close(mrb);
     return -1;
@@ -534,7 +535,7 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
      , MODULE_NAME
      , __func__
      , getpid()
-     , mruby_code_file
+     , code->path
    );
 
   p = mrb_parse_file(mrb, mrb_file, NULL);
@@ -550,14 +551,14 @@ static int ap_mruby_run_nr(const char *mruby_code_file)
     , "%s DEBUG %s: run mruby code: %s"
     , MODULE_NAME
     , __func__
-    , mruby_code_file
+    , code->path
   );
 
   ap_mrb_set_status_code(OK);
   mrb_run(mrb, proc, mrb_top_self(mrb));
 
   if (mrb->exc)
-    ap_mrb_raise_file_error_nr(mrb, mrb_obj_value(mrb->exc), mruby_code_file);
+    ap_mrb_raise_error(mrb, mrb_obj_value(mrb->exc), code);
 
   mrb_close(mrb);
 
@@ -612,7 +613,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
   mrb_gc_arena_restore(mrb, ai);
 
   if (mrb->exc)
-    ap_mrb_raise_file_error(mrb, mrb_obj_value(mrb->exc), r, code->path);
+    ap_mrb_raise_error(mrb, mrb_obj_value(mrb->exc), code);
 
   ap_log_rerror(APLOG_MARK
     , APLOG_DEBUG
@@ -687,6 +688,9 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t 
     , c->proc
     , mrb_top_self(mrb)
   );
+  if (mrb->exc) {
+    ap_mrb_raise_error(mrb, mrb_obj_value(mrb->exc), c);
+  }
   mrb_gc_arena_restore(mrb, ai);
   ap_mruby_state_clean(mrb);
   // mutex unlock
@@ -800,7 +804,7 @@ static void mod_mruby_##hook(apr_pool_t *pool, server_rec *server)            \
   if (conf->mod_mruby_##hook##_code == NULL)                      \
     return;                                     \
                                             \
-  ap_mruby_run_nr(conf->mod_mruby_##hook##_code->path);                 \
+  ap_mruby_run_nr(conf->mod_mruby_##hook##_code);                 \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC_NR_VOID(child_init_first);
@@ -816,7 +820,7 @@ static int mod_mruby_##hook(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, 
   if (conf->mod_mruby_##hook##_code == NULL)                                      \
     return DECLINED;                                                  \
                                                               \
-  ap_mruby_run_nr(conf->mod_mruby_##hook##_code->path);                                 \
+  ap_mruby_run_nr(conf->mod_mruby_##hook##_code);                                 \
   return OK;                                                      \
 }
 
