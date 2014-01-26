@@ -331,7 +331,9 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_class_method(mrb, class_core, "rputs", ap_mrb_rputs, ARGS_ANY());
   mrb_define_class_method(mrb, class_core, "return", ap_mrb_return, ARGS_ANY());
   mrb_define_class_method(mrb, class_core, "errlogger", ap_mrb_errlogger, ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "log", ap_mrb_errlogger, ARGS_ANY());
   mrb_define_class_method(mrb, class_core, "syslogger", ap_mrb_syslogger, ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "syslog", ap_mrb_syslogger, ARGS_ANY());
   //mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
   mrb_define_class_method(mrb, class_core, "module_name", ap_mrb_get_mod_mruby_name, ARGS_NONE());
   mrb_define_class_method(mrb, class_core, "module_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
