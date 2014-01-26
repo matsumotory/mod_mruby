@@ -103,6 +103,15 @@ mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str)
 }
 */
 
+mrb_value ap_mrb_replace_stderr_log(mrb_state *mrb, mrb_value self)
+{
+  const char *file;
+  request_rec *r = ap_mrb_get_request();
+
+  mrb_get_args(mrb, "z", &file);
+  return mrb_fixnum_value(ap_replace_stderr_log(r->pool, file));
+}
+
 mrb_value ap_mrb_get_request_body(mrb_state *mrb, mrb_value str)
 {
   char *val;
@@ -854,6 +863,7 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   //mrb_define_method(mrb, class_request, "request_rec_json", ap_mrb_get_request_rec_json, ARGS_NONE());
   mrb_define_method(mrb, class_request, "body", ap_mrb_get_request_body, ARGS_NONE());
 
+  mrb_define_method(mrb, class_request, "error_log_into", ap_mrb_replace_stderr_log, ARGS_REQ(1));
   mrb_define_method(mrb, class_request, "the_request=", ap_mrb_set_request_the_request, ARGS_ANY());
   mrb_define_method(mrb, class_request, "the_request", ap_mrb_get_request_the_request, ARGS_NONE());
   mrb_define_method(mrb, class_request, "protocol=", ap_mrb_set_request_protocol, ARGS_ANY());
