@@ -847,6 +847,19 @@ static mrb_value ap_mrb_finfo_obj(mrb_state *mrb, mrb_value self)
   return ap_mrb_get_class_obj(mrb, self, "finfo_obj", "Finfo");
 }
 
+static mrb_value ap_mrb_request_error_log(mrb_state *mrb, mrb_value self)
+{
+
+  mrb_value msg;
+  mrb_int pri;
+  request_rec *r = ap_mrb_get_request();
+
+  mrb_get_args(mrb, "io", &pri, &msg);
+  ap_log_rerror(APLOG_MARK, pri, 0, r, "%s", RSTRING_PTR(msg));
+
+  return msg;
+}
+
 void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
 {
   struct RClass *class_request;
@@ -864,6 +877,8 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_request, "body", ap_mrb_get_request_body, ARGS_NONE());
 
   mrb_define_method(mrb, class_request, "error_log_into", ap_mrb_replace_stderr_log, ARGS_REQ(1));
+  mrb_define_method(mrb, class_request, "error_log", ap_mrb_request_error_log, ARGS_REQ(2));
+  mrb_define_method(mrb, class_request, "log", ap_mrb_request_error_log, ARGS_REQ(2));
   mrb_define_method(mrb, class_request, "the_request=", ap_mrb_set_request_the_request, ARGS_ANY());
   mrb_define_method(mrb, class_request, "the_request", ap_mrb_get_request_the_request, ARGS_NONE());
   mrb_define_method(mrb, class_request, "protocol=", ap_mrb_set_request_protocol, ARGS_ANY());
