@@ -13,7 +13,7 @@ ap_mrb_filter_rec *mrb_filter_state = NULL;
 
 int ap_mrb_push_filter(ap_filter_t *f, apr_bucket_brigade *bb)
 {
-  mrb_filter_state = (ap_mrb_filter_rec *)apr_pcalloc(f->r->pool, sizeof(ap_mrb_filter_rec *));
+  mrb_filter_state = (ap_mrb_filter_rec *)apr_pcalloc(f->r->pool, sizeof(ap_mrb_filter_rec));
   mrb_filter_state->f = f;
   mrb_filter_state->bb = bb;
   return OK;
