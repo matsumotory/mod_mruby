@@ -959,7 +959,8 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* 
   if (dir_conf->mod_mruby_output_filter_code == NULL)
     return ap_pass_brigade(f->next, bb);
 
-  ap_mrb_push_filter(f, bb);
+  ap_mrb_set_filter_rec(f, bb, r->pool);
+  ap_mrb_push_request(r);
   rv = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r, dir_conf->mod_mruby_output_filter_code, OK);
   return ap_pass_brigade(f->next, bb);
 }
