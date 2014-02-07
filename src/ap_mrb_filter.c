@@ -67,10 +67,10 @@ static mrb_value ap_mrb_filter_puts(mrb_state *mrb, mrb_value self)
 static mrb_value ap_mrb_filter_insert_tail(mrb_state *mrb, mrb_value self)
 {
   ap_mrb_filter_rec *ff = ap_mrb_get_filter();
-  mrb_value bkt_o;
+  char *s;
   apr_bucket *b;
-  mrb_get_args(mrb, "o", &bkt_o);
-  b = (apr_bucket *)mrb_check_datatype(mrb, bkt_o, &mrb_apr_bucket_type);
+  mrb_get_args(mrb, "z", &s);
+  b = apr_bucket_immortal_create(s, strlen(s), ff->f->c->bucket_alloc);
   APR_BRIGADE_INSERT_TAIL(ff->bb, b);
   return self;
 }
@@ -105,7 +105,7 @@ static mrb_value ap_mrb_filter_brigade_pflatten(mrb_state *mrb, mrb_value self)
   rv = apr_brigade_pflatten(ff->bb, &data, &len, ff->f->r->pool);
   if (rv) 
     mrb_raise(mrb, E_RUNTIME_ERROR, "apr_brigade_pflatten failed");
-  return mrb_str_new(mrb, data, len);
+  return mrb_str_new_cstr(mrb, data);
 }
 
 static mrb_value ap_mrb_filter_brigade_length(mrb_state *mrb, mrb_value self)
@@ -124,35 +124,35 @@ static mrb_value ap_mrb_filter_brigade_empty(mrb_state *mrb, mrb_value self)
   return (rv) ? mrb_true_value()  : mrb_false_value();
 }
 
-static mrb_value ap_mrb_filter_brigade_is_eos(mrb_state *mrb, mrb_value self)
-{
-  apr_status_t rv;
-  apr_bucket *b;
-  //mrb_value bkt_o;
-  //mrb_get_args(mrb, "o", &bkt_o);
-  b = (apr_bucket *)mrb_check_datatype(mrb, self, &mrb_apr_bucket_type);
-  rv = APR_BUCKET_IS_EOS(b);
-  return (rv) ? mrb_true_value()  : mrb_false_value();
-}
-
-static mrb_value ap_mrb_filter_bucket_read(mrb_state *mrb, mrb_value self)
-{
-  apr_size_t len;
-  const char* data;
-  apr_status_t rv;
-  apr_bucket *b;
-  mrb_value bkt_o;
-  mrb_get_args(mrb, "o", &bkt_o);
-  b = (apr_bucket *)mrb_check_datatype(mrb, bkt_o, &mrb_apr_bucket_type);
-  apr_bucket_read(b, &data, &len, APR_BLOCK_READ);
-  return mrb_str_new(mrb, data, len);
-}
+//static mrb_value ap_mrb_filter_brigade_is_eos(mrb_state *mrb, mrb_value self)
+//{
+//  apr_status_t rv;
+//  apr_bucket *b;
+//  //mrb_value bkt_o;
+//  //mrb_get_args(mrb, "o", &bkt_o);
+//  b = (apr_bucket *)mrb_check_datatype(mrb, self, &mrb_apr_bucket_type);
+//  rv = APR_BUCKET_IS_EOS(b);
+//  return (rv) ? mrb_true_value()  : mrb_false_value();
+//}
+//
+//static mrb_value ap_mrb_filter_bucket_read(mrb_state *mrb, mrb_value self)
+//{
+//  apr_size_t len;
+//  const char* data;
+//  apr_status_t rv;
+//  apr_bucket *b;
+//  mrb_value bkt_o;
+//  mrb_get_args(mrb, "o", &bkt_o);
+//  b = (apr_bucket *)mrb_check_datatype(mrb, bkt_o, &mrb_apr_bucket_type);
+//  apr_bucket_read(b, &data, &len, APR_BLOCK_READ);
+//  return mrb_str_new(mrb, data, len);
+//}
 
 void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
 {
   struct RClass *class_filter;
 
-  mrb_define_method(mrb, mrb->kernel_module, "is_eos?", ap_mrb_filter_brigade_is_eos, ARGS_NONE());
+  //mrb_define_method(mrb, mrb->kernel_module, "is_eos?", ap_mrb_filter_brigade_is_eos, ARGS_NONE());
 
   class_filter = mrb_define_class_under(mrb, class_core, "Filter", mrb->object_class);
   mrb_define_method(mrb, class_filter, "initialize", ap_mrb_filter_init, ARGS_NONE());
@@ -165,6 +165,6 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_filter, "length", ap_mrb_filter_brigade_length, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "empty?", ap_mrb_filter_brigade_empty, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "first_bucket", ap_mrb_filter_brigade_first, ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "bucket_read", ap_mrb_filter_bucket_read, ARGS_REQ(1));
+  //mrb_define_method(mrb, class_filter, "bucket_read", ap_mrb_filter_bucket_read, ARGS_REQ(1));
   
 }
