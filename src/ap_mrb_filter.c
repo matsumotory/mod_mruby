@@ -75,6 +75,17 @@ static mrb_value ap_mrb_filter_insert_tail(mrb_state *mrb, mrb_value self)
   return self;
 }
 
+static mrb_value ap_mrb_filter_insert_head(mrb_state *mrb, mrb_value self)
+{
+  ap_mrb_filter_rec *ff = ap_mrb_get_filter();
+  char *s;
+  apr_bucket *b;
+  mrb_get_args(mrb, "z", &s);
+  b = apr_bucket_immortal_create(s, strlen(s), ff->f->c->bucket_alloc);
+  APR_BRIGADE_INSERT_HEAD(ff->bb, b);
+  return self;
+}
+
 static mrb_value ap_mrb_filter_insert_eos(mrb_state *mrb, mrb_value self)
 {
   ap_mrb_filter_rec *ff = ap_mrb_get_filter();
@@ -158,6 +169,7 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_filter, "initialize", ap_mrb_filter_init, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "puts", ap_mrb_filter_puts, ARGS_REQ(1));
   mrb_define_method(mrb, class_filter, "insert_tail", ap_mrb_filter_insert_tail, ARGS_REQ(1));
+  mrb_define_method(mrb, class_filter, "insert_head", ap_mrb_filter_insert_head, ARGS_REQ(1));
   mrb_define_method(mrb, class_filter, "insert_eos", ap_mrb_filter_insert_eos, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "destroy", ap_mrb_filter_brigade_destroy, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "cleanup", ap_mrb_filter_brigade_cleanup, ARGS_NONE());
