@@ -39,7 +39,7 @@ void ap_mruby_ext_class_init(mrb_state *mrb, struct RClass *class_core)
 
 int ap_mruby_class_init(mrb_state *mrb)
 {
-  struct RClass *class = mrb_define_module(mrb, "Apache");
+  struct RClass *class = mrb_define_class(mrb, "Apache", mrb->object_class);
 
   ap_mruby_core_init(mrb, class); GC_ARENA_RESTORE;
   ap_mruby_server_init(mrb, class); GC_ARENA_RESTORE;
