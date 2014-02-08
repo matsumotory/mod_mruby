@@ -109,7 +109,7 @@ mrb_value ap_mrb_get_server_version(mrb_state *mrb, mrb_value str)
 #if AP_SERVER_PATCHLEVEL_NUMBER > 3
   return mrb_str_new(mrb, ap_get_server_description(), strlen(ap_get_server_description()));
 #else
-  return mrb_str_new_cstr(mrb, AP_SERVER_BASEVERSION " (" PLATFORM ")");
+  return mrb_str_new_lit(mrb, AP_SERVER_BASEVERSION " (" PLATFORM ")");
 #endif
 }
 
@@ -228,7 +228,7 @@ mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
 
 mrb_value ap_mrb_server_name(mrb_state *mrb, mrb_value self)
 {
-  return mrb_str_new_cstr(mrb, AP_SERVER_BASEPRODUCT);
+  return mrb_str_new_lit(mrb, AP_SERVER_BASEPRODUCT);
 }
 
 mrb_value ap_mrb_f_global_remove(mrb_state *mrb, mrb_value self)
