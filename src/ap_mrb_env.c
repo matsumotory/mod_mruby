@@ -27,7 +27,7 @@ mrb_value ap_mrb_set_env(mrb_state *mrb, mrb_value str)
   apr_table_t *e = r->subprocess_env;
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_setn(e, RSTRING_PTR(key), RSTRING_PTR(val));
+  apr_table_setn(e, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -40,7 +40,7 @@ mrb_value ap_mrb_get_env(mrb_state *mrb, mrb_value str)
   apr_table_t *e = r->subprocess_env;
 
   mrb_get_args(mrb, "o", &key);
-  val = apr_table_get(e, RSTRING_PTR(key));
+  val = apr_table_get(e, mrb_str_to_cstr(mrb, key));
   if (val == NULL)
     return mrb_nil_value();
   return mrb_str_new(mrb, val, strlen(val));

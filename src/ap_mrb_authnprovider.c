@@ -88,7 +88,7 @@ mrb_value ap_mrb_set_authnprovider_rethash(mrb_state *mrb, mrb_value str)
   mrb_value val;
   authnprovider_rec *anp = ap_mrb_get_authnprovider();
   mrb_get_args(mrb, "o", &val);
-  anp->rethash = apr_pstrdup(anp->r->pool, RSTRING_PTR(val));
+  anp->rethash = apr_pstrdup(anp->r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 

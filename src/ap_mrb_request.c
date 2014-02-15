@@ -260,7 +260,7 @@ mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->the_request = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->the_request = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -269,7 +269,7 @@ mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->protocol = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->protocol = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -278,7 +278,7 @@ mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->vlist_validator = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->vlist_validator = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -287,7 +287,7 @@ mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->user = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->user = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -296,7 +296,7 @@ mrb_value ap_mrb_set_request_ap_auth_type(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->ap_auth_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->ap_auth_type = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -305,7 +305,7 @@ mrb_value ap_mrb_set_request_unparsed_uri(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->unparsed_uri = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->unparsed_uri = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -314,7 +314,7 @@ mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->uri = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->uri = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -323,7 +323,7 @@ mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->filename = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->filename = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -332,7 +332,7 @@ mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->canonical_filename = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->canonical_filename = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -341,7 +341,7 @@ mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->path_info = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->path_info = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -350,7 +350,7 @@ mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->args = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->args = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -359,7 +359,7 @@ mrb_value ap_mrb_set_request_hostname(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->hostname = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->hostname = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -368,7 +368,7 @@ mrb_value ap_mrb_set_request_status_line(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->status_line = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->status_line = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -386,7 +386,7 @@ mrb_value ap_mrb_set_request_method(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->method = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->method = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -395,7 +395,7 @@ mrb_value ap_mrb_set_request_range(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->range = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->range = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -404,7 +404,7 @@ mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->content_type = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->content_type = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -413,7 +413,7 @@ mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->handler = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->handler = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -422,7 +422,7 @@ mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->content_encoding = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->content_encoding = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -432,7 +432,7 @@ mrb_value ap_mrb_set_request_notes(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_set(r->notes, RSTRING_PTR(key), RSTRING_PTR(val));
+  apr_table_set(r->notes, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -443,7 +443,7 @@ mrb_value ap_mrb_get_request_notes(mrb_state *mrb, mrb_value str)
   const char *val;
 
   mrb_get_args(mrb, "o", &key);
-  val = apr_table_get(r->notes, RSTRING_PTR(key));
+  val = apr_table_get(r->notes, mrb_str_to_cstr(mrb, key));
   if (val == NULL)
     return mrb_nil_value();
   return mrb_str_new(mrb, val, strlen(val));
@@ -455,7 +455,7 @@ mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_set(r->headers_in, RSTRING_PTR(key), RSTRING_PTR(val));
+  apr_table_set(r->headers_in, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -466,7 +466,7 @@ mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
   const char *val;
 
   mrb_get_args(mrb, "o", &key);
-  val = apr_table_get(r->headers_in, RSTRING_PTR(key));
+  val = apr_table_get(r->headers_in, mrb_str_to_cstr(mrb, key));
   if (val == NULL)
     return mrb_nil_value();
   return mrb_str_new(mrb, val, strlen(val));
@@ -495,7 +495,7 @@ mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_set(r->headers_out, RSTRING_PTR(key), RSTRING_PTR(val));
+  apr_table_set(r->headers_out, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -506,7 +506,7 @@ mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "o", &key);
-  val = apr_table_get(r->headers_out, RSTRING_PTR(key));
+  val = apr_table_get(r->headers_out, mrb_str_to_cstr(mrb, key));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
@@ -579,7 +579,7 @@ mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
   const char *val;
 
   mrb_get_args(mrb, "o", &key);
-  val = apr_table_get(r->headers_in, RSTRING_PTR(key));
+  val = apr_table_get(r->headers_in, mrb_str_to_cstr(mrb, key));
   if (val == NULL)
     return mrb_nil_value();
   return mrb_str_new(mrb, val, strlen(val));
@@ -781,8 +781,8 @@ mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
     return str;
   }
 
-  member = RSTRING_PTR(argv[0]);
-  value  = RSTRING_PTR(argv[1]);
+  member = mrb_str_to_cstr(mrb, argv[0]);
+  value  = mrb_str_to_cstr(mrb, argv[1]);
 
   if (strcmp(member, "filename") == 0)
     r->filename = apr_pstrdup(r->pool, value);
@@ -855,7 +855,7 @@ static mrb_value ap_mrb_request_error_log(mrb_state *mrb, mrb_value self)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "io", &pri, &msg);
-  ap_log_rerror(APLOG_MARK, pri, 0, r, "%s", RSTRING_PTR(msg));
+  ap_log_rerror(APLOG_MARK, pri, 0, r, "%s", mrb_str_to_cstr(mrb, msg));
 
   return msg;
 }

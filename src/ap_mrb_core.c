@@ -148,7 +148,7 @@ mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
     return str;
   }
 
-  ap_log_error(APLOG_MARK, mrb_fixnum(argv[0]), 0, NULL, "%s", RSTRING_PTR(argv[1]));
+  ap_log_error(APLOG_MARK, mrb_fixnum(argv[0]), 0, NULL, "%s", mrb_str_to_cstr(mrb, argv[1]));
 
   return str;
 }
@@ -177,7 +177,7 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
     return str;
   }
 
-  i_pri = RSTRING_PTR(argv[0]);
+  i_pri = mrb_str_to_cstr(mrb, argv[0]);
 
   i = 0;
   while (logpriority[i].c_name != NULL) {
@@ -200,7 +200,7 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
     return str;
   }
 
-  msg = RSTRING_PTR(argv[1]);
+  msg = mrb_str_to_cstr(mrb, argv[1]);
 
   openlog(NULL, LOG_PID, LOG_SYSLOG);
   syslog(pri, "%s", msg);
@@ -217,7 +217,7 @@ mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
   int ai = mrb_gc_arena_save(mrb);
   mrb_get_args(mrb, "o", &msg);
   if (mrb_type(msg) == MRB_TT_STRING) {
-    ap_rputs(RSTRING_PTR(msg), ap_mrb_get_request());
+    ap_rputs(mrb_str_to_cstr(mrb, msg), ap_mrb_get_request());
   } else {
     ap_rputs("not string", ap_mrb_get_request());
   }

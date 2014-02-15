@@ -18,7 +18,7 @@ mrb_value ap_mrb_set_server_error_fname(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
-  r->server->error_fname = apr_pstrdup(r->pool, RSTRING_PTR(val));
+  r->server->error_fname = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
 }
 
