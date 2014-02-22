@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# ENV example
+#
+#   APXS_PATH_ENV='--with-apxs=/usr/local/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=/usr/local/apache/bin/apachectl' sh build.sh
+#
+
 set -e
 
 #APXS_PATH='--with-apxs=/usr/local/apache/bin/apxs'
