@@ -103,7 +103,7 @@ mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str)
 }
 */
 
-mrb_value ap_mrb_replace_stderr_log(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_replace_stderr_log(mrb_state *mrb, mrb_value self)
 {
   const char *file;
   request_rec *r = ap_mrb_get_request();
@@ -112,7 +112,7 @@ mrb_value ap_mrb_replace_stderr_log(mrb_state *mrb, mrb_value self)
   return mrb_fixnum_value(ap_replace_stderr_log(r->pool, file));
 }
 
-mrb_value ap_mrb_get_request_body(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_body(mrb_state *mrb, mrb_value str)
 {
   char *val;
   int len;
@@ -128,126 +128,126 @@ mrb_value ap_mrb_get_request_body(mrb_state *mrb, mrb_value str)
   return mrb_nil_value();
 }
 
-mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->the_request));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_protocol(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_protocol(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->protocol));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_vlist_validator(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_vlist_validator(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->vlist_validator));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_user(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_user(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->user));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_ap_auth_type(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_ap_auth_type(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->ap_auth_type));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_unparsed_uri(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_unparsed_uri(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->unparsed_uri));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_uri(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_uri(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->uri));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_filename(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_filename(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->filename));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_canonical_filename(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_canonical_filename(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->canonical_filename));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_path_info(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_path_info(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->path_info));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_args(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_args(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->args));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool,r->hostname));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_status_line(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_status_line(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool,r->status_line));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_method(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_method(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool,r->method));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_range(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_range(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool,r->range));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->content_type));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_handler(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_handler(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->handler));
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_content_encoding(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_content_encoding(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->content_encoding));
@@ -255,7 +255,7 @@ mrb_value ap_mrb_get_request_content_encoding(mrb_state *mrb, mrb_value str)
 }
 
 
-mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -264,7 +264,7 @@ mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -273,7 +273,7 @@ mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -282,7 +282,7 @@ mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -291,7 +291,7 @@ mrb_value ap_mrb_set_request_user(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_ap_auth_type(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_ap_auth_type(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -300,7 +300,7 @@ mrb_value ap_mrb_set_request_ap_auth_type(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_unparsed_uri(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_unparsed_uri(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -309,7 +309,7 @@ mrb_value ap_mrb_set_request_unparsed_uri(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -318,7 +318,7 @@ mrb_value ap_mrb_set_request_uri(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -327,7 +327,7 @@ mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -336,7 +336,7 @@ mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -345,7 +345,7 @@ mrb_value ap_mrb_set_request_path_info(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -354,7 +354,7 @@ mrb_value ap_mrb_set_request_args(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_hostname(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_hostname(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -363,7 +363,7 @@ mrb_value ap_mrb_set_request_hostname(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_status_line(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_status_line(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -372,7 +372,7 @@ mrb_value ap_mrb_set_request_status_line(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_status(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_status(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -381,7 +381,7 @@ mrb_value ap_mrb_set_request_status(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_method(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_method(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -390,7 +390,7 @@ mrb_value ap_mrb_set_request_method(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_range(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_range(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -399,7 +399,7 @@ mrb_value ap_mrb_set_request_range(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -408,7 +408,7 @@ mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -417,7 +417,7 @@ mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -426,7 +426,7 @@ mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_set_request_notes(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_notes(mrb_state *mrb, mrb_value str)
 {
   mrb_value key, val;
   request_rec *r = ap_mrb_get_request();
@@ -436,7 +436,7 @@ mrb_value ap_mrb_set_request_notes(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_get_request_notes(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_notes(mrb_state *mrb, mrb_value str)
 {
   mrb_value key;
   request_rec *r = ap_mrb_get_request();
@@ -449,7 +449,7 @@ mrb_value ap_mrb_get_request_notes(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
 {
   mrb_value key, val;
   request_rec *r = ap_mrb_get_request();
@@ -459,7 +459,7 @@ mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
 {
   mrb_value key;
   request_rec *r = ap_mrb_get_request();
@@ -472,7 +472,7 @@ mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, mrb_value str)
 {
   int i;
   mrb_value hash = mrb_hash_new(mrb);
@@ -489,7 +489,7 @@ mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, mrb_value str)
   return hash;
 }
 
-mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
 {
   mrb_value key, val;
   request_rec *r = ap_mrb_get_request();
@@ -499,7 +499,7 @@ mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
 {
   mrb_value key;
   const char *val;
@@ -510,7 +510,7 @@ mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str)
 {
   int i;
   mrb_value hash = mrb_hash_new(mrb);
@@ -531,7 +531,7 @@ mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str)
 // Apache::Finfo (r->finfo)
 //
 
-mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
 {
 // TODO
 //struct apr_finfo_t {
@@ -585,86 +585,86 @@ mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.protection);
 }
 
-mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.filetype);
 }
 
-mrb_value ap_mrb_get_request_finfo_inode(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_inode(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.inode);
 }
 
-mrb_value ap_mrb_get_request_finfo_device(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_device(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.device);
 }
 
-mrb_value ap_mrb_get_request_finfo_nlink(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_nlink(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.nlink);
 }
 
-mrb_value ap_mrb_get_request_finfo_group(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_group(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.group);
 }
 
-mrb_value ap_mrb_get_request_finfo_user(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_user(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.user);
 }
 
-mrb_value ap_mrb_get_request_finfo_size(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_size(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_float_value(mrb, (mrb_float)r->finfo.size);
 }
 
-mrb_value ap_mrb_get_request_finfo_csize(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_csize(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_float_value(mrb, (mrb_float)r->finfo.csize);
 }
 
-mrb_value ap_mrb_get_request_finfo_atime(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_atime(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_float_value(mrb, (mrb_float)r->finfo.atime);
 }
 
-mrb_value ap_mrb_get_request_finfo_ctime(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_ctime(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_float_value(mrb, (mrb_float)r->finfo.ctime);
 }
 
-mrb_value ap_mrb_get_request_finfo_mtime(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_mtime(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_float_value(mrb, (mrb_float)r->finfo.mtime);
 }
 
-mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_assbackwards(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->assbackwards;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_set_request_proxyreq(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_proxyreq(mrb_state *mrb, mrb_value str)
 {
 
   mrb_int ret;
@@ -675,84 +675,84 @@ mrb_value ap_mrb_set_request_proxyreq(mrb_state *mrb, mrb_value str)
   return str;
 }
 
-mrb_value ap_mrb_get_request_proxyreq(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_proxyreq(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->proxyreq;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_header_only(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_header_only(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->header_only;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_proto_num(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_proto_num(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->proto_num;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_status(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_status(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->status;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_method_number(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_method_number(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->method_number;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_chunked(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_chunked(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->chunked;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_read_body(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_read_body(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->read_body;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_read_chunked(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_read_chunked(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->read_chunked;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->used_path_info;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_eos_sent(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_eos_sent(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->eos_sent;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_no_cache(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_no_cache(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->no_cache;
   return mrb_fixnum_value(val);
 }
 
-mrb_value ap_mrb_get_request_no_local_copy(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_no_local_copy(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->no_local_copy;
@@ -760,7 +760,7 @@ mrb_value ap_mrb_get_request_no_local_copy(mrb_state *mrb, mrb_value str)
 }
 
 
-mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
 {   
 
   struct RProc *b;
@@ -792,7 +792,7 @@ mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
   return str;
 }
 
-mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
 {
   request_rec *r = ap_mrb_get_request();
   apr_status_t result = ap_invoke_handler(r);
