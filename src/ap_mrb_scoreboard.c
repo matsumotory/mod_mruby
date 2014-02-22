@@ -349,7 +349,7 @@ static unsigned long sb_get_access_count()
   return count;
 }
 
-mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
 {
 #ifdef HAVE_TIMES
   float tick;
@@ -373,7 +373,7 @@ mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-mrb_value ap_mrb_get_scoreboard_loadavg(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_get_scoreboard_loadavg(mrb_state *mrb, mrb_value self)
 {
   mrb_value ary;
   ap_loadavg_t t;
@@ -387,39 +387,39 @@ mrb_value ap_mrb_get_scoreboard_loadavg(mrb_state *mrb, mrb_value self)
   return ary;
 }
 
-mrb_value ap_mrb_get_scoreboard_idle_worker(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_idle_worker(mrb_state *mrb, mrb_value str)
 {
   return mrb_fixnum_value((mrb_int)sb_get_idle_worker());
 }
 
-mrb_value ap_mrb_get_scoreboard_process_worker(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_process_worker(mrb_state *mrb, mrb_value str)
 {
   return mrb_fixnum_value((mrb_int)sb_get_process_worker());
 }
 
-mrb_value ap_mrb_get_scoreboard_restart_time(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_restart_time(mrb_state *mrb, mrb_value str)
 {
   return mrb_float_value(mrb, (mrb_float)sb_get_restart_time());
 }
 
-mrb_value ap_mrb_get_scoreboard_pid(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_pid(mrb_state *mrb, mrb_value str)
 {
   return mrb_fixnum_value(getpid());
 }
 
-mrb_value ap_mrb_get_scoreboard_server_limit(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_server_limit(mrb_state *mrb, mrb_value str)
 {
   ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
   return mrb_fixnum_value(mruby_server_limit);
 }
 
-mrb_value ap_mrb_get_scoreboard_thread_limit(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_thread_limit(mrb_state *mrb, mrb_value str)
 {
   ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
   return mrb_fixnum_value(mruby_thread_limit);
 }
 
-mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
 {
   int i, j;
   mrb_int pid;
@@ -439,22 +439,22 @@ mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(-1);
 }
 
-mrb_value ap_mrb_get_scoreboard_uptime(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_uptime(mrb_state *mrb, mrb_value str)
 {
   return mrb_float_value(mrb, (mrb_float)sb_get_uptime());
 }
 
-mrb_value ap_mrb_get_scoreboard_total_kbyte(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_total_kbyte(mrb_state *mrb, mrb_value str)
 {
   return mrb_float_value(mrb, (mrb_float)sb_get_kbcount());
 }
 
-mrb_value ap_mrb_get_scoreboard_total_access(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_total_access(mrb_state *mrb, mrb_value str)
 {
   return mrb_float_value(mrb, (mrb_float)sb_get_access_count());
 }
 
-mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
 {
 
   int i, j, ai;
@@ -523,7 +523,7 @@ mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
   return hash;
 }
 
-mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
 {
 
   int i, j, ai;

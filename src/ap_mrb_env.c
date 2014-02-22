@@ -8,7 +8,7 @@
 #include "mruby/hash.h"
 #include "util_script.h"
 
-mrb_value ap_mrb_init_env(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_init_env(mrb_state *mrb, mrb_value self)
 {
   request_rec *r = ap_mrb_get_request();
   ap_add_common_vars(r);
@@ -19,7 +19,7 @@ mrb_value ap_mrb_init_env(mrb_state *mrb, mrb_value self)
 }
 
 
-mrb_value ap_mrb_set_env(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_env(mrb_state *mrb, mrb_value str)
 {
   mrb_value key, val;
 
@@ -31,7 +31,7 @@ mrb_value ap_mrb_set_env(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-mrb_value ap_mrb_get_env(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_env(mrb_state *mrb, mrb_value str)
 {
   mrb_value key;
   const char *val;
@@ -46,7 +46,7 @@ mrb_value ap_mrb_get_env(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-mrb_value ap_mrb_get_env_hash(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_env_hash(mrb_state *mrb, mrb_value str)
 {
   int i, ai;
   mrb_value hash = mrb_hash_new(mrb);
