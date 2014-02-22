@@ -82,7 +82,7 @@ void ap_mrb_raise_error(mrb_state *mrb, mrb_value obj, mod_mruby_code_t *code)
   }
 }
 
-mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
 {
 
   mrb_int ret;
@@ -93,18 +93,18 @@ mrb_value ap_mrb_return(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-mrb_value ap_mrb_get_mod_mruby_name(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_mod_mruby_name(mrb_state *mrb, mrb_value str)
 {
   return mrb_str_new(mrb, MODULE_NAME, strlen(MODULE_NAME));
 }
 
-mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
 {
   return mrb_str_new(mrb, MODULE_VERSION, strlen(MODULE_VERSION));
 }
 
 
-mrb_value ap_mrb_get_server_version(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_server_version(mrb_state *mrb, mrb_value str)
 {
 #if AP_SERVER_PATCHLEVEL_NUMBER > 3
   return mrb_str_new(mrb, ap_get_server_description(), strlen(ap_get_server_description()));
@@ -113,12 +113,12 @@ mrb_value ap_mrb_get_server_version(mrb_state *mrb, mrb_value str)
 #endif
 }
 
-mrb_value ap_mrb_get_server_build(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_server_build(mrb_state *mrb, mrb_value str)
 {
   return mrb_str_new(mrb, ap_get_server_built(), strlen(ap_get_server_built()));
 }
 
-mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
 {
 
   mrb_int time;
@@ -129,7 +129,7 @@ mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
   return str;
 }
 
-mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
 {
 
   mrb_value *argv;
@@ -154,7 +154,7 @@ mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
 }
 
 
-mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
 {   
 
 #ifdef SUPPORT_SYSLOG
@@ -210,7 +210,7 @@ mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
   return str;
 }
 
-mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
 {
   mrb_value msg;
 
@@ -226,12 +226,12 @@ mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
   return str;
 }
 
-mrb_value ap_mrb_server_name(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_server_name(mrb_state *mrb, mrb_value self)
 {
   return mrb_str_new_lit(mrb, AP_SERVER_BASEPRODUCT);
 }
 
-mrb_value ap_mrb_f_global_remove(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_f_global_remove(mrb_state *mrb, mrb_value self)
 {
   mrb_sym id;
   mrb_get_args(mrb, "n", &id);
@@ -240,7 +240,7 @@ mrb_value ap_mrb_f_global_remove(mrb_state *mrb, mrb_value self)
   return mrb_f_global_variables(mrb, self);
 }
 
-mrb_value ap_mrb_f_count_arena(mrb_state *mrb, mrb_value self)
+static mrb_value ap_mrb_f_count_arena(mrb_state *mrb, mrb_value self)
 {
   return mrb_fixnum_value(mrb_gc_arena_save(mrb));
 }
