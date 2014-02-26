@@ -216,11 +216,27 @@ static mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
 
   int ai = mrb_gc_arena_save(mrb);
   mrb_get_args(mrb, "o", &msg);
-  if (mrb_type(msg) == MRB_TT_STRING) {
-    ap_rputs(mrb_str_to_cstr(mrb, msg), ap_mrb_get_request());
-  } else {
-    ap_rputs("not string", ap_mrb_get_request());
+
+  if (mrb_type(msg) != MRB_TT_STRING) {
+    msg = mrb_funcall(mrb, msg, "to_s", 0, NULL);
   }
+  ap_rputs(mrb_str_to_cstr(mrb,  msg), ap_mrb_get_request());
+  mrb_gc_arena_restore(mrb, ai);
+
+  return str;
+}
+
+static mrb_value ap_mrb_echo(mrb_state *mrb, mrb_value str)
+{
+  mrb_value msg;
+
+  int ai = mrb_gc_arena_save(mrb);
+  mrb_get_args(mrb, "o", &msg);
+
+  if (mrb_type(msg) != MRB_TT_STRING) {
+    msg = mrb_funcall(mrb, msg, "to_s", 0, NULL);
+  }
+  ap_rputs(mrb_str_to_cstr(mrb, mrb_str_plus(mrb, msg, mrb_str_new_lit(mrb, "\n"))), ap_mrb_get_request());
   mrb_gc_arena_restore(mrb, ai);
 
   return str;
@@ -329,6 +345,7 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
 
   mrb_define_class_method(mrb, class_core, "sleep", ap_mrb_sleep, ARGS_ANY());
   mrb_define_class_method(mrb, class_core, "rputs", ap_mrb_rputs, ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "echo", ap_mrb_echo, ARGS_ANY());
   mrb_define_class_method(mrb, class_core, "return", ap_mrb_return, ARGS_ANY());
   mrb_define_class_method(mrb, class_core, "errlogger", ap_mrb_errlogger, ARGS_ANY());
   mrb_define_class_method(mrb, class_core, "log", ap_mrb_errlogger, ARGS_ANY());
