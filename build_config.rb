@@ -27,8 +27,10 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-vedis.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-userdata.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-mod-mruby-ext.git'
   conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'
+
+  # mod_mruby extended class
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-mod-mruby-ext.git'
 
   # use markdown on mod_mruby
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
