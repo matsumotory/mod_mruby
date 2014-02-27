@@ -41,7 +41,7 @@ MRuby::Build.new do |conf|
   conf.cc do |cc|
   #   cc.command = ENV['CC'] || 'gcc'
     if ENV['BUILD_TYPE'] == "debug"
-      cc.flags = '-fPIC -g3 -Wall -Werror-implicit-function-declaration'
+      cc.flags << '-fPIC -g3 -Wall -Werror-implicit-function-declaration'
     else
       cc.flags << '-fPIC'
     end
