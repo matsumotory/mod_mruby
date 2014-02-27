@@ -240,6 +240,13 @@ static mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
+static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+  mrb_int val = r->clength;
+  return mrb_fixnum_value(val);
+}
+
 static mrb_value ap_mrb_get_request_handler(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
@@ -406,6 +413,15 @@ static mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
   mrb_get_args(mrb, "o", &val);
   r->content_type = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
   return val;
+}
+
+static mrb_value ap_mrb_set_request_content_length(mrb_state *mrb, mrb_value str)
+{
+  mrb_int val;
+  request_rec *r = ap_mrb_get_request();
+  mrb_get_args(mrb, "i", &val);
+  ap_set_content_length(r, (apr_off_t)val);
+  return mrb_fixnum_value(val);
 }
 
 static mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
@@ -911,6 +927,8 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_request, "range", ap_mrb_get_request_range, ARGS_NONE());
   mrb_define_method(mrb, class_request, "content_type=", ap_mrb_set_request_content_type, ARGS_ANY());
   mrb_define_method(mrb, class_request, "content_type", ap_mrb_get_request_content_type, ARGS_NONE());
+  mrb_define_method(mrb, class_request, "content_length=", ap_mrb_set_request_content_length, ARGS_ANY());
+  mrb_define_method(mrb, class_request, "content_length", ap_mrb_get_request_content_length, ARGS_NONE());
   mrb_define_method(mrb, class_request, "handler=", ap_mrb_set_request_handler, ARGS_ANY());
   mrb_define_method(mrb, class_request, "handler", ap_mrb_get_request_handler, ARGS_NONE());
   mrb_define_method(mrb, class_request, "content_encoding=", ap_mrb_set_request_content_encoding, ARGS_ANY());
