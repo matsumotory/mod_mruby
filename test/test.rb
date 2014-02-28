@@ -11,144 +11,141 @@
 module ModMruby
   class Test
     def initialize
-      @md = Discount.new("https://gist.github.com/andyferra/2554919/raw/2e66cabdafe1c9a7f354aa2ebf5bc38265e638e5/github.css", "mod_mruby test page")
     end
     def code
     end
     def start
-      Apache.rputs @md.header
-      Apache.rputs "# mod_mruby Test Page".to_html
-      Apache.rputs "__mod_mruby test start.__".to_html
+      Apache.echo "# mod_mruby Test Page"
+      Apache.echo "__mod_mruby test start.__"
     end
     def finish
-      Apache.rputs "__Test Complete. Wellcome to mod_mruby world!!__".to_html
-      Apache.rputs @md.footer
+      Apache.echo "__Test Complete. Wellcome to mod_mruby world!!__"
       Apache.return(Apache::OK)
     end
     def core
-      Apache.rputs "## Apache Class Test".to_html
-      Apache.rputs "- Server: #{server_name}".to_html
-      Apache.rputs "- Apache version: #{Apache::server_version}".to_html
-      Apache.rputs "- Apache build: #{Apache::server_build}".to_html
-      Apache.rputs "- module name: #{Apache::module_name}".to_html
-      Apache.rputs "- module version: #{Apache::module_version}".to_html
+      Apache.echo "## Apache Class Test"
+      Apache.echo "- Server: #{server_name}"
+      Apache.echo "- Apache version: #{Apache::server_version}"
+      Apache.echo "- Apache build: #{Apache::server_build}"
+      Apache.echo "- module name: #{Apache::module_name}"
+      Apache.echo "- module version: #{Apache::module_version}"
       Apache.syslogger "warn", "mod_mruby warning syslogger test."
-      Apache.rputs "- syslogger function: OK".to_html
+      Apache.echo "- syslogger function: OK"
       Apache.errlogger 4, "mod_mruby warning errlogger test."
-      Apache.rputs "- errlogger function: OK".to_html
-      Apache.rputs "- OK status = #{Apache::OK.to_s}".to_html
-      Apache.rputs "- DECLINED status = #{Apache::DECLINED.to_s}".to_html
-      Apache.rputs "- HTTP_OK status = #{Apache::HTTP_OK.to_s}".to_html
-      Apache.rputs "- HTTP_SERVICE_UNAVAILABLE status = #{Apache::HTTP_SERVICE_UNAVAILABLE.to_s}".to_html
+      Apache.echo "- errlogger function: OK"
+      Apache.echo "- OK status = #{Apache::OK.to_s}"
+      Apache.echo "- DECLINED status = #{Apache::DECLINED.to_s}"
+      Apache.echo "- HTTP_OK status = #{Apache::HTTP_OK.to_s}"
+      Apache.echo "- HTTP_SERVICE_UNAVAILABLE status = #{Apache::HTTP_SERVICE_UNAVAILABLE.to_s}"
     end
     def request
-      Apache.rputs "## Request Class Test".to_html
+      Apache.echo "## Request Class Test"
       r = Apache::Request.new()
-      r.content_type = "text/html"
-      Apache.rputs "- filename = #{r.filename}".to_html
-      Apache.rputs "- uri = #{r.uri}".to_html
-      Apache.rputs "- ---- request_rec changed ----".to_html
+      r.content_type = "text/plain"
+      Apache.echo "- filename = #{r.filename}"
+      Apache.echo "- uri = #{r.uri}"
+      Apache.echo "- ---- request_rec changed ----"
       r.filename = "/var/www/html/index.html"
       r.uri = "/index.html"
-      Apache.rputs "- filename = #{r.filename}".to_html
-      Apache.rputs "- uri = #{r.uri}".to_html
+      Apache.echo "- filename = #{r.filename}"
+      Apache.echo "- uri = #{r.uri}"
     end
     def server
-      Apache.rputs "## Server Class Test".to_html
+      Apache.echo "## Server Class Test"
       s = Apache::Server.new()
-      Apache.rputs "- document_root = #{s.document_root}".to_html
-      Apache.rputs "- error_fname = #{s.error_fname}".to_html
-      Apache.rputs "- hostname = #{s.hostname}".to_html
-      Apache.rputs "- timeout = #{s.timeout.to_s}".to_html
+      Apache.echo "- document_root = #{s.document_root}"
+      Apache.echo "- error_fname = #{s.error_fname}"
+      Apache.echo "- hostname = #{s.hostname}"
+      Apache.echo "- timeout = #{s.timeout.to_s}"
     end
     def connection
-      Apache.rputs "## Connection Class Test".to_html
+      Apache.echo "## Connection Class Test"
       c = Apache::Connection.new()
-      Apache.rputs "- remote_ip #{c.remote_ip}".to_html
-      Apache.rputs "- local_ip #{c.local_ip}".to_html
-      Apache.rputs "- keepalives = #{c.keepalives.to_s}".to_html
+      Apache.echo "- remote_ip #{c.remote_ip}"
+      Apache.echo "- local_ip #{c.local_ip}"
+      Apache.echo "- keepalives = #{c.keepalives.to_s}"
     end
     def note
-      Apache.rputs "##Notes Class Test".to_html
+      Apache.echo "##Notes Class Test"
       n = Apache::Request.new.notes
       n["memo"] = "hello"
-      Apache.rputs "- memo = #{n['memo']}".to_html
+      Apache.echo "- memo = #{n['memo']}"
     end
     def env
-      Apache.rputs "## Env Class Test".to_html
+      Apache.echo "## Env Class Test"
       e = Apache::Env.new()
       e["AUTHOR"] = "MATSUMOTO Ryosuke"
       e["AUTHOR"] = "matsumoto_r"
-      Apache.rputs "- AUTHOR = #{e["AUTHOR"]}".to_html
-      Apache.rputs "- SERVER_SOFTWARE = #{e['SERVER_SOFTWARE'].nil? ? 'nil' : e['SERVER_SOFTWARE']}".to_html
+      Apache.echo "- AUTHOR = #{e["AUTHOR"]}"
+      Apache.echo "- SERVER_SOFTWARE = #{e['SERVER_SOFTWARE'].nil? ? 'nil' : e['SERVER_SOFTWARE']}"
       e["SERVER_SOFTWARE"] = "A p a c h e"
       eall = e.env_hash
-      Apache.rputs "- env hash size = #{eall.size.to_s}".to_html
+      Apache.echo "- env hash size = #{eall.size.to_s}"
       eall.each_key do |key|
-          Apache.rputs "- env key = #{key} val = #{eall[key].to_s}".to_html
+          Apache.echo "- env key = #{key} val = #{eall[key].to_s}"
       end
     end
     def headers_in
-      Apache.rputs "## Headers_in Class Test".to_html
+      Apache.echo "## Headers_in Class Test"
       hi = Apache::Request.new.headers_in
-      Apache.rputs "- Accept-Encoding = #{hi['Accept-Encoding'].nil? ? 'nil' : hi['Accept-Encoding']}".to_html
+      Apache.echo "- Accept-Encoding = #{hi['Accept-Encoding'].nil? ? 'nil' : hi['Accept-Encoding']}"
       hi["Accept-Encoding"] = "gzip"
-      Apache.rputs "- Accept-Encoding = #{hi["Accept-Encoding"]}".to_html
+      Apache.echo "- Accept-Encoding = #{hi["Accept-Encoding"]}"
       hiall = hi.all
-      Apache.rputs "- headers_in hash size = #{hiall.size.to_s}".to_html
+      Apache.echo "- headers_in hash size = #{hiall.size.to_s}"
       hiall.each_key do |key|
-        Apache.rputs "- headers_in key = #{key} val = #{hiall[key]}".to_html
+        Apache.echo "- headers_in key = #{key} val = #{hiall[key]}"
       end
     end
     def headers_out
-      Apache.rputs "## Headers_out Class Test".to_html
+      Apache.echo "## Headers_out Class Test"
       ho = Apache::Request.new.headers_out
       hoall = ho.all
-      Apache.rputs "- headers_out hash size = #{hoall.size.to_s}".to_html
+      Apache.echo "- headers_out hash size = #{hoall.size.to_s}"
       hoall.each_key do |key|
-        Apache.rputs "- headers_in key = #{key}  val = #{hoall[key]}".to_html
+        Apache.echo "- headers_in key = #{key}  val = #{hoall[key]}"
       end
     end
     def scoreboard
-      Apache.rputs "## Scoreboard Class Test".to_html
+      Apache.echo "## Scoreboard Class Test"
       wc = Apache::Scoreboard.new()
-      Apache.rputs "- child pid = #{wc.pid.to_s}".to_html
-      Apache.rputs "- thread limit    = #{wc.thread_limit.to_s}".to_html
-      Apache.rputs "- server limit    = #{wc.server_limit.to_s}".to_html
-      Apache.rputs "__Cannot get below values of scoreboard because of ExtendedStatus Off__".to_html if wc.restart_time == 0
-      Apache.rputs "- cpu load        = #{wc.cpu_load.to_s}".to_html
-      Apache.rputs "- load avereage   = #{wc.loadavg.to_s}".to_html
-      Apache.rputs "- total kbyte     = #{wc.total_kbyte.to_s}".to_html
-      Apache.rputs "- total access    = #{wc.total_access.to_s}".to_html
-      Apache.rputs "- restart time    = #{wc.restart_time.to_s}".to_html
-      Apache.rputs "- idle worker     = #{wc.idle_worker.to_s}".to_html
-      Apache.rputs "- busy worker     = #{wc.busy_worker.to_s}".to_html
-      Apache.rputs "- uptime          = #{wc.uptime.to_s}".to_html
-      Apache.rputs "- access counter  = #{wc.access_counter(wc.pid).to_s}".to_html
-      Apache.rputs "- scoreboard status hash size = #{wc.status.size.to_s}".to_html
+      Apache.echo "- child pid = #{wc.pid.to_s}"
+      Apache.echo "- thread limit    = #{wc.thread_limit.to_s}"
+      Apache.echo "- server limit    = #{wc.server_limit.to_s}"
+      Apache.echo "__Cannot get below values of scoreboard because of ExtendedStatus Off__" if wc.restart_time == 0
+      Apache.echo "- cpu load        = #{wc.cpu_load.to_s}"
+      Apache.echo "- load avereage   = #{wc.loadavg.to_s}"
+      Apache.echo "- total kbyte     = #{wc.total_kbyte.to_s}"
+      Apache.echo "- total access    = #{wc.total_access.to_s}"
+      Apache.echo "- restart time    = #{wc.restart_time.to_s}"
+      Apache.echo "- idle worker     = #{wc.idle_worker.to_s}"
+      Apache.echo "- busy worker     = #{wc.busy_worker.to_s}"
+      Apache.echo "- uptime          = #{wc.uptime.to_s}"
+      Apache.echo "- access counter  = #{wc.access_counter(wc.pid).to_s}"
+      Apache.echo "- scoreboard status hash size = #{wc.status.size.to_s}"
       wc.status.each_key do |key|
-          Apache.rputs "- scoreboard key = #{key} val = #{wc.status[key]}".to_html
+          Apache.echo "- scoreboard key = #{key} val = #{wc.status[key]}"
       end
-      Apache.rputs "- scoreboard counter hash size = #{wc.counter.size.to_s}".to_html
+      Apache.echo "- scoreboard counter hash size = #{wc.counter.size.to_s}"
       wc.counter.each_key do |key|
-          Apache.rputs "- scoreboard key = #{key} val = #{wc.counter[key].to_s}".to_html
+          Apache.echo "- scoreboard key = #{key} val = #{wc.counter[key].to_s}"
       end
     end
     def finfo
-      Apache::rputs "## Finfo Class Test".to_html
+      Apache::echo "## Finfo Class Test"
       f = Apache::Request.new.finfo
-      Apache.rputs "- permission = #{f.permission.to_s}".to_html
-      Apache.rputs "- filetype regular file = #{f.filetype == Apache::Finfo::APR_REG}".to_html
-      Apache.rputs "- user = #{f.user.to_s}".to_html
-      Apache.rputs "- group = #{f.group.to_s}".to_html
-      Apache.rputs "- device = #{f.device.to_s}".to_html
-      Apache.rputs "- inode = #{f.inode.to_s}".to_html
-      Apache.rputs "- nlink = #{f.nlink.to_s}".to_html
-      Apache.rputs "- size = #{f.size.to_s}".to_html
-      Apache.rputs "- csize = #{f.csize.to_s}".to_html
-      Apache.rputs "- atime = #{f.atime.to_s}".to_html
-      Apache.rputs "- mtime = #{f.mtime.to_s}".to_html
-      Apache.rputs "- ctime = #{f.ctime.to_s}".to_html
+      Apache.echo "- permission = #{f.permission.to_s}"
+      Apache.echo "- filetype regular file = #{f.filetype == Apache::Finfo::APR_REG}"
+      Apache.echo "- user = #{f.user.to_s}"
+      Apache.echo "- group = #{f.group.to_s}"
+      Apache.echo "- device = #{f.device.to_s}"
+      Apache.echo "- inode = #{f.inode.to_s}"
+      Apache.echo "- nlink = #{f.nlink.to_s}"
+      Apache.echo "- size = #{f.size.to_s}"
+      Apache.echo "- csize = #{f.csize.to_s}"
+      Apache.echo "- atime = #{f.atime.to_s}"
+      Apache.echo "- mtime = #{f.mtime.to_s}"
+      Apache.echo "- ctime = #{f.ctime.to_s}"
     end
   end
 end
