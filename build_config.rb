@@ -27,8 +27,10 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-vedis.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-userdata.git'
-  conf.gem :git => 'git://github.com/matsumoto-r/mruby-mod-mruby-ext.git'
   conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'
+
+  # mod_mruby extended class
+  conf.gem :git => 'git://github.com/matsumoto-r/mruby-mod-mruby-ext.git'
 
   # use markdown on mod_mruby
   #conf.gem :git => 'git://github.com/matsumoto-r/mruby-discount.git'
@@ -41,7 +43,7 @@ MRuby::Build.new do |conf|
   conf.cc do |cc|
   #   cc.command = ENV['CC'] || 'gcc'
     if ENV['BUILD_TYPE'] == "debug"
-      cc.flags = '-fPIC -g3 -Wall -Werror-implicit-function-declaration'
+      cc.flags << '-fPIC -g3 -Wall -Werror-implicit-function-declaration'
     else
       cc.flags << '-fPIC'
     end
