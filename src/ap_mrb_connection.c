@@ -39,7 +39,11 @@ static mrb_value ap_mrb_get_conn_remote_ip(mrb_state *mrb, mrb_value str)
 static mrb_value ap_mrb_get_conn_remote_port(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
+#ifdef __APACHE24__
   mrb_int val = (mrb_int)r->connection->client_addr->port;
+#else
+  mrb_int val = (mrb_int)r->connection->remote_addr->port;
+#endif
   return mrb_fixnum_value(val);
 }
 
