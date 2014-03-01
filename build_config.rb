@@ -27,7 +27,7 @@ MRuby::Build.new do |conf|
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-vedis.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-sleep.git'
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-userdata.git'
-  conf.gem :git => 'git://github.com/masamitsu-murase/mruby-hs-regexp.git'
+  conf.gem :git => 'https://github.com/mattn/mruby-onig-regexp.git'
 
   # mod_mruby extended class
   conf.gem :git => 'git://github.com/matsumoto-r/mruby-mod-mruby-ext.git'
