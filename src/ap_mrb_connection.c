@@ -36,6 +36,17 @@ static mrb_value ap_mrb_get_conn_remote_ip(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
+static mrb_value ap_mrb_get_conn_remote_port(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+#ifdef __APACHE24__
+  mrb_int val = (mrb_int)r->connection->client_addr->port;
+#else
+  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->remote_ip));
+#endif
+  return mrb_fixnum_value(val);
+}
+
 static mrb_value ap_mrb_get_conn_remote_host(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
@@ -109,6 +120,7 @@ void ap_mruby_conn_init(mrb_state *mrb, struct RClass *class_core)
 
   class_conn = mrb_define_class_under(mrb, class_core, "Connection", mrb->object_class);
   mrb_define_method(mrb, class_conn, "remote_ip", ap_mrb_get_conn_remote_ip, ARGS_NONE());
+  mrb_define_method(mrb, class_conn, "remote_port", ap_mrb_get_conn_remote_port, ARGS_NONE());
   mrb_define_method(mrb, class_conn, "remote_host", ap_mrb_get_conn_remote_host, ARGS_NONE());
   mrb_define_method(mrb, class_conn, "remote_logname", ap_mrb_get_conn_remote_logname, ARGS_NONE());
   mrb_define_method(mrb, class_conn, "local_ip", ap_mrb_get_conn_local_ip, ARGS_NONE());
