@@ -64,6 +64,13 @@ static mrb_value ap_mrb_get_conn_local_ip(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
+static mrb_value ap_mrb_get_conn_local_port(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+  mrb_int val = (mrb_int)r->connection->local_addr->port;
+  return mrb_fixnum_value(val);
+}
+
 static mrb_value ap_mrb_get_conn_local_host(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
@@ -120,6 +127,7 @@ void ap_mruby_conn_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_conn, "remote_host", ap_mrb_get_conn_remote_host, ARGS_NONE());
   mrb_define_method(mrb, class_conn, "remote_logname", ap_mrb_get_conn_remote_logname, ARGS_NONE());
   mrb_define_method(mrb, class_conn, "local_ip", ap_mrb_get_conn_local_ip, ARGS_NONE());
+  mrb_define_method(mrb, class_conn, "local_port", ap_mrb_get_conn_local_port, ARGS_NONE());
   mrb_define_method(mrb, class_conn, "local_host", ap_mrb_get_conn_local_host, ARGS_NONE());
   mrb_define_method(mrb, class_conn, "keepalives", ap_mrb_get_conn_keepalives, ARGS_NONE());
   mrb_define_method(mrb, class_conn, "data_in_input_filters", ap_mrb_get_conn_data_in_input_filters, ARGS_NONE());
