@@ -49,6 +49,11 @@ module ModMruby
       r.uri = "/index.html"
       Apache.echo "- filename = #{r.filename}"
       Apache.echo "- uri = #{r.uri}"
+      p_docroot = r.document_root
+      Apache.echo "r.document_root: #{r.document_root}"
+      r.document_root = "/tmp"
+      Apache.echo "r.document_root: #{r.document_root}"
+      r.document_root = p_docroot
     end
     def server
       Apache.echo "## Server Class Test"
