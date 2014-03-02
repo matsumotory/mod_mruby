@@ -8,6 +8,8 @@
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
 #include "mruby/hash.h"
+#include "httpd.h"
+#include "http_core.h"
 #include "http_protocol.h"
 //#include "apr_table.h"
 //#include "json.h"
@@ -212,6 +214,13 @@ static mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
+static mrb_value ap_mrb_get_request_document_root(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+  char *val = apr_pstrdup(r->pool, ap_document_root(r));
+  return mrb_str_new(mrb, val, strlen(val));
+}
+
 static mrb_value ap_mrb_get_request_status_line(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
@@ -367,6 +376,15 @@ static mrb_value ap_mrb_set_request_hostname(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
   r->hostname = apr_pstrdup(r->pool, mrb_str_to_cstr(mrb, val));
+  return val;
+}
+
+static mrb_value ap_mrb_set_request_document_root(mrb_state *mrb, mrb_value str)
+{
+  mrb_value val;
+  request_rec *r = ap_mrb_get_request();
+  mrb_get_args(mrb, "o", &val);
+  ap_set_document_root(r, (const char *)mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -919,6 +937,8 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_request, "args", ap_mrb_get_request_args, ARGS_NONE());
   mrb_define_method(mrb, class_request, "hostname=", ap_mrb_set_request_hostname, ARGS_ANY());
   mrb_define_method(mrb, class_request, "hostname", ap_mrb_get_request_hostname, ARGS_NONE());
+  mrb_define_method(mrb, class_request, "document_root=", ap_mrb_set_request_document_root, ARGS_ANY());
+  mrb_define_method(mrb, class_request, "document_root", ap_mrb_get_request_document_root, ARGS_NONE());
   mrb_define_method(mrb, class_request, "status_line=", ap_mrb_set_request_status_line, ARGS_ANY());
   mrb_define_method(mrb, class_request, "status_line", ap_mrb_get_request_status_line, ARGS_NONE());
   mrb_define_method(mrb, class_request, "method=", ap_mrb_set_request_method, ARGS_ANY());
