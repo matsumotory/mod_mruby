@@ -84,7 +84,7 @@ module ModMruby
       Apache.echo "- AUTHOR = #{e["AUTHOR"]}"
       Apache.echo "- SERVER_SOFTWARE = #{e['SERVER_SOFTWARE'].nil? ? 'nil' : e['SERVER_SOFTWARE']}"
       e["SERVER_SOFTWARE"] = "A p a c h e"
-      eall = e.env_hash
+      eall = e.all
       Apache.echo "- env hash size = #{eall.size.to_s}"
       eall.each_key do |key|
           Apache.echo "- env key = #{key} val = #{eall[key].to_s}"

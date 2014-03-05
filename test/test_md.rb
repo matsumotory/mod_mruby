@@ -82,7 +82,7 @@ module ModMruby
       Apache.rputs "- AUTHOR = #{e["AUTHOR"]}".to_html
       Apache.rputs "- SERVER_SOFTWARE = #{e['SERVER_SOFTWARE'].nil? ? 'nil' : e['SERVER_SOFTWARE']}".to_html
       e["SERVER_SOFTWARE"] = "A p a c h e"
-      eall = e.env_hash
+      eall = e.all
       Apache.rputs "- env hash size = #{eall.size.to_s}".to_html
       eall.each_key do |key|
           Apache.rputs "- env key = #{key} val = #{eall[key].to_s}".to_html
