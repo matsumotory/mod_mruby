@@ -48,7 +48,7 @@ ap_mrb_filter_rec *ap_mrb_get_filter_rec(apr_pool_t *pool)
 
 mrb_value ap_mrb_filter_init(mrb_state *mrb, mrb_value self)
 {
-  request_rec *r = ap_mrb_get_request();
+  //request_rec *r = ap_mrb_get_request();
   return self;
 }
 

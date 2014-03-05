@@ -565,59 +565,59 @@ static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value s
 // Apache::Finfo (r->finfo)
 //
 
-static mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
-{
-// TODO
-//struct apr_finfo_t {
-//  /* Allocates memory and closes lingering handles in the specified pool */
-//  apr_pool_t *pool;
-//  /** The bitmask describing valid fields of this apr_finfo_t structure 
-//   *  including all available 'wanted' fields and potentially more */
-//  apr_int32_t valid;
-//  /** The access permissions of the file.  Mimics Unix access rights. */
-//  apr_fileperms_t protection;
-//  /** The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE, 
-//   * APR_LNK or APR_SOCK.  If the type is undetermined, the value is APR_NOFILE.
-//   * If the type cannot be determined, the value is APR_UNKFILE.
-//   */
-//  apr_filetype_e filetype;
-//  /** The user id that owns the file */
-//  apr_uid_t user;
-//  /** The group id that owns the file */
-//  apr_gid_t group;
-//  /** The inode of the file. */
-//  apr_ino_t inode;
-//  /** The id of the device the file is on. */
-//  apr_dev_t device;
-//  /** The number of hard links to the file. */
-//  apr_int32_t nlink;
-//  /** The size of the file */
-//  apr_off_t size;
-//  /** The storage size consumed by the file */
-//  apr_off_t csize;
-//  /** The time the file was last accessed */
-//  apr_time_t atime;
-//  /** The time the file was last modified */
-//  apr_time_t mtime;
-//  /** The time the file was created, or the inode was last changed */
-//  apr_time_t ctime;
-//  /** The pathname of the file (possibly unrooted) */
-//  const char *fname;
-//  /** The file's name (no path) in filesystem case */
-//  const char *name;
-//  /** The file's handle, if accessed (can be submitted to apr_duphandle) */
-//  struct apr_file_t *filehand;
-//};
-  mrb_value key;
-  request_rec *r = ap_mrb_get_request();
-  const char *val;
-
-  mrb_get_args(mrb, "o", &key);
-  val = apr_table_get(r->headers_in, mrb_str_to_cstr(mrb, key));
-  if (val == NULL)
-    return mrb_nil_value();
-  return mrb_str_new(mrb, val, strlen(val));
-}
+//static mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
+//{
+//// TODO
+////struct apr_finfo_t {
+////  /* Allocates memory and closes lingering handles in the specified pool */
+////  apr_pool_t *pool;
+////  /** The bitmask describing valid fields of this apr_finfo_t structure 
+////   *  including all available 'wanted' fields and potentially more */
+////  apr_int32_t valid;
+////  /** The access permissions of the file.  Mimics Unix access rights. */
+////  apr_fileperms_t protection;
+////  /** The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE, 
+////   * APR_LNK or APR_SOCK.  If the type is undetermined, the value is APR_NOFILE.
+////   * If the type cannot be determined, the value is APR_UNKFILE.
+////   */
+////  apr_filetype_e filetype;
+////  /** The user id that owns the file */
+////  apr_uid_t user;
+////  /** The group id that owns the file */
+////  apr_gid_t group;
+////  /** The inode of the file. */
+////  apr_ino_t inode;
+////  /** The id of the device the file is on. */
+////  apr_dev_t device;
+////  /** The number of hard links to the file. */
+////  apr_int32_t nlink;
+////  /** The size of the file */
+////  apr_off_t size;
+////  /** The storage size consumed by the file */
+////  apr_off_t csize;
+////  /** The time the file was last accessed */
+////  apr_time_t atime;
+////  /** The time the file was last modified */
+////  apr_time_t mtime;
+////  /** The time the file was created, or the inode was last changed */
+////  apr_time_t ctime;
+////  /** The pathname of the file (possibly unrooted) */
+////  const char *fname;
+////  /** The file's name (no path) in filesystem case */
+////  const char *name;
+////  /** The file's handle, if accessed (can be submitted to apr_duphandle) */
+////  struct apr_file_t *filehand;
+////};
+//  mrb_value key;
+//  request_rec *r = ap_mrb_get_request();
+//  const char *val;
+//
+//  mrb_get_args(mrb, "o", &key);
+//  val = apr_table_get(r->headers_in, mrb_str_to_cstr(mrb, key));
+//  if (val == NULL)
+//    return mrb_nil_value();
+//  return mrb_str_new(mrb, val, strlen(val));
+//}
 
 static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, mrb_value str)
 {
@@ -794,37 +794,37 @@ static mrb_value ap_mrb_get_request_no_local_copy(mrb_state *mrb, mrb_value str)
 }
 
 
-static mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
-{   
-
-  struct RProc *b;
-  mrb_value argc, *argv;
-  char *member, *value;
-  request_rec *r = ap_mrb_get_request();
-
-  mrb_get_args(mrb, "b*", &b, &argv, &argc);
-  if (mrb_fixnum(argc) != 2) {
-    ap_log_error(APLOG_MARK
-      , APLOG_WARNING
-      , 0
-      , NULL
-      , "%s ERROR %s: argument is not 2"
-      , MODULE_NAME
-      , __func__
-    );
-    return str;
-  }
-
-  member = mrb_str_to_cstr(mrb, argv[0]);
-  value  = mrb_str_to_cstr(mrb, argv[1]);
-
-  if (strcmp(member, "filename") == 0)
-    r->filename = apr_pstrdup(r->pool, value);
-  else if (strcmp(member, "uri") == 0)
-    r->uri = apr_pstrdup(r->pool, value);
-
-  return str;
-}
+//static mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
+//{   
+//
+//  struct RProc *b;
+//  mrb_value argc, *argv;
+//  char *member, *value;
+//  request_rec *r = ap_mrb_get_request();
+//
+//  mrb_get_args(mrb, "b*", &b, &argv, &argc);
+//  if (mrb_fixnum(argc) != 2) {
+//    ap_log_error(APLOG_MARK
+//      , APLOG_WARNING
+//      , 0
+//      , NULL
+//      , "%s ERROR %s: argument is not 2"
+//      , MODULE_NAME
+//      , __func__
+//    );
+//    return str;
+//  }
+//
+//  member = mrb_str_to_cstr(mrb, argv[0]);
+//  value  = mrb_str_to_cstr(mrb, argv[1]);
+//
+//  if (strcmp(member, "filename") == 0)
+//    r->filename = apr_pstrdup(r->pool, value);
+//  else if (strcmp(member, "uri") == 0)
+//    r->uri = apr_pstrdup(r->pool, value);
+//
+//  return str;
+//}
 
 static mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
 {

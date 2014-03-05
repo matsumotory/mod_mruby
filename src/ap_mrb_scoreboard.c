@@ -59,10 +59,10 @@ static pid_t child_pid;
 #endif
 
 #ifdef HAVE_TIMES
-static void status_child_init(apr_pool_t *p, server_rec *s)
-{
-  child_pid = getpid();
-}
+//static void status_child_init(apr_pool_t *p, server_rec *s)
+//{
+//  child_pid = getpid();
+//}
 #endif
 
 #if (AP_SERVER_MINORVERSION_NUMBER < 5)
@@ -108,7 +108,6 @@ static void ap_get_loadavg(ap_loadavg_t *ld)
 static sc_clocks_t ap_mrb_get_sc_clocks()
 {
 #ifdef HAVE_TIMES
-  float tick;
   int times_per_thread;
   sc_clocks_t cur, proc, tmp;
   unsigned long lres;
@@ -281,7 +280,7 @@ static apr_off_t sb_get_kbcount()
   apr_off_t bytes;
   apr_off_t bcount, kbcount;
   worker_score *ws_record;
-  process_score *ps_record;
+  //process_score *ps_record;
 
   ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
   ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
@@ -293,7 +292,7 @@ static apr_off_t sb_get_kbcount()
     return kbcount;
 
   for (i = 0; i < mruby_server_limit; ++i) {
-    ps_record = ap_get_scoreboard_process(i);
+    //ps_record = ap_get_scoreboard_process(i);
     for (j = 0; j < mruby_thread_limit; ++j) {
 
       ws_record = ap_get_scoreboard_worker(i, j);
@@ -323,7 +322,7 @@ static unsigned long sb_get_access_count()
   unsigned long lres;
 
   worker_score *ws_record;
-  process_score *ps_record;
+  //process_score *ps_record;
 
   ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
   ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
@@ -334,7 +333,7 @@ static unsigned long sb_get_access_count()
     return count;
 
   for (i = 0; i < mruby_server_limit; ++i) {
-    ps_record = ap_get_scoreboard_process(i);
+    //ps_record = ap_get_scoreboard_process(i);
     for (j = 0; j < mruby_thread_limit; ++j) {
 
       ws_record = ap_get_scoreboard_worker(i, j);

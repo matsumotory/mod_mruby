@@ -92,10 +92,9 @@ static void ap_mrb_set_mrb_state(apr_pool_t *pool, mrb_state *mrb)
     , APLOG_DEBUG
     , 0
     , ap_server_conf
-    , "%s DEBUG %s: set mrb_state to mod_mruby_state key: %x"
+    , "%s DEBUG %s: set mrb_state to mod_mruby_state"
     , MODULE_NAME
     , __func__
-    , mrb
   );
 }
 
@@ -122,10 +121,9 @@ static mrb_state *ap_mrb_get_mrb_state(apr_pool_t *pool)
         , APLOG_DEBUG
         , 0
         , ap_server_conf
-        , "%s DEBUG %s: mrb_state found from mod_mruby_state key: %x"
+        , "%s DEBUG %s: mrb_state found from mod_mruby_state"
         , MODULE_NAME
         , __func__
-        , mrb
       );
       return mrb;
     }
@@ -568,7 +566,7 @@ static int ap_mruby_run_nr(mod_mruby_code_t *code)
 static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, int module_status)
 {
 
-  int ai, i, last_idx;
+  int ai;
   jmp_buf mod_mruby_jmp;
   TRACER;
 
@@ -658,7 +656,6 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
 static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t *c)
 {
   int ai;
-  mrb_value ret;
 
   // mutex lock
   if (apr_thread_mutex_lock(mod_mruby_mutex) != APR_SUCCESS) {
@@ -684,10 +681,9 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t 
     , c->irep_idx_start
     , c->code
   );
-  ret = mrb_run(mrb
-    , c->proc
-    , mrb_top_self(mrb)
-  );
+
+  mrb_run(mrb, c->proc, mrb_top_self(mrb));
+
   if (mrb->exc) {
     ap_mrb_raise_error(mrb, mrb_obj_value(mrb->exc), c);
   }
@@ -775,11 +771,11 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, se
 
 static void mod_mruby_child_init(apr_pool_t *pool, server_rec *server)
 {
-  mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
-  struct mrb_parser_state* p;
+  //mruby_config_t *conf = ap_get_module_config(server->module_config, &mruby_module);
+  //struct mrb_parser_state* p;
   TRACER;
 
-  mrb_state *mrb = ap_mrb_get_mrb_state(server->process->pconf);
+  //mrb_state *mrb = ap_mrb_get_mrb_state(server->process->pconf);
 
   ap_log_error(APLOG_MARK
     , APLOG_INFO
@@ -951,7 +947,6 @@ static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, const char *u
 
 static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* bb)
 {
-  apr_status_t rv;
   request_rec *r = f->r;
 
   mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, &mruby_module);
@@ -961,7 +956,7 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f, apr_bucket_brigade* 
 
   ap_mrb_set_filter_rec(f, bb, r->pool);
   ap_mrb_push_request(r);
-  rv = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r, dir_conf->mod_mruby_output_filter_code, OK);
+  ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r, dir_conf->mod_mruby_output_filter_code, OK);
   return ap_pass_brigade(f->next, bb);
 }
 
@@ -1056,6 +1051,7 @@ static void register_hooks(apr_pool_t *p)
   ap_hook_handler(mod_mruby_handler, NULL, NULL, APR_HOOK_REALLY_FIRST);
   MOD_MRUBY_SET_ALL_REGISTER(handler);
   MOD_MRUBY_SET_ALL_REGISTER(child_init);
+  MOD_MRUBY_SET_ALL_REGISTER(post_config);
   MOD_MRUBY_SET_ALL_REGISTER(post_read_request);
   MOD_MRUBY_SET_ALL_REGISTER(quick_handler);
   MOD_MRUBY_SET_ALL_REGISTER(translate_name);
