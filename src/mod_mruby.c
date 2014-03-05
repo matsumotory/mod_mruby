@@ -49,7 +49,6 @@
 
 #include <unistd.h>
 #include <sys/stat.h>
-#include <setjmp.h>
 //#include <sys/prctl.h>
 
 #include "mod_mruby.h"
@@ -567,7 +566,6 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
 {
 
   int ai;
-  jmp_buf mod_mruby_jmp;
   TRACER;
 
   // mutex lock
@@ -602,12 +600,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
   );
 
   ap_mrb_set_status_code(OK);
-  if (!setjmp(mod_mruby_jmp)) {
-    mrb->jmp = &mod_mruby_jmp;
-    mrb_run(mrb, code->proc, mrb_top_self(mrb));
-  }
-
-  mrb->jmp = 0;
+  mrb_run(mrb, code->proc, mrb_top_self(mrb));
   mrb_gc_arena_restore(mrb, ai);
 
   if (mrb->exc)
