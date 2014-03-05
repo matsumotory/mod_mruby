@@ -4,6 +4,11 @@
 
 ※ [hello world simple benchmark, see details of blog entry.](http://blog.matsumoto-r.jp/?p=3974)
 
+## Documents
+- [Directives](https://github.com/matsumoto-r/mod_mruby/wiki/Directives)
+- [Class and Method](https://github.com/matsumoto-r/mod_mruby/wiki/Class-and-Method)
+- [Use Case](https://github.com/matsumoto-r/mod_mruby/wiki/Use-Case)
+
 ## What's mod_mruby
 __mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd.__
 
