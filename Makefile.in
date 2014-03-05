@@ -14,8 +14,8 @@ APACHECTL=@APACHECTL_PATH@
 MRUBY_ROOT=@MRUBY_ROOT@
 DEFS=@DEFS@
 INC=-I. -I$(MRUBY_ROOT)/src -I$(MRUBY_ROOT)/include
-LIB=@LIBS@ $(MRUBY_ROOT)/build/host/lib/libmruby.a $(MRUBY_ROOT)/build/host/mrblib/mrblib.o
-WC=-Wc,-std=c99,-Wall,-Werror-implicit-function-declaration,-g
+LIB=@LIBS@
+WC=-Wc,'-std=c99 -Wall -Werror-implicit-function-declaration -g'
 MRUBY_REPOS=@MRUBY_REPOS@
 RAKE_PATH=@RAKE_PATH@
 ENABLE_GEMS=@ENABLE_GEMS@

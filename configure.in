@@ -163,7 +163,7 @@ AS_IF([test "x$enable_load" != xno],
     ]
 )
 
-WLFLAG="-Wl,`echo "$LIBS" | sed -e "s/\s\+/,/g"`"
+WLFLAG="-Wl,'`echo "$LIBS" | sed -e "s/\s\+/ /g"`'"
 LDFLAGS="$WLFLAG $LDFLAGS"
 AC_SUBST(FEATURE_TARGETS)
 
