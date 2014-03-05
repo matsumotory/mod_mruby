@@ -8,7 +8,10 @@
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
 #include "mruby/hash.h"
+
+#define CORE_PRIVATE
 #include "httpd.h"
+#include "http_config.h"
 #include "http_core.h"
 #include "http_protocol.h"
 //#include "apr_table.h"
@@ -384,7 +387,12 @@ static mrb_value ap_mrb_set_request_document_root(mrb_state *mrb, mrb_value str)
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
   mrb_get_args(mrb, "o", &val);
+#ifdef __APACHE24__
   ap_set_document_root(r, (const char *)mrb_str_to_cstr(mrb, val));
+#else
+  core_server_config *conf = (core_server_config *)ap_get_module_config(r->server->module_config, &core_module);
+  conf->ap_document_root = (const char *)mrb_str_to_cstr(mrb, val);
+#endif
   return val;
 }
 
