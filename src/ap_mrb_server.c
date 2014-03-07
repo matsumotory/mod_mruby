@@ -171,7 +171,7 @@ void ap_mruby_server_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_server, "hostname", ap_mrb_get_server_hostname, ARGS_NONE());
   mrb_define_method(mrb, class_server, "path", ap_mrb_get_server_path, ARGS_NONE());
   mrb_define_method(mrb, class_server, "admin", ap_mrb_get_server_admin, ARGS_NONE());
-  mrb_define_method(mrb, class_server, "scheme", ap_mrb_get_server_scheme, ARGS_NONE());
+  mrb_define_method(mrb, class_server, "redirect_server_scheme", ap_mrb_get_server_scheme, ARGS_NONE());
   mrb_define_method(mrb, class_server, "defn_name", ap_mrb_get_server_defn_name, ARGS_NONE());
   mrb_define_method(mrb, class_server, "is_virtual", ap_mrb_get_server_is_virtual, ARGS_NONE());
   mrb_define_method(mrb, class_server, "keep_alive_max", ap_mrb_get_server_keep_alive_max, ARGS_NONE());
@@ -182,6 +182,6 @@ void ap_mruby_server_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_server, "limit_req_fields", ap_mrb_get_server_limit_req_fields, ARGS_NONE());
   mrb_define_method(mrb, class_server, "timeout", ap_mrb_get_server_timeout, ARGS_NONE());
   mrb_define_method(mrb, class_server, "keep_alive_timeout", ap_mrb_get_server_keep_alive_timeout, ARGS_NONE());
-  mrb_define_method(mrb, class_server, "port", ap_mrb_get_server_port, ARGS_NONE());
+  mrb_define_method(mrb, class_server, "redirect_server_port", ap_mrb_get_server_port, ARGS_NONE());
   mrb_define_method(mrb, class_server, "defn_line_number", ap_mrb_get_server_defn_line_number, ARGS_NONE());
 }
