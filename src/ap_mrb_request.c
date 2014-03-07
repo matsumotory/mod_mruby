@@ -39,16 +39,15 @@ request_rec *ap_mrb_get_request()
   return mrb_request_rec_state;
 }
 
-const char *ap_mrb_string_check(apr_pool_t *p, const char *str)
+mrb_value ap_mrb_str_to_value(mrb_state *mrb, apr_pool_t *p, const char *str)
 {
-  char *val;
+  const char *val;
 
   if (str == NULL) {
-    val = apr_pstrdup(p, "null");
-    return val;
+    return mrb_nil_value();
   }
-
-  return str;
+  val = apr_pstrdup(p, str);
+  return mrb_str_new(mrb, val, strlen(val));
 }
 
 /*
@@ -133,89 +132,25 @@ static mrb_value ap_mrb_get_request_body(mrb_state *mrb, mrb_value str)
   return mrb_nil_value();
 }
 
-static mrb_value ap_mrb_get_request_the_request(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->the_request));
-  return mrb_str_new(mrb, val, strlen(val));
+#define AP_MRB_GET_REQUEST_VALUE(value) \
+static mrb_value ap_mrb_get_request_##value(mrb_state *mrb, mrb_value self)             \
+{                                                             \
+  request_rec *r = ap_mrb_get_request(); \
+  return ap_mrb_str_to_value(mrb, r->pool, r->value); \
 }
 
-static mrb_value ap_mrb_get_request_protocol(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->protocol));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_vlist_validator(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->vlist_validator));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_user(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->user));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_ap_auth_type(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->ap_auth_type));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_unparsed_uri(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->unparsed_uri));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_uri(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->uri));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_filename(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->filename));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_canonical_filename(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->canonical_filename));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_path_info(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->path_info));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_args(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->args));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_hostname(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool,r->hostname));
-  return mrb_str_new(mrb, val, strlen(val));
-}
+AP_MRB_GET_REQUEST_VALUE(the_request)
+AP_MRB_GET_REQUEST_VALUE(protocol)
+AP_MRB_GET_REQUEST_VALUE(vlist_validator)
+AP_MRB_GET_REQUEST_VALUE(user)
+AP_MRB_GET_REQUEST_VALUE(ap_auth_type)
+AP_MRB_GET_REQUEST_VALUE(unparsed_uri)
+AP_MRB_GET_REQUEST_VALUE(uri)
+AP_MRB_GET_REQUEST_VALUE(filename)
+AP_MRB_GET_REQUEST_VALUE(canonical_filename)
+AP_MRB_GET_REQUEST_VALUE(path_info)
+AP_MRB_GET_REQUEST_VALUE(args)
+AP_MRB_GET_REQUEST_VALUE(hostname)
 
 static mrb_value ap_mrb_get_request_document_root(mrb_state *mrb, mrb_value str)
 {
@@ -224,33 +159,10 @@ static mrb_value ap_mrb_get_request_document_root(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-static mrb_value ap_mrb_get_request_status_line(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool,r->status_line));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_method(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool,r->method));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_range(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool,r->range));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_content_type(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->content_type));
-  return mrb_str_new(mrb, val, strlen(val));
-}
+AP_MRB_GET_REQUEST_VALUE(status_line)
+AP_MRB_GET_REQUEST_VALUE(method)
+AP_MRB_GET_REQUEST_VALUE(range)
+AP_MRB_GET_REQUEST_VALUE(content_type)
 
 static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb, mrb_value str)
 {
@@ -259,19 +171,8 @@ static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb, mrb_value str
   return mrb_fixnum_value(val);
 }
 
-static mrb_value ap_mrb_get_request_handler(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->handler));
-  return mrb_str_new(mrb, val, strlen(val));
-}
-
-static mrb_value ap_mrb_get_request_content_encoding(mrb_state *mrb, mrb_value str)
-{
-  request_rec *r = ap_mrb_get_request();
-  const char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->content_encoding));
-  return mrb_str_new(mrb, val, strlen(val));
-}
+AP_MRB_GET_REQUEST_VALUE(handler)
+AP_MRB_GET_REQUEST_VALUE(content_encoding)
 
 
 static mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)

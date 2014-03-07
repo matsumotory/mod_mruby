@@ -10,7 +10,7 @@
 #include "mruby/variable.h"
 #include "mruby/class.h"
 
-const char *ap_mrb_string_check(apr_pool_t *p, const char *str);
+mrb_value ap_mrb_str_to_value(mrb_state *mrb, apr_pool_t *p, const char *str);
 int ap_mrb_push_request(request_rec *r);
 request_rec *ap_mrb_get_request();
 

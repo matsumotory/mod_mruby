@@ -29,11 +29,10 @@ static mrb_value ap_mrb_get_conn_remote_ip(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
 #ifdef __APACHE24__
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->client_ip));
+  return ap_mrb_str_to_value(mrb, r->pool, r->connection->client_ip);
 #else
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->remote_ip));
+  return ap_mrb_str_to_value(mrb, r->pool, r->connection->remote_ip);
 #endif
-  return mrb_str_new(mrb, val, strlen(val));
 }
 
 static mrb_value ap_mrb_get_conn_remote_port(mrb_state *mrb, mrb_value str)
@@ -50,22 +49,19 @@ static mrb_value ap_mrb_get_conn_remote_port(mrb_state *mrb, mrb_value str)
 static mrb_value ap_mrb_get_conn_remote_host(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->remote_host));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->connection->remote_host);
 }
 
 static mrb_value ap_mrb_get_conn_remote_logname(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->remote_logname));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->connection->remote_logname);
 }
 
 static mrb_value ap_mrb_get_conn_local_ip(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->local_ip));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->connection->local_ip);
 }
 
 static mrb_value ap_mrb_get_conn_local_port(mrb_state *mrb, mrb_value str)
@@ -78,8 +74,7 @@ static mrb_value ap_mrb_get_conn_local_port(mrb_state *mrb, mrb_value str)
 static mrb_value ap_mrb_get_conn_local_host(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->connection->local_host));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->connection->local_host);
 }
 
 // int write

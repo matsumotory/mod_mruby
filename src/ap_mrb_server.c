@@ -26,8 +26,7 @@ static mrb_value ap_mrb_set_server_error_fname(mrb_state *mrb, mrb_value str)
 static mrb_value ap_mrb_get_server_error_fname(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->server->error_fname));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->server->error_fname);
 }
 
 static mrb_value ap_mrb_get_server_document_root(mrb_state *mrb, mrb_value str)
@@ -40,36 +39,31 @@ static mrb_value ap_mrb_get_server_document_root(mrb_state *mrb, mrb_value str)
 static mrb_value ap_mrb_get_server_hostname(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->server->server_hostname));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->server->server_hostname);
 }
 
 static mrb_value ap_mrb_get_server_path(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->server->path));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->server->path);
 }
 
 static mrb_value ap_mrb_get_server_admin(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->server->server_admin));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->server->server_admin);
 }
 
 static mrb_value ap_mrb_get_server_scheme(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->server->server_scheme));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->server->server_scheme);
 }
 
 static mrb_value ap_mrb_get_server_defn_name(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  char *val = apr_pstrdup(r->pool, ap_mrb_string_check(r->pool, r->server->defn_name));
-  return mrb_str_new(mrb, val, strlen(val));
+  return ap_mrb_str_to_value(mrb, r->pool, r->server->defn_name);
 }
 
 
