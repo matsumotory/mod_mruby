@@ -345,7 +345,7 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *server)
 static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, const char *arg);         \
 static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, const char *arg)          \
 {                                                         \
-  const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                   \
+  const char *err = ap_check_cmd_context(cmd, NOT_IN_LIMIT);                   \
   mruby_config_t *conf = (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);  \
                                                           \
   if (err != NULL)                                                \
@@ -364,7 +364,7 @@ static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, 
 static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *path, const char *cache_opt);  \
 static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *path, const char *cache_opt)   \
 {                                                         \
-  const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                   \
+  const char *err = ap_check_cmd_context(cmd, NOT_IN_LIMIT);                   \
   mruby_config_t *conf = (mruby_config_t *) ap_get_module_config(cmd->server->module_config, &mruby_module);  \
   TRACER; \
                                                           \
@@ -394,7 +394,7 @@ SET_MOD_MRUBY_SERVER_CMDS(insert_filter_last);
 static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *path, const char *cache_opt);              \
 static const char *set_mod_mruby_##hook(cmd_parms *cmd, void *mconfig, const char *path, const char *cache_opt)               \
 {                                                         \
-  const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                   \
+  const char *err = ap_check_cmd_context(cmd, NOT_IN_LIMIT);                   \
   mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;                         \
   TRACER; \
                                                           \
@@ -443,7 +443,7 @@ SET_MOD_MRUBY_DIR_CMDS(output_filter);
 static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, const char *arg);              \
 static const char *set_mod_mruby_##hook##_inline(cmd_parms *cmd, void *mconfig, const char *arg)               \
 {                                                         \
-  const char *err = ap_check_cmd_context(cmd, NOT_IN_FILES | NOT_IN_LIMIT);                   \
+  const char *err = ap_check_cmd_context(cmd, NOT_IN_LIMIT);                   \
   mruby_dir_config_t *dir_conf = (mruby_dir_config_t *)mconfig;                         \
                                                           \
   if (err != NULL)                                                \
@@ -1102,7 +1102,7 @@ static const command_rec mod_mruby_cmds[] = {
 
   AP_INIT_TAKE12("mrubyAuthnCheckPassword", set_mod_mruby_authn_check_password, NULL, OR_AUTHCFG, "hook for authn basic."),
   AP_INIT_TAKE12("mrubyAuthnGetRealmHash", set_mod_mruby_authn_get_realm_hash, NULL, OR_AUTHCFG, "hook for authn digest."),
-  AP_INIT_TAKE12("mrubyOutputFilter", set_mod_mruby_output_filter, NULL, OR_OPTIONS, "set mruby output filter script."),
+  AP_INIT_TAKE12("mrubyOutputFilter", set_mod_mruby_output_filter, NULL, RSRC_CONF | ACCESS_CONF, "set mruby output filter script."),
 
   {NULL}
 };
