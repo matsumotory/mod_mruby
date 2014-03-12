@@ -505,12 +505,14 @@ static int ap_mruby_run_nr(server_rec *s, mod_mruby_code_t *code)
 {
 
   mrb_state *mrb = ap_mrb_get_mrb_state(s->process->pconf);
+  // code->cache force enabled since this function only run at startup server phase
+  code->cache = CACHE_ENABLE;
 
   ap_log_error(APLOG_MARK
     , APLOG_DEBUG
     , 0
     , ap_server_conf
-    , "%s DEBUG %s: [CONFIG PHASE] run mruby code: %s"
+    , "%s DEBUG %s: [CONFIG PHASE] [CACHE FORCE ENABLED] run mruby code: %s"
     , MODULE_NAME
     , __func__
     , code->path
