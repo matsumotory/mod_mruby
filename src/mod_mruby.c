@@ -501,63 +501,28 @@ static void ap_mruby_state_clean(mrb_state *mrb)
 }
 
 // mruby_run for not request phase.
-static int ap_mruby_run_nr(mod_mruby_code_t *code)
+static int ap_mruby_run_nr(server_rec *s, mod_mruby_code_t *code)
 {
 
-  struct RProc *proc;
-  struct mrb_parser_state* p;
-  FILE *mrb_file;
-  mrb_state *mrb = mrb_open();
-  ap_mruby_class_init(mrb);
-
-  if ((mrb_file = fopen(code->path, "r")) == NULL) {
-    ap_log_error(APLOG_MARK
-      , APLOG_ERR
-      , 0
-      , ap_server_conf
-      , "%s ERROR %s: mrb file oepn failed: %s"
-      , MODULE_NAME
-      , __func__
-      , code->path
-    );
-    mrb_close(mrb);
-    return -1;
-  }
-
-   ap_log_error(APLOG_MARK
-     , APLOG_DEBUG
-     , 0
-     , ap_server_conf
-     , "%s DEBUG %s: cache nothing on pid %d, compile code: %s"
-     , MODULE_NAME
-     , __func__
-     , getpid()
-     , code->path
-   );
-
-  p = mrb_parse_file(mrb, mrb_file, NULL);
-  fclose(mrb_file);
-  proc = mrb_generate_code(mrb, p);
-
-  mrb_pool_close(p->pool);
+  mrb_state *mrb = ap_mrb_get_mrb_state(s->process->pconf);
 
   ap_log_error(APLOG_MARK
     , APLOG_DEBUG
     , 0
     , ap_server_conf
-    , "%s DEBUG %s: run mruby code: %s"
+    , "%s DEBUG %s: [CONFIG PHASE] run mruby code: %s"
     , MODULE_NAME
     , __func__
     , code->path
   );
 
-  ap_mrb_set_status_code(OK);
-  mrb_run(mrb, proc, mrb_top_self(mrb));
+  mrb_run(mrb, code->proc, mrb_top_self(mrb));
 
-  if (mrb->exc)
+  if (mrb->exc) {
     ap_mrb_raise_error(mrb, mrb_obj_value(mrb->exc), code);
+  }
 
-  mrb_close(mrb);
+  ap_mruby_state_clean(mrb);
 
   return APR_SUCCESS;
 }
@@ -793,7 +758,7 @@ static void mod_mruby_##hook(apr_pool_t *pool, server_rec *server)            \
   if (conf->mod_mruby_##hook##_code == NULL)                      \
     return;                                     \
                                             \
-  ap_mruby_run_nr(conf->mod_mruby_##hook##_code);                 \
+  ap_mruby_run_nr(server, conf->mod_mruby_##hook##_code);                 \
 }
 
 MOD_MRUBY_REGISTER_HOOK_FUNC_NR_VOID(child_init_first);
@@ -809,7 +774,7 @@ static int mod_mruby_##hook(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, 
   if (conf->mod_mruby_##hook##_code == NULL)                                      \
     return DECLINED;                                                  \
                                                               \
-  ap_mruby_run_nr(conf->mod_mruby_##hook##_code);                                 \
+  ap_mruby_run_nr(server, conf->mod_mruby_##hook##_code);                                 \
   return OK;                                                      \
 }
 
