@@ -183,7 +183,7 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
 
 static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_rec *s)
 {
-  struct mrb_parser_state* p;
+  struct mrb_parser_state* p = NULL;
   FILE *mrb_file;
   c->ctx = mrbc_context_new(mrb);
   TRACER;
@@ -215,6 +215,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, server_r
           , __func__
           , c->path
         );
+        c->proc = NULL;
         return;
       }
       mrbc_filename(mrb, c->ctx, c->path);
@@ -550,7 +551,20 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
 
   ap_mrb_push_request(r);
   if (code->cache == CACHE_DISABLE) {
+    // must be code->path
     mod_mruby_compile_code(mrb, code, r->server);
+    if (code->proc == NULL) {
+      ap_log_rerror(APLOG_MARK
+        , APLOG_ERR
+        , 0
+        , r
+        , "%s ERROR %s: mruby proc is NULL, DECLINED phase, hook file: %s"
+        , MODULE_NAME
+        , __func__
+        , code->path
+      );
+      return DECLINED;
+    }
   }
   ai = mrb_gc_arena_save(mrb);
   ap_log_rerror(APLOG_MARK
