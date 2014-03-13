@@ -35,12 +35,12 @@ module ModMruby
     end
     def allow_access?
       c = Apache::Connection.new
-      @a.errlogger 4, "allow ip: #{@allow_ip} <=> access ip: #{c.remote_ip}"
+      @a.errlogger 6, "allow ip: #{@allow_ip} <=> access ip: #{c.remote_ip}"
       if @allow_ip == c.remote_ip
-        @a.errlogger 4, "api access OK: #{c.remote_ip}"
+        @a.errlogger 6, "api access OK: #{c.remote_ip}"
         true
       else
-        @a.errlogger 4, "api access NG: #{c.remote_ip}. allow_ip is #{@allow_ip}"
+        @a.errlogger 6, "api access NG: #{c.remote_ip}. allow_ip is #{@allow_ip}"
         false
       end
     end
@@ -56,11 +56,11 @@ module ModMruby
         :val     => ModMruby.escape(param[5]),
       }
 
-      @a.errlogger 4, "=== [#{el[:id]}] api request [#{el[:class]}:#{el[:method]}]==="
+      @a.errlogger @a::APLOG_DEBUG, "=== [#{el[:id]}] api request [#{el[:class]}:#{el[:method]}]==="
       el.each_key do |key|
-        @a.errlogger 4, "#{key}: #{el[key]}"
+        @a.errlogger @a::APLOG_DEBUG, "#{key}: #{el[key]}"
       end
-      @a.errlogger 4, "=== [#{el[:id]}] api request [#{el[:class]}:#{el[:method]}]==="
+      @a.errlogger @a::APLOG_DEBUG, "=== [#{el[:id]}] api request [#{el[:class]}:#{el[:method]}]==="
 
       call_api(el)
     end
@@ -87,20 +87,22 @@ module ModMruby
         @r.status = 200
         @a.return Apache::OK
       end
-      def busy_worker;  @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.busy_worker}})); end
-      def idle_worker;  @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.idle_worker}})); end
-      def total_kbyte;  @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.total_kbyte}})); end
-      def total_access; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.total_access}})); end
-      def counter; @a.rputs JSON::stringify(@param.merge({:result => {@param[:method] => @sc.counter}})); end
+      def json_response(result); @a.rputs JSON::stringify(@param.merge result); end
+      def busy_worker; result = {:result => {@param[:method] => @sc.busy_worker}}; json_response result; end
+      def idle_worker; result = {:result => {@param[:method] => @sc.idle_worker}}; json_response result; end
+      def total_kbyte; result = {:result => {@param[:method] => @sc.total_kbyte}}; json_response result; end
+      def total_access; result = {:result => {@param[:method] => @sc.total_access}}; json_response result; end
+      def counter;      result = {:result => {@param[:method] => @sc.counter}}; json_response result; end
       def all
-        @a.rputs JSON::stringify(@param.merge({:result => {
+        result = {:result => {
             :busy_worker   => @sc.busy_worker,
             :idle_worker   => @sc.idle_worker,
             :total_access  => @sc.total_access,
             :total_kbyte   => @sc.total_kbyte,
             :counter       => @sc.counter,
             :loadavg       => @sc.loadavg,
-          }})) 
+       }}
+       json_response result
       end
     end
     class Request
