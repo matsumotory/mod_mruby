@@ -8,11 +8,11 @@ install:
     - sudo apt-get -qq install apache2 apache2-prefork-dev rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
 before_script:
   - cd ../
-  - wget http://ftp.riken.jp/net/apache//httpd/httpd-2.4.7.tar.gz
+  - wget http://ftp.jaist.ac.jp/pub/apache//httpd/httpd-2.4.7.tar.gz
   - tar xf httpd-2.4.7.tar.gz
   - cd httpd-2.4.7/srclib
-  - wget http://ftp.riken.jp/net/apache//apr/apr-1.5.0.tar.gz
-  - wget http://ftp.riken.jp/net/apache//apr/apr-util-1.5.3.tar.gz
+  - wget http://ftp.jaist.ac.jp/pub/apache//apr/apr-1.5.0.tar.gz
+  - wget http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.5.3.tar.gz
   - tar xf apr-1.5.0.tar.gz
   - tar xf apr-util-1.5.3.tar.gz
   - ln -s apr-1.5.0 apr
