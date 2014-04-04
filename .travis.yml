@@ -18,13 +18,13 @@ before_script:
   - ln -s apr-1.5.0 apr
   - ln -s apr-util-1.5.3 apr-util
   - cd ..
-  - ./configure --prefix=`pwd`/apache247 --with-included-apr 
+  - ./configure --prefix=`pwd`/apache --with-included-apr 
   - make
   - make install
   - cd ../mod_mruby
 script: 
   # for 2.4.x using source installed binary
-  - APXS_PATH_ENV='--with-apxs=../httpd-2.4.9/apache247/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.9/apache247/bin/apachectl' sh build.sh
+  - APXS_PATH_ENV='--with-apxs=../httpd-2.4.9/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.9/apache/bin/apachectl' sh build.sh
   # for 2.2.x using apt-get apache2 package
   - sh build.sh
 notifications:
