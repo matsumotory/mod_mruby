@@ -154,7 +154,7 @@ static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path,
   TRACER;
 
   c->type = MOD_MRUBY_FILE;
-  c->path = apr_pstrdup(p, path);
+  c->code.path = apr_pstrdup(p, path);
   if (cache_opt && !strcmp(cache_opt, "cache")) {
     c->cache = CACHE_ENABLE;
     ap_log_error(APLOG_MARK
@@ -165,7 +165,7 @@ static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path,
       , MODULE_NAME
       , __func__
       , phase
-      , c->path
+      , c->code.path
     );  
   } else {
     c->cache = CACHE_DISABLE;
@@ -181,7 +181,7 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
   TRACER;
 
   c->type = MOD_MRUBY_STRING;
-  c->code = apr_pstrdup(p, arg);
+  c->code.code = apr_pstrdup(p, arg);
 
   return c;
 }
@@ -197,7 +197,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c,
   if (c != NULL) {
     if (c->type == MOD_MRUBY_STRING) {
       mrbc_filename(mrb, c->ctx, "inline_conf");
-      p = mrb_parse_string(mrb, c->code, c->ctx);
+      p = mrb_parse_string(mrb, c->code.code, c->ctx);
       c->proc = mrb_generate_code(mrb, p);
       ap_log_error(APLOG_MARK
         , APLOG_DEBUG
@@ -207,12 +207,12 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c,
             "irep_idx_start=[%d] to irep_idx_end=[%d]"
         , MODULE_NAME
         , __func__
-        , c->code
+        , c->code.code
         , c->irep_idx_start
         , c->irep_idx_end
       );
     } else if (c->type == MOD_MRUBY_FILE) {
-      if ((mrb_file = fopen(c->path, "r")) == NULL) {
+      if ((mrb_file = fopen(c->code.path, "r")) == NULL) {
         ap_log_error(APLOG_MARK
           , APLOG_ERR
           , 0
@@ -220,12 +220,12 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c,
           , "%s ERROR %s: mrb file oepn failed: %s"
           , MODULE_NAME
           , __func__
-          , c->path
+          , c->code.path
         );
         c->proc = NULL;
         return;
       }
-      mrbc_filename(mrb, c->ctx, c->path);
+      mrbc_filename(mrb, c->ctx, c->code.path);
       p = mrb_parse_file(mrb, mrb_file, c->ctx);
       fclose(mrb_file);
       c->proc = mrb_generate_code(mrb, p);
@@ -237,7 +237,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c,
             "irep_idx_start=[%d] to irep_idx_end=[%d]"
         , MODULE_NAME
         , __func__
-        , c->path
+        , c->code.path
         , c->irep_idx_start
         , c->irep_idx_end
       );
@@ -526,7 +526,7 @@ static int ap_mruby_run_nr(server_rec *s, mod_mruby_code_t *code)
     , "%s DEBUG %s: [CONFIG PHASE] [CACHE FORCE ENABLED] run mruby code: %s"
     , MODULE_NAME
     , __func__
-    , code->path
+    , code->code.path
   );
 
   mrb_run(mrb, code->proc, mrb_top_self(mrb));
@@ -572,7 +572,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code,
         , "%s ERROR %s: mruby proc is NULL, DECLINED phase, hook file: %s"
         , MODULE_NAME
         , __func__
-        , code->path
+        , code->code.path
       );
       return DECLINED;
     }
@@ -585,7 +585,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code,
     , "%s DEBUG %s: run mruby code: path=[%s] irep_idx=[%d]~[%d] cache=[%d]"
     , MODULE_NAME
     , __func__
-    , code->path
+    , code->code.path
     , code->irep_idx_start
     , code->irep_idx_end
     , code->cache
@@ -607,7 +607,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code,
     , __func__
     , code->irep_idx_start
     , ap_mrb_get_status_code()
-    , code->path
+    , code->code.path
   );
   if (code->cache == CACHE_DISABLE) {
     ap_log_rerror(APLOG_MARK
@@ -665,7 +665,7 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r,
     , MODULE_NAME
     , __func__
     , c->irep_idx_start
-    , c->code
+    , c->code.code
   );
 
   mrb_run(mrb, c->proc, mrb_top_self(mrb));

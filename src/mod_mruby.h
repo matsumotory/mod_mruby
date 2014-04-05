@@ -77,10 +77,10 @@ enum code_type {
 };
 
 typedef struct {
-  union {
+  union code {
     char *path;
     char *code;
-  };
+  } code;
   struct RProc *proc;
   mrbc_context *ctx;
   int irep_idx_start;
