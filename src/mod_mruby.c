@@ -515,7 +515,8 @@ static int ap_mruby_run_nr(server_rec *s, mod_mruby_code_t *code)
 {
 
   mrb_state *mrb = ap_mrb_get_mrb_state(s->process->pconf);
-  // code->cache force enabled since this function only run at startup server phase
+  // code->cache force enabled since this function only run at startup server 
+  // phase
   code->cache = CACHE_ENABLE;
 
   ap_log_error(APLOG_MARK
@@ -1031,7 +1032,6 @@ static void register_hooks(apr_pool_t *p)
   TRACER;
   // inline code in httpd.conf
   ap_hook_handler(mod_mruby_handler_inline, NULL, NULL, APR_HOOK_MIDDLE);
-  //ap_hook_translate_name(mod_mruby_translate_name_first_inline, NULL, NULL, APR_HOOK_FIRST);
   MOD_MRUBY_SET_ALL_REGISTER_INLINE(handler);
   MOD_MRUBY_SET_ALL_REGISTER_INLINE(post_read_request);
   MOD_MRUBY_SET_ALL_REGISTER_INLINE(translate_name);
@@ -1080,7 +1080,8 @@ static void register_hooks(apr_pool_t *p)
 
 static const command_rec mod_mruby_cmds[] = {
 
-  AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, RSRC_CONF | ACCESS_CONF, "hook inline code for handler phase."),
+  AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, 
+      RSRC_CONF | ACCESS_CONF, "hook inline code for handler phase."),
   MOD_MRUBY_SET_ALL_CMDS_INLINE(handler, Handler)
   MOD_MRUBY_SET_ALL_CMDS_INLINE(post_read_request, PostReadRequest)
   MOD_MRUBY_SET_ALL_CMDS_INLINE(translate_name, TranslateName)
@@ -1091,7 +1092,8 @@ static const command_rec mod_mruby_cmds[] = {
   MOD_MRUBY_SET_ALL_CMDS_INLINE(fixups, Fixups)
   MOD_MRUBY_SET_ALL_CMDS_INLINE(log_transaction, LogTransaction)
 
-  AP_INIT_TAKE12("mrubyHandler", set_mod_mruby_handler, NULL, RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
+  AP_INIT_TAKE12("mrubyHandler", set_mod_mruby_handler, NULL, 
+      RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
   MOD_MRUBY_SET_ALL_CMDS(handler, Handler)
   MOD_MRUBY_SET_ALL_CMDS(post_config, PostConfig)
   MOD_MRUBY_SET_ALL_CMDS(child_init, ChildInit)
@@ -1105,11 +1107,13 @@ static const command_rec mod_mruby_cmds[] = {
   MOD_MRUBY_SET_ALL_CMDS(fixups, Fixups)
   MOD_MRUBY_SET_ALL_CMDS(insert_filter, InsertFilter)
   MOD_MRUBY_SET_ALL_CMDS(log_transaction, LogTransaction)
-  //AP_INIT_TAKE1("mrubyCacheSize", set_mod_mruby_cache_table_size, NULL, RSRC_CONF | ACCESS_CONF, "set mruby cache table size."),
 
-  AP_INIT_TAKE12("mrubyAuthnCheckPassword", set_mod_mruby_authn_check_password, NULL, OR_AUTHCFG, "hook for authn basic."),
-  AP_INIT_TAKE12("mrubyAuthnGetRealmHash", set_mod_mruby_authn_get_realm_hash, NULL, OR_AUTHCFG, "hook for authn digest."),
-  AP_INIT_TAKE12("mrubyOutputFilter", set_mod_mruby_output_filter, NULL, RSRC_CONF | ACCESS_CONF, "set mruby output filter script."),
+  AP_INIT_TAKE12("mrubyAuthnCheckPassword", set_mod_mruby_authn_check_password, 
+      NULL, OR_AUTHCFG, "hook for authn basic."),
+  AP_INIT_TAKE12("mrubyAuthnGetRealmHash", set_mod_mruby_authn_get_realm_hash, 
+      NULL, OR_AUTHCFG, "hook for authn digest."),
+  AP_INIT_TAKE12("mrubyOutputFilter", set_mod_mruby_output_filter, 
+      NULL, RSRC_CONF | ACCESS_CONF, "set mruby output filter script."),
 
   {NULL}
 };
