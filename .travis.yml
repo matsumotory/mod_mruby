@@ -37,4 +37,6 @@ notifications:
     skip_join: true
     template:
         - "[%{message}] %{repository} (%{commit}) by %{author}: See %{build_url}"
+  webhooks:
+    - https://idobata.io/hook/e404405a-95aa-4802-be7d-b3282d891bdd
 
