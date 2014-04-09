@@ -38,5 +38,5 @@ notifications:
     template:
         - "[%{message}] %{repository} (%{commit}) by %{author}: See %{build_url}"
   webhooks:
-    - https://idobata.io/hook/f48e8f58-29d9-414e-8336-1fadb62bfa2d
+    - secure: "BYpv6AjLGEtNMX67AaUEbirIQRX9Tl6ovPA/2+BDdHiNEMr1+xZVhp1rOBEP7nli1opvKe7OfJFNaJ2HRMmECmh3ZtfIiGQ8t3LtKd2kl+6tL9rdYuWo7M9PjGKsVXhcsJlK3FpeYXGGqmxRelapMAs+yn3EWz9S54Yy7QWqO/Q="
 
