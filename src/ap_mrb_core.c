@@ -55,7 +55,7 @@ void ap_mrb_raise_error(mrb_state *mrb, mrb_value obj, mod_mruby_code_t *code)
 
   if (mrb_type(obj) == MRB_TT_STRING) {
     str = mrb_str_ptr(obj);
-    err_out = str->ptr;
+    err_out = str->as.heap.ptr;
     if (code->type == MOD_MRUBY_STRING) {
       type = "STRING";
     }
