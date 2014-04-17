@@ -83,6 +83,24 @@ As the increase of large-scale and complex Web services, not only a development 
 ### 1. Download
     git clone git://github.com/matsumoto-r/mod_mruby.git
 
+- if you want __more features__, you can get [mrbgems](https://github.com/mruby/mruby/wiki/Related-Projects) and write to [build_config.rb](https://github.com/matsumoto-r/mod_mruby/blob/master/build_config.rb)
+- for example, use mruby-io and implement [file base access check like .htaccess](https://gist.github.com/matsumoto-r/7150832).
+- default mrbgems
+  - gembox: mruby/mruby default mrbgems, mruby-randoma, mruby-env, mruby-print...
+  - mruby-process: Process ::fork, ::kill, ::pid, ::ppid, ::waitpid...
+  - mruby-pack: pack, unpack...
+  - mruby-digest: MD5, RMD160, SHA1, SHA256, SHA384, SHA512 and HMAC Digests
+  - mruby-json: JSON::parse, JSON::stringify
+  - mruby-redis: Redis#set, get, [], []=...
+  - mruby-vedis: Vedis#set, get, [], []=...
+  - mruby-memcached: Memcached#set, get, [], []=...
+  - mruby-sleep: sleep, usleep...
+  - mruby-userdata: https://github.com/matsumoto-r/mruby-userdata
+  - mruby-onig-regexp: regexp engine
+  - mruby-io: https://github.com/iij/mruby-io
+- __We should implement ngx_mruby/mod_mruby extensions as mrbgems, as possible.__
+- __We recommend the contribute to mruby by implementing mrbgems.__
+
 ### 2. Auto Build
     cd mod_mruby
     sh build.sh
