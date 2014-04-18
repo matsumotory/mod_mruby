@@ -22,6 +22,7 @@ before_script:
   - make
   - make install
   - cd ../mod_mruby
+  - sudo service apache2 stop
 script: 
   # test for 2.4.x using source installed binary
   - cp -pr mruby mruby.orig
