@@ -47,8 +47,10 @@ SYSCONFDIR=$(shell $(APXS) -q SYSCONFDIR)
 test: install
 		cp -p $(SYSCONFDIR)/httpd.conf ./test/conf/httpd.conf.orig
 		cat ./test/conf/httpd.conf.orig ./test/conf/mod_mruby_test.conf > ./test/conf/httpd.conf
+		sed -i "s/^Listen .*80/Listen 48080/" ./test/conf/httpd.conf
 		$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf
 		cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
+		cp -p ./test/t/mod_mruby.rb $(MRUBY_ROOT)/test/t/.
 		cd $(MRUBY_ROOT) && rake clean && rake all test
 		$(APACHECTL) stop
 
