@@ -47,10 +47,10 @@ SYSCONFDIR=$(shell $(APXS) -q SYSCONFDIR)
 test: install
 		cp -p $(SYSCONFDIR)/httpd.conf ./test/conf/httpd.conf.orig
 		cat ./test/conf/httpd.conf.orig ./test/conf/mod_mruby_test.conf > ./test/conf/httpd.conf
-		$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -X &
+		$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf
 		cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
 		cd $(MRUBY_ROOT) && rake clean && rake all test
-		killall httpd
+		$(APACHECTL) stop
 
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
