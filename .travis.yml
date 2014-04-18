@@ -28,8 +28,8 @@ script:
   - APXS_PATH_ENV='--with-apxs=../httpd-2.4.9/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.9/apache/bin/apachectl' sh test.sh
   - sudo rm -rf mruby
   - mv mruby.orig mruby
-  # build for 2.2.x using apt-get apache2 package
-  - sh build.sh
+  # test for 2.2.x using apt-get apache2 package
+  - sh test.sh
 notifications:
   irc:
     channels:
