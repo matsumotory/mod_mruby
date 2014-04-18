@@ -42,6 +42,16 @@ all: mod_mruby.so
 mod_mruby.so: $(TARGET)
 	$(APXS) -c $(DEFS) $(CFLAGS) $(LDFLAGS) $(LIBS) $(WC) $(APXS_LDFLAGS) $(TARGET)
 
+SYSCONFDIR=$(shell $(APXS) -q SYSCONFDIR)
+# test
+test: install
+		cp -p $(SYSCONFDIR)/httpd.conf ./test/conf/httpd.conf.orig
+		cat ./test/conf/httpd.conf.orig ./test/conf/mod_mruby_test.conf > ./test/conf/httpd.conf
+		$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -X &
+		cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
+		cd $(MRUBY_ROOT) && rake clean && rake all test
+		killall httpd
+
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
 install:
