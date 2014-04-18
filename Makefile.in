@@ -44,7 +44,7 @@ mod_mruby.so: $(TARGET)
 
 SYSCONFDIR=$(shell $(APXS) -q SYSCONFDIR)
 # test
-test: 
+test: install
 		cp -p $(SYSCONFDIR)/httpd.conf ./test/conf/httpd.conf.orig
 		cat ./test/conf/httpd.conf.orig ./test/conf/mod_mruby_test.conf > ./test/conf/httpd.conf
 		$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf

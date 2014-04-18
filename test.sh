@@ -43,8 +43,7 @@ make
 echo "mod_mruby building ... Done"
 
 echo "mod_mruby testing ..."
-sudo make install
-make test
+sudo make test
 echo "mod_mruby testing ... Done"
 
 echo "build.sh ... successful"
