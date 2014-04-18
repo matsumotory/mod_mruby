@@ -6,6 +6,7 @@
 
 ## Documents
 - [Install](https://github.com/matsumoto-r/mod_mruby/wiki/Install)
+- [Test](https://github.com/matsumoto-r/mod_mruby/wiki/Test)
 - [Directives](https://github.com/matsumoto-r/mod_mruby/wiki/Directives)
 - [Class and Method](https://github.com/matsumoto-r/mod_mruby/wiki/Class-and-Method)
 - [Use Case](https://github.com/matsumoto-r/mod_mruby/wiki/Use-Case)
