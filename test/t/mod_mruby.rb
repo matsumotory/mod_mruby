@@ -1,5 +1,5 @@
 ##
-# ngx_mruby test
+# mod_mruby test
 
 base = 'http://127.0.0.1'
 
