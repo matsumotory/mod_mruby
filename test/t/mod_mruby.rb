@@ -8,3 +8,8 @@ assert('mod_mruby', 'location /hello-inline') do
   assert_equal 'hello', res["body"]
 end
 
+assert('mod_mruby', 'location /echo-test') do
+  res = HttpRequest.new.get base + '/echo-test'
+  assert_equal "echo\n", res["body"]
+end
+
