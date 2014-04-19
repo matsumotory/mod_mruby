@@ -54,11 +54,11 @@ test:
 	cat ./test/conf/httpd.conf.orig > ./test/conf/httpd.conf
 	echo 'LoadModule mruby_module $(MOD_MRUBY_SO)' >> ./test/conf/httpd.conf
 	sed -e 's|__MOD_MRUBY_TEST_DIR__|$(TEST_DIR)|g' ./test/conf/mod_mruby_test.conf >> ./test/conf/httpd.conf
-	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf
+	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
 	cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
 	cp -p ./test/t/mod_mruby.rb $(MRUBY_ROOT)/test/t/.
 	cd $(MRUBY_ROOT) && rake clean && rake all test
-	$(APACHECTL) stop
+	$(APACHECTL) -k stop
 
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
@@ -79,10 +79,10 @@ reload: install restart
 
 #   the general Apache start/restart/stop procedures
 start:
-	$(APACHECTL) start
+	$(APACHECTL) -k start
 restart:
-	$(APACHECTL) restart
+	$(APACHECTL) -k restart
 stop:
-	$(APACHECTL) stop
+	$(APACHECTL) -k stop
 
 .PHONY: test
