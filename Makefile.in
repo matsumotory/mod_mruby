@@ -42,13 +42,17 @@ all: mod_mruby.so
 mod_mruby.so: $(TARGET)
 	$(APXS) -c $(DEFS) $(CFLAGS) $(LDFLAGS) $(LIBS) $(WC) $(APXS_LDFLAGS) $(TARGET)
 
+PWD=$(shell pwd)
 SYSCONFDIR=$(shell $(APXS) -q SYSCONFDIR)
 APCONFNAME=$(shell $(APXS) -q progname).conf
+MOD_MRUBY_SO=$(PWD)/src/.libs/mod_mruby.so
 
 # 	test
-test: install
+test:
 	cp -p $(SYSCONFDIR)/$(APCONFNAME) ./test/conf/httpd.conf.orig
-	cat ./test/conf/httpd.conf.orig ./test/conf/mod_mruby_test.conf > ./test/conf/httpd.conf
+	cat ./test/conf/httpd.conf.orig > ./test/conf/httpd.conf
+	echo 'LoadModule mruby_module $(MOD_MRUBY_SO)' >> ./test/conf/httpd.conf
+	cat ./test/conf/mod_mruby_test.conf >> ./test/conf/httpd.conf
 	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf
 	cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
 	cp -p ./test/t/mod_mruby.rb $(MRUBY_ROOT)/test/t/.
@@ -58,7 +62,7 @@ test: install
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
 install:
-	$(APXS) -i -a -n 'mruby' src/.libs/mod_mruby.so
+	$(APXS) -i -a -n 'mruby' $(MOD_MRUBY_SO)
 
 #   cleanup
 clean:
@@ -79,3 +83,5 @@ restart:
 	$(APACHECTL) restart
 stop:
 	$(APACHECTL) stop
+
+.PHONY: test
