@@ -26,7 +26,6 @@ before_script:
 script: 
   # test for 2.4.x using source installed binary
   - APXS_PATH_ENV='--with-apxs=../httpd-2.4.9/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.9/apache/bin/apachectl' sh test.sh
-  - sudo chown $USER.$USER -R mruby
   # test for 2.2.x using apt-get apache2 package
   - sh test.sh
 notifications:

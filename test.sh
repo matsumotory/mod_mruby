@@ -44,6 +44,7 @@ echo "mod_mruby building ... Done"
 
 echo "mod_mruby testing ..."
 sudo make test
+sudo chown -R $USER mruby
 echo "mod_mruby testing ... Done"
 
 echo "build.sh ... successful"
