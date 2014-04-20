@@ -18,17 +18,17 @@ before_script:
   - ln -s apr-1.5.0 apr
   - ln -s apr-util-1.5.3 apr-util
   - cd ..
-  - ./configure --prefix=`pwd`/apache --with-included-apr 
+  - ./configure --prefix=`pwd`/apache --with-included-apr
   - make
   - make install
   - cd ../mod_mruby
   - sudo service apache2 stop
-script: 
+script:
   # test for 2.4.x using source installed binary
-  - ../httpd-2.4.9/apache/bin/apxs -v
+  - ../httpd-2.4.9/apache/bin/apachectl -v
   - APXS_PATH_ENV='--with-apxs=../httpd-2.4.9/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.9/apache/bin/apachectl' sh test.sh
   # test for 2.2.x using apt-get apache2 default package on travis
-  - apahcectl -v
+  - apachectl -v
   - sh test.sh
 notifications:
   irc:
