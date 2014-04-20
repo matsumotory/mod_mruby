@@ -25,8 +25,10 @@ before_script:
   - sudo service apache2 stop
 script: 
   # test for 2.4.x using source installed binary
+  - ../httpd-2.4.9/apache/bin/apxs -v
   - APXS_PATH_ENV='--with-apxs=../httpd-2.4.9/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.9/apache/bin/apachectl' sh test.sh
-  # test for 2.2.x using apt-get apache2 package
+  # test for 2.2.x using apt-get apache2 default package on travis
+  - apahcectl -v
   - sh test.sh
 notifications:
   irc:
