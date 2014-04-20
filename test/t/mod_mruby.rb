@@ -18,3 +18,12 @@ assert('mod_mruby', 'location /proxy') do
   assert_equal "proxy reply success", res["body"]
 end
 
+assert('mod_mruby', 'output filter') do
+  res = HttpRequest.new.get base + '/'
+  body_ary = res["body"].split("\n")
+  head = body_ary.first
+  tail = body_ary.last
+  assert_equal "__mod_mruby_head__", head
+  assert_equal "__mod_mruby_tail__", tail
+end
+
