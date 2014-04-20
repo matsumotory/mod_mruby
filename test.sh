@@ -57,4 +57,4 @@ sudo make test
 sudo chown -R $USER mruby
 echo "mod_mruby testing ... Done"
 
-echo "build.sh ... successful"
+echo "test.sh ... successful"
