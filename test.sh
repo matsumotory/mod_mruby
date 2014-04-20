@@ -34,7 +34,7 @@ fi
 echo "mruby building ..."
 mv build_config.rb build_config.rb.orig
 cp ../build_config.rb .
-BUILD_TYPE='debug' ./minirake 
+BUILD_TYPE='debug' ./minirake
 echo "mruby building ... Done"
 cd ..
 echo "mod_mruby building ..."
@@ -44,6 +44,16 @@ echo "mod_mruby building ... Done"
 
 echo "mod_mruby testing ..."
 sudo make test
+
+## /home/matsumotory/DEV/mod_mruby/mruby/tools/mrbc/mrbc.c:334:1: fatal error:
+## opening dependency file
+## /home/matsumotory/DEV/mod_mruby/mruby/build/host/tools/mrbc/mrbc.d: Permission
+## denied
+## }
+##  ^
+##  compilation terminated
+
+# if above message output, exec below chown command and exec test.sh again.
 sudo chown -R $USER mruby
 echo "mod_mruby testing ... Done"
 

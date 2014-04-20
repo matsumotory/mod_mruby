@@ -13,3 +13,8 @@ assert('mod_mruby', 'location /echo-test') do
   assert_equal "echo\n", res["body"]
 end
 
+assert('mod_mruby', 'location /proxy') do
+  res = HttpRequest.new.get base + '/proxy'
+  assert_equal "proxy reply success", res["body"]
+end
+
