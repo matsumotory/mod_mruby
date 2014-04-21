@@ -668,6 +668,7 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r,
     , c->code.code
   );
 
+  ap_mrb_set_status_code(OK);
   mrb_run(mrb, c->proc, mrb_top_self(mrb));
 
   if (mrb->exc) {
@@ -688,7 +689,7 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r,
     return OK;
   }
 
-  return OK;
+  return ap_mrb_get_status_code();;
 }
 
 /*
