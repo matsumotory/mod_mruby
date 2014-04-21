@@ -27,3 +27,13 @@ assert('mod_mruby', 'output filter') do
   assert_equal "__mod_mruby_tail__", tail
 end
 
+assert('mod_mruby', 'location /header') do
+  res1 = HttpRequest.new.get base + '/header'
+  res2 = HttpRequest.new.get base + '/header', nil, {"X-REQUEST-HEADER" => "hoge"}
+
+  assert_equal "X-REQUEST-HEADER not found", res1["body"]
+  assert_equal "nothing", res1["x-response-header"]
+  assert_equal "X-REQUEST-HEADER found", res2["body"]
+  assert_equal "hoge", res2["x-response-header"]
+end
+
