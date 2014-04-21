@@ -52,3 +52,8 @@ assert('mod_mruby', 'location /request_body') do
   assert_equal "request body", res.body
 end
 
+assert('mod_mruby', 'location /note') do
+  res = HttpRequest.new.post base + '/note'
+  assert_equal "allow", res.body
+end
+
