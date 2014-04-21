@@ -37,3 +37,8 @@ assert('mod_mruby', 'location /header') do
   assert_equal "hoge", res2["x-response-header"]
 end
 
+assert('mod_mruby', 'location /service_unavailable') do
+  res = HttpRequest.new.get base + '/service_unavailable'
+  assert_equal 503, res.code
+end
+
