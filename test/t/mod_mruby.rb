@@ -42,3 +42,8 @@ assert('mod_mruby', 'location /service_unavailable') do
   assert_equal 503, res.code
 end
 
+assert('mod_mruby', 'location /document_root') do
+  res = HttpRequest.new.get base + '/document_root'
+  assert_equal "OK", res.body
+end
+

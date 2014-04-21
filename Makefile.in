@@ -46,6 +46,7 @@ PWD=$(shell pwd)
 SYSCONFDIR=$(shell $(APXS) -q SYSCONFDIR)
 APCONFNAME=$(shell $(APXS) -q progname).conf
 APLIBEXECDIR=$(shell $(APXS) -q exp_libexecdir)
+APDOCROOT=$(shell $(APXS) -q exp_htdocsdir)
 MOD_MRUBY_SO=$(PWD)/src/.libs/mod_mruby.so
 TEST_DIR=$(PWD)/test
 
@@ -55,7 +56,7 @@ test:
 	cp -p $(SYSCONFDIR)/$(APCONFNAME) ./test/conf/httpd.conf.orig
 	cat ./test/conf/httpd.conf.orig > ./test/conf/httpd.conf
 	echo 'LoadModule mruby_module $(MOD_MRUBY_SO)' >> ./test/conf/httpd.conf
-	sed -e 's|__MOD_MRUBY_TEST_DIR__|$(TEST_DIR)|g' ./test/conf/mod_mruby_test.conf | sed -e 's|__APLIBEXECDIR__|$(APLIBEXECDIR)|g' >> ./test/conf/httpd.conf
+	sed -e 's|__MOD_MRUBY_TEST_DIR__|$(TEST_DIR)|g' ./test/conf/mod_mruby_test.conf | sed -e 's|__APLIBEXECDIR__|$(APLIBEXECDIR)|g' | sed -e 's|__APDOCROOT__|$(APDOCROOT)|g' >> ./test/conf/httpd.conf
 	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
 	cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
 	cp -p ./test/t/mod_mruby.rb $(MRUBY_ROOT)/test/t/.
