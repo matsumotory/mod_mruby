@@ -47,3 +47,8 @@ assert('mod_mruby', 'location /document_root') do
   assert_equal "OK", res.body
 end
 
+assert('mod_mruby', 'location /request_body') do
+  res = HttpRequest.new.post base + '/request_body', "request body"
+  assert_equal "request body", res.body
+end
+
