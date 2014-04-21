@@ -61,11 +61,11 @@ apr_thread_mutex_t *mod_mruby_mutex;
 module AP_MODULE_DECLARE_DATA mruby_module;
 
 int ap_mruby_class_init(mrb_state *mrb);
-static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, 
+static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
     server_rec *s);
-static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code,
     int module_status);
-static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, 
+static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c,
     server_rec *s);
 
 //
@@ -104,7 +104,7 @@ static mrb_state *ap_mrb_get_mrb_state(apr_pool_t *pool)
 {
   mrb_state *mrb = NULL;
   TRACER;
-  if (apr_pool_userdata_get((void **)&mrb, "mod_mruby_state", pool) 
+  if (apr_pool_userdata_get((void **)&mrb, "mod_mruby_state", pool)
       == APR_SUCCESS) {
     if (mrb == NULL) {
       ap_log_error(APLOG_MARK
@@ -145,11 +145,11 @@ static mrb_state *ap_mrb_get_mrb_state(apr_pool_t *pool)
 
 //
 // Set code functions
-// 
-static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path, 
+//
+static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path,
     const char *cache_opt, const char *phase)
 {
-  mod_mruby_code_t *c = 
+  mod_mruby_code_t *c =
     (mod_mruby_code_t *)apr_pcalloc(p, sizeof(mod_mruby_code_t));
   TRACER;
 
@@ -159,14 +159,14 @@ static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path,
     c->cache = CACHE_ENABLE;
     ap_log_error(APLOG_MARK
       , APLOG_NOTICE
-      , 0        
+      , 0
       , ap_server_conf
       , "%s NOTICE %s: phase=[%s] file=[%s] cache enabled"
       , MODULE_NAME
       , __func__
       , phase
       , c->code.path
-    );  
+    );
   } else {
     c->cache = CACHE_DISABLE;
   }
@@ -176,7 +176,7 @@ static mod_mruby_code_t *ap_mrb_set_file(apr_pool_t *p, const char *path,
 
 static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
 {
-  mod_mruby_code_t *c = 
+  mod_mruby_code_t *c =
     (mod_mruby_code_t *)apr_pcalloc(p, sizeof(mod_mruby_code_t));
   TRACER;
 
@@ -186,7 +186,7 @@ static mod_mruby_code_t *ap_mrb_set_string(apr_pool_t *p, const char *arg)
   return c;
 }
 
-static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c, 
+static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c,
     server_rec *s)
 {
   struct mrb_parser_state* p = NULL;
@@ -250,7 +250,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c,
 
 static void *mod_mruby_create_dir_config(apr_pool_t *p, char *dummy)
 {
-  mruby_dir_config_t *dir_conf = 
+  mruby_dir_config_t *dir_conf =
     (mruby_dir_config_t *)apr_pcalloc(p, sizeof(*dir_conf));
   TRACER;
 
@@ -327,7 +327,7 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *server)
   ap_mrb_set_mrb_state(server->process->pconf, mrb);
   TRACER;
 
-  mruby_config_t *conf = 
+  mruby_config_t *conf =
     (mruby_config_t *)apr_pcalloc(p, sizeof(mruby_config_t));
   conf->mod_mruby_child_init_first_code       = NULL;
   conf->mod_mruby_child_init_middle_code      = NULL;
@@ -496,7 +496,7 @@ SET_MOD_MRUBY_DIR_INLINE_CMDS(log_transaction_last);
 //
 // run mruby core functions
 //
-static void ap_mruby_code_clean(mrb_state *mrb, struct RProc *proc, 
+static void ap_mruby_code_clean(mrb_state *mrb, struct RProc *proc,
     mod_mruby_code_t *code, request_rec *r)
 {
   TRACER;
@@ -515,7 +515,7 @@ static int ap_mruby_run_nr(server_rec *s, mod_mruby_code_t *code)
 {
 
   mrb_state *mrb = ap_mrb_get_mrb_state(s->process->pconf);
-  // code->cache force enabled since this function only run at startup server 
+  // code->cache force enabled since this function only run at startup server
   // phase
   code->cache = CACHE_ENABLE;
 
@@ -540,7 +540,7 @@ static int ap_mruby_run_nr(server_rec *s, mod_mruby_code_t *code)
   return APR_SUCCESS;
 }
 
-static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
+static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code,
     int module_status)
 {
 
@@ -638,7 +638,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code,
   return ap_mrb_get_status_code();
 }
 
-static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, 
+static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r,
     mod_mruby_code_t *c)
 {
   int ai;
@@ -707,54 +707,54 @@ static int mod_mruby_preinit(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp)
   return OK;
 }
 
-static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp, 
+static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
     server_rec *s)
 {
-  apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex, 
+  apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex,
       APR_THREAD_MUTEX_DEFAULT, p);
   TRACER;
   if(status != APR_SUCCESS){
     ap_log_error(APLOG_MARK
-      , APLOG_ERR    
-      , 0        
-      , ap_server_conf       
+      , APLOG_ERR
+      , 0
+      , ap_server_conf
       , APLOGNO(05001) "%s ERROR %s: Error creating thread mutex."
       , MODULE_NAME
       , __func__
     );
     return DECLINED;
-  }   
+  }
 
   void *data = NULL;
   const char *userdata_key = "mruby_init";
 
   ap_log_error(APLOG_MARK
     , APLOG_INFO
-    , 0        
+    , 0
     , ap_server_conf
     , APLOGNO(05002) "%s %s: main process / thread (pid=%d) initialized."
     , MODULE_NAME
     , __func__
     , getpid()
-  );  
+  );
 
   apr_pool_userdata_get(&data, userdata_key, p);
 
   if (!data)
-    apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null, 
+    apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null,
         p);
 
   ap_log_error(APLOG_MARK
     , APLOG_NOTICE
-    , 0        
+    , 0
     , ap_server_conf
     , APLOGNO(05003) "%s %s: %s / %s mechanism enabled."
     , MODULE_NAME
     , __func__
     , MODULE_NAME
     , MODULE_VERSION
-  );  
-  
+  );
+
   return DECLINED;
 }
 
@@ -811,7 +811,7 @@ MOD_MRUBY_REGISTER_HOOK_FUNC_NR_INT(post_config_last);
 
 static int mod_mruby_handler(request_rec *r)
 {
-  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, 
+  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
   TRACER;
 
@@ -819,12 +819,12 @@ static int mod_mruby_handler(request_rec *r)
     return DECLINED;
 
   if (strcmp(r->handler, "mruby-script") == 0)
-    dir_conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename, 
+    dir_conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename,
         NULL, "mruby-script");
   else
     return DECLINED;
 
-  return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r, 
+  return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r,
       dir_conf->mod_mruby_handler_code, DECLINED);
 }
 
@@ -910,41 +910,41 @@ MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_first);
 MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_middle);
 MOD_MRUBY_REGISTER_HOOK_FUNC_VOID(insert_filter_last);
 
-static authn_status mod_mruby_authn_check_password(request_rec *r, 
+static authn_status mod_mruby_authn_check_password(request_rec *r,
     const char *user, const char *password)
 {
-  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, 
+  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
   if (dir_conf->mod_mruby_authn_check_password_code == NULL)
     return AUTH_GENERAL_ERROR;
 
   ap_mrb_init_authnprovider_basic(r, user, password);
-  return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r, 
+  return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r,
       dir_conf->mod_mruby_authn_check_password_code, OK);
 }
 
-static authn_status mod_mruby_authn_get_realm_hash(request_rec *r, 
+static authn_status mod_mruby_authn_get_realm_hash(request_rec *r,
     const char *user, const char *realm, char **rethash)
 {
   authn_status ret;
-  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, 
+  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
   if (dir_conf->mod_mruby_authn_get_realm_hash_code == NULL)
     return AUTH_GENERAL_ERROR;
 
   ap_mrb_init_authnprovider_digest(r, user, realm);
-  ret = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r, 
+  ret = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r,
       dir_conf->mod_mruby_authn_get_realm_hash_code, OK);
   *rethash = ap_mrb_get_authnprovider_digest_rethash();
   return ret;
 }
 
-static apr_status_t mod_mruby_output_filter(ap_filter_t* f, 
+static apr_status_t mod_mruby_output_filter(ap_filter_t* f,
     apr_bucket_brigade* bb)
 {
   request_rec *r = f->r;
 
-  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, 
+  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
 
   if (dir_conf->mod_mruby_output_filter_code == NULL)
@@ -952,7 +952,7 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f,
 
   ap_mrb_set_filter_rec(f, bb, r->pool);
   ap_mrb_push_request(r);
-  ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r, 
+  ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r,
       dir_conf->mod_mruby_output_filter_code, OK);
   return ap_pass_brigade(f->next, bb);
 }
@@ -967,13 +967,13 @@ static const authn_provider authn_mruby_provider = {
 //
 static int mod_mruby_handler_inline(request_rec *r)
 {
-  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config, 
+  mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
 
   if (strcmp(r->handler, "mruby-native-script") != 0)
     return DECLINED;
 
-  return ap_mruby_run_inline(ap_mrb_get_mrb_state(r->server->process->pconf), 
+  return ap_mruby_run_inline(ap_mrb_get_mrb_state(r->server->process->pconf),
       r, dir_conf->mod_mruby_handler_inline_code);
 }
 
@@ -1061,9 +1061,9 @@ static void register_hooks(apr_pool_t *p)
   MOD_MRUBY_SET_ALL_REGISTER(insert_filter);
   MOD_MRUBY_SET_ALL_REGISTER(log_transaction);
 
-  ap_register_provider(p, AUTHN_PROVIDER_GROUP, "mruby", "0", 
+  ap_register_provider(p, AUTHN_PROVIDER_GROUP, "mruby", "0",
       &authn_mruby_provider);
-  ap_register_output_filter("mruby", mod_mruby_output_filter, NULL, 
+  ap_register_output_filter("mruby", mod_mruby_output_filter, NULL,
       AP_FTYPE_CONTENT_SET);
   //ap_register_input_filter( "MODMRUBYFILTER", mod_mruby_input_filter,  NULL, AP_FTYPE_CONTENT_SET);
 }
@@ -1080,7 +1080,7 @@ static void register_hooks(apr_pool_t *p)
 
 static const command_rec mod_mruby_cmds[] = {
 
-  AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL, 
+  AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL,
       RSRC_CONF | ACCESS_CONF, "hook inline code for handler phase."),
   MOD_MRUBY_SET_ALL_CMDS_INLINE(handler, Handler)
   MOD_MRUBY_SET_ALL_CMDS_INLINE(post_read_request, PostReadRequest)
@@ -1092,7 +1092,7 @@ static const command_rec mod_mruby_cmds[] = {
   MOD_MRUBY_SET_ALL_CMDS_INLINE(fixups, Fixups)
   MOD_MRUBY_SET_ALL_CMDS_INLINE(log_transaction, LogTransaction)
 
-  AP_INIT_TAKE12("mrubyHandler", set_mod_mruby_handler, NULL, 
+  AP_INIT_TAKE12("mrubyHandler", set_mod_mruby_handler, NULL,
       RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
   MOD_MRUBY_SET_ALL_CMDS(handler, Handler)
   MOD_MRUBY_SET_ALL_CMDS(post_config, PostConfig)
@@ -1108,11 +1108,11 @@ static const command_rec mod_mruby_cmds[] = {
   MOD_MRUBY_SET_ALL_CMDS(insert_filter, InsertFilter)
   MOD_MRUBY_SET_ALL_CMDS(log_transaction, LogTransaction)
 
-  AP_INIT_TAKE12("mrubyAuthnCheckPassword", set_mod_mruby_authn_check_password, 
+  AP_INIT_TAKE12("mrubyAuthnCheckPassword", set_mod_mruby_authn_check_password,
       NULL, OR_AUTHCFG, "hook for authn basic."),
-  AP_INIT_TAKE12("mrubyAuthnGetRealmHash", set_mod_mruby_authn_get_realm_hash, 
+  AP_INIT_TAKE12("mrubyAuthnGetRealmHash", set_mod_mruby_authn_get_realm_hash,
       NULL, OR_AUTHCFG, "hook for authn digest."),
-  AP_INIT_TAKE12("mrubyOutputFilter", set_mod_mruby_output_filter, 
+  AP_INIT_TAKE12("mrubyOutputFilter", set_mod_mruby_output_filter,
       NULL, RSRC_CONF | ACCESS_CONF, "set mruby output filter script."),
 
   {NULL}
