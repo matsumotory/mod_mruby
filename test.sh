@@ -25,18 +25,21 @@ if [ ! -d "./mruby/src" ]; then
     git submodule update
     echo "mruby Downloading ... Done"
 fi
+
 cd mruby
 if [ -d "./build" ]; then
     echo "mruby Cleaning ..."
     ./minirake clean
     echo "mruby Cleaning ... Done"
 fi
+
 echo "mruby building ..."
 mv build_config.rb build_config.rb.orig
 cp ../build_config.rb .
 BUILD_TYPE='debug' ./minirake
 echo "mruby building ... Done"
 cd ..
+
 echo "mod_mruby building ..."
 ./configure $APXS_PATH $APACHECTL_PATH
 make
