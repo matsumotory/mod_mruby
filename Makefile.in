@@ -75,6 +75,7 @@ install:
 clean:
 	-rm -rf src/.libs src/*.o src/*.so src/*.lo src/*.la src/*.slo src/*.loT
 	-rm -rf ./lib/*/.libs ./lib/*/*.o ./lib/*/*.lo ./lib/*/*.slo
+	-rm -rf test/conf/httpd.conf*
 
 #   clobber
 clobber: clean
