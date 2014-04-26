@@ -14,24 +14,6 @@
 #define sleep(x) Sleep(x*1000)
 #endif
 
-#ifdef SUPPORT_SYSLOG
-CODE logpriority[] =
-{
-  { "alert", LOG_ALERT },
-  { "crit", LOG_CRIT },
-  { "debug", LOG_DEBUG },
-  { "emerg", LOG_EMERG },
-  { "err", LOG_ERR },
-  { "error", LOG_ERR },
-  { "info", LOG_INFO },
-  { "notice", LOG_NOTICE },
-  { "panic", LOG_EMERG },
-  { "warn", LOG_WARNING },
-  { "warning", LOG_WARNING },
-  { NULL, -1 }
-};
-#endif
-
 int mod_mruby_return_code;
 
 int ap_mrb_get_status_code()
@@ -160,54 +142,28 @@ static mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
 #ifdef SUPPORT_SYSLOG
   mrb_value *argv;
   mrb_int argc;
-  char *i_pri,*msg;
-  int i;
-  int pri = INVALID_PRIORITY;
+  mrb_int pri;
+  char *msg;
 
-  mrb_get_args(mrb, "*", &argv, &argc);
-  if (argc != 2) {
-    ap_log_error(APLOG_MARK
-      , APLOG_WARNING
-      , 0
-      , NULL
-      , "%s ERROR %s: argument is not 2"
-      , MODULE_NAME
-      , __func__
-    );
-    return str;
-  }
-
-  i_pri = mrb_str_to_cstr(mrb, argv[0]);
-
-  i = 0;
-  while (logpriority[i].c_name != NULL) {
-    if (strcmp(logpriority[i].c_name, i_pri) == 0) {
-      pri = logpriority[i].c_val;
-      break;
-    }
-    i++;
-  }
-
-  if (pri == INVALID_PRIORITY) {
-    ap_log_error(APLOG_MARK
-      , APLOG_WARNING
-      , 0
-      , NULL
-      , "%s ERROR %s: priority is invalid"
-      , MODULE_NAME
-      , __func__
-    );
-    return str;
-  }
-
-  msg = mrb_str_to_cstr(mrb, argv[1]);
+  mrb_get_args(mrb, "iz", &pri, &msg);
 
   openlog(NULL, LOG_PID, LOG_SYSLOG);
   syslog(pri, "%s", msg);
   closelog();
-#endif
 
   return str;
+#else
+  ap_log_error(APLOG_MARK
+    , APLOG_ERR
+    , 0
+    , NULL
+    , "%s ERROR %s: syslog was not supported"
+    , MODULE_NAME
+    , __func__
+  );
+
+  return mrb_nil_value();
+#endif
 }
 
 static mrb_value ap_mrb_rputs(mrb_state *mrb, mrb_value str)
