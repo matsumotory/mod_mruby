@@ -75,7 +75,7 @@ void ap_mrb_raise_error(mrb_state *mrb, mrb_value obj, mod_mruby_code_t *code)
       , "%s ERROR %s: mrb_run failed: [TYPE: %s] [CACHED: %s] mruby raise: %s"
       , MODULE_NAME
       , __func__
-      , type 
+      , type
       , cache
       , err_out
     );
@@ -122,7 +122,7 @@ static mrb_value ap_mrb_sleep(mrb_state *mrb, mrb_value str)
 {
 
   mrb_int time;
-  
+
   mrb_get_args(mrb, "i", &time);
   sleep((int)time);
 
@@ -134,7 +134,7 @@ static mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
 
   mrb_value *argv;
   mrb_int argc;
-  
+
   mrb_get_args(mrb, "*", &argv, &argc);
   if (argc != 2) {
     ap_log_error(APLOG_MARK
@@ -155,7 +155,7 @@ static mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
 
 
 static mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
-{   
+{
 
 #ifdef SUPPORT_SYSLOG
   mrb_value *argv;
@@ -305,6 +305,16 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(M_BASELINE_CONTROL);
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(M_MERGE);
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(M_INVALID);
+
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_ALERT);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_CRIT);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_DEBUG);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_EMERG);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_ERR);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_INFO);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_NOTICE);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_EMERG);
+  AP_MRB_DEFINE_CORE_CONST_FIXNUM(LOG_WARNING);
 
 
   mrb_define_const(mrb, class_core, "OK", mrb_fixnum_value(OK));
