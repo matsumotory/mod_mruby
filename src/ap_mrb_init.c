@@ -18,7 +18,8 @@ void ap_mruby_env_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_authnprovider_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core);
 
-// add extended class init functions like ap_mruby_redis_init() in lib/redis/redis.c
+// add extended class init functions like ap_mruby_redis_init() in
+// lib/redis/redis.c
 void ap_mruby_redis_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_hello_init(mrb_state *mrb, struct RClass *class_core);
 void ap_mruby_load_init(mrb_state *mrb, struct RClass *class_core);

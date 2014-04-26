@@ -10,34 +10,38 @@
 #include "mruby/hash.h"
 #include "mruby/variable.h"
 
-void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb, apr_pool_t *pool)
-{ 
-  ap_mrb_filter_rec *fr = (ap_mrb_filter_rec *)apr_pcalloc(f->r->pool, sizeof(ap_mrb_filter_rec));
-  fr->f = f; 
+void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb,
+    apr_pool_t *pool)
+{
+  ap_mrb_filter_rec *fr = (ap_mrb_filter_rec *)apr_pcalloc(f->r->pool,
+      sizeof(ap_mrb_filter_rec));
+  fr->f = f;
   fr->bb = bb;
   apr_pool_userdata_set(fr, "mod_mruby_filter_rec", NULL, pool);
 }
 
 ap_mrb_filter_rec *ap_mrb_get_filter_rec(apr_pool_t *pool)
-{ 
+{
   ap_mrb_filter_rec *fr = NULL;
-  if (apr_pool_userdata_get((void **)&fr, "mod_mruby_filter_rec", pool) == APR_SUCCESS) {
+  if (apr_pool_userdata_get((void **)&fr, "mod_mruby_filter_rec", pool)
+      == APR_SUCCESS) {
     if (fr == NULL) {
       ap_log_error(APLOG_MARK
         , APLOG_ERR
-        , 0  
+        , 0
         , NULL
-        , "%s ERROR %s: apr_pool_userdata_get mod_mruby_filter_rec success, but fr is NULL"
+        , "%s ERROR %s: apr_pool_userdata_get mod_mruby_filter_rec success, "
+          "but fr is NULL"
         , MODULE_NAME
         , __func__
-      );   
+      );
       return NULL;
-    }    
+    }
     return fr;
   }
   ap_log_error(APLOG_MARK
     , APLOG_ERR
-    , 0  
+    , 0
     , NULL
     , "%s ERROR %s: apr_pool_userdata_get mod_mruby_filter_rec faled"
     , MODULE_NAME
@@ -73,7 +77,8 @@ static mrb_value ap_mrb_filter_brigade_first(mrb_state *mrb, mrb_value self)
   request_rec *r = ap_mrb_get_request();
   ap_mrb_filter_rec *ff = ap_mrb_get_filter_rec(r->pool);
   const apr_bucket *bkt = APR_BRIGADE_FIRST(ff->bb);
-  return mrb_obj_value(Data_Wrap_Struct(mrb, mrb->object_class, &mrb_apr_bucket_type, (void*) bkt));
+  return mrb_obj_value(Data_Wrap_Struct(mrb, mrb->object_class,
+        &mrb_apr_bucket_type, (void*) bkt));
 }
 
 
@@ -116,7 +121,8 @@ static mrb_value ap_mrb_filter_insert_eos(mrb_state *mrb, mrb_value self)
 {
   request_rec *r = ap_mrb_get_request();
   ap_mrb_filter_rec *ff = ap_mrb_get_filter_rec(r->pool);
-  APR_BRIGADE_INSERT_TAIL(ff->bb, apr_bucket_eos_create(ff->f->c->bucket_alloc));
+  APR_BRIGADE_INSERT_TAIL(ff->bb, apr_bucket_eos_create(
+        ff->f->c->bucket_alloc));
   return self;
 }
 
@@ -144,7 +150,7 @@ static mrb_value ap_mrb_filter_brigade_pflatten(mrb_state *mrb, mrb_value self)
   request_rec *r = ap_mrb_get_request();
   ap_mrb_filter_rec *ff = ap_mrb_get_filter_rec(r->pool);
   rv = apr_brigade_pflatten(ff->bb, &data, &len, ff->f->r->pool);
-  if (rv) 
+  if (rv)
     mrb_raise(mrb, E_RUNTIME_ERROR, "apr_brigade_pflatten failed");
   return mrb_str_new_cstr(mrb, data);
 }
@@ -195,8 +201,6 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
 {
   struct RClass *class_filter;
 
-  //mrb_define_method(mrb, mrb->kernel_module, "is_eos?", ap_mrb_filter_brigade_is_eos, ARGS_NONE());
-
   class_filter = mrb_define_class_under(mrb, class_core, "Filter", mrb->object_class);
   mrb_define_method(mrb, class_filter, "initialize", ap_mrb_filter_init, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "puts", ap_mrb_filter_puts, ARGS_REQ(1));
@@ -210,5 +214,5 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_filter, "empty?", ap_mrb_filter_brigade_empty, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "first_bucket", ap_mrb_filter_brigade_first, ARGS_NONE());
   //mrb_define_method(mrb, class_filter, "bucket_read", ap_mrb_filter_bucket_read, ARGS_REQ(1));
-  
+
 }

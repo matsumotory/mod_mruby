@@ -89,7 +89,8 @@ static mrb_value ap_mrb_get_mod_mruby_version(mrb_state *mrb, mrb_value str)
 static mrb_value ap_mrb_get_server_version(mrb_state *mrb, mrb_value str)
 {
 #if AP_SERVER_PATCHLEVEL_NUMBER > 3
-  return mrb_str_new(mrb, ap_get_server_description(), strlen(ap_get_server_description()));
+  return mrb_str_new(mrb, ap_get_server_description(),
+      strlen(ap_get_server_description()));
 #else
   return mrb_str_new_lit(mrb, AP_SERVER_BASEVERSION " (" PLATFORM ")");
 #endif
@@ -130,7 +131,8 @@ static mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
     return str;
   }
 
-  ap_log_error(APLOG_MARK, mrb_fixnum(argv[0]), 0, NULL, "%s", mrb_str_to_cstr(mrb, argv[1]));
+  ap_log_error(APLOG_MARK, mrb_fixnum(argv[0]), 0, NULL, "%s",
+      mrb_str_to_cstr(mrb, argv[1]));
 
   return str;
 }
@@ -192,7 +194,8 @@ static mrb_value ap_mrb_echo(mrb_state *mrb, mrb_value str)
   if (mrb_type(msg) != MRB_TT_STRING) {
     msg = mrb_funcall(mrb, msg, "to_s", 0, NULL);
   }
-  ap_rputs(mrb_str_to_cstr(mrb, mrb_str_plus(mrb, msg, mrb_str_new_lit(mrb, "\n"))), ap_mrb_get_request());
+  ap_rputs(mrb_str_to_cstr(mrb, mrb_str_plus(mrb, msg,
+          mrb_str_new_lit(mrb, "\n"))), ap_mrb_get_request());
   mrb_gc_arena_restore(mrb, ai);
 
   return str;
@@ -217,7 +220,8 @@ static mrb_value ap_mrb_f_count_arena(mrb_state *mrb, mrb_value self)
   return mrb_fixnum_value(mrb_gc_arena_save(mrb));
 }
 
-#define AP_MRB_DEFINE_CORE_CONST_FIXNUM(val)  mrb_define_const(mrb, class_core, #val, mrb_fixnum_value(val));
+#define AP_MRB_DEFINE_CORE_CONST_FIXNUM(val)  mrb_define_const(mrb, \
+    class_core, #val, mrb_fixnum_value(val));
 
 void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
 {

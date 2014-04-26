@@ -122,13 +122,15 @@ static mrb_value ap_mrb_get_server_limit_req_line(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(r->server->limit_req_line);
 }
 
-static mrb_value ap_mrb_get_server_limit_req_fieldsize(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_server_limit_req_fieldsize(mrb_state *mrb,
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value(r->server->limit_req_fieldsize);
 }
 
-static mrb_value ap_mrb_get_server_limit_req_fields(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_server_limit_req_fields(mrb_state *mrb,
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value(r->server->limit_req_fields);
@@ -140,7 +142,8 @@ static mrb_value ap_mrb_get_server_timeout(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(r->server->timeout);
 }
 
-static mrb_value ap_mrb_get_server_keep_alive_timeout(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_server_keep_alive_timeout(mrb_state *mrb,
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value(r->server->keep_alive_timeout);
@@ -152,7 +155,8 @@ static mrb_value ap_mrb_get_server_port(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(r->server->port);
 }
 
-static mrb_value ap_mrb_get_server_defn_line_number(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_server_defn_line_number(mrb_state *mrb,
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value(r->server->defn_line_number);
