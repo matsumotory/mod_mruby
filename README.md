@@ -1,4 +1,4 @@
-# Welcome to mod_mruby Pages  [![Build Status](https://travis-ci.org/matsumoto-r/mod_mruby.png?branch=master)](https://travis-ci.org/matsumoto-r/mod_mruby)
+# Welcome to mod_mruby Pages  [![Build Status](https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master)](https://travis-ci.org/matsumoto-r/mod_mruby)
 
 [![ngx_mruby mod_mruby performance](https://dl.dropboxusercontent.com/s/2h8wxf2b8gisvd1/performance_20140301.png)](http://blog.matsumoto-r.jp/?p=3974)
 
