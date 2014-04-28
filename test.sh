@@ -46,18 +46,7 @@ make
 echo "mod_mruby building ... Done"
 
 echo "mod_mruby testing ..."
-sudo make test
-
-## /home/matsumotory/DEV/mod_mruby/mruby/tools/mrbc/mrbc.c:334:1: fatal error:
-## opening dependency file
-## /home/matsumotory/DEV/mod_mruby/mruby/build/host/tools/mrbc/mrbc.d: Permission
-## denied
-## }
-##  ^
-##  compilation terminated
-
-# if above message output, exec below chown command and exec test.sh again.
-sudo chown -R $USER mruby
+sudo TEST_USER=$USER make test
 echo "mod_mruby testing ... Done"
 
 echo "test.sh ... successful"

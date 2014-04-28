@@ -63,7 +63,8 @@ test:
 	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
 	cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
 	cp -p ./test/t/mod_mruby.rb $(MRUBY_ROOT)/test/t/.
-	cd $(MRUBY_ROOT) && rake clean && rake all test
+	chown -R ${TEST_USER} ./test
+	cd $(MRUBY_ROOT) && sudo -u ${TEST_USER} rake clean && sudo -u ${TEST_USER} rake all test
 	$(APACHECTL) -k stop
 
 #   install the DSO file into the Apache installation
