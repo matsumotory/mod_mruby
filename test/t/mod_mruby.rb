@@ -1,6 +1,11 @@
 ##
 # mod_mruby test
 
+def base64 value
+  r = [ value ].pack 'm'
+  r.include?("\n") ? r.split("\n").join("") : r
+end
+
 base = 'http://127.0.0.1'
 
 assert('mod_mruby', 'location /hello-inline') do
@@ -55,5 +60,11 @@ end
 assert('mod_mruby', 'location /note') do
   res = HttpRequest.new.post base + '/note'
   assert_equal "allow", res.body
+end
+
+assert('mod_mruby', 'location /basic/test') do
+  token = base64 "user1:passwd"
+  res = HttpRequest.new.post base + '/basic/test', nil, {"Authorization" => "Basic #{token}"}
+  assert_equal "basic auth allowed", res.body
 end
 
