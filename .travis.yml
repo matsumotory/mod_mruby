@@ -13,6 +13,7 @@ env:
     HTTPD_TAR=${HTTPD_VERSION}.tar.gz 
     APR_TAR=${APR}.tar.gz 
     APR_UTIL_TAR=${APR_UTIL}.tar.gz 
+    HTTPD_CONFIG_OPT=
     APXS_CHECK_CMD="../${HTTPD_VERSION}/apache/bin/apachectl -v"
   - HTTPD_VERSION=httpd-2.2.27 
     APR=apr-1.5.1 
@@ -20,6 +21,7 @@ env:
     HTTPD_TAR=${HTTPD_VERSION}.tar.gz 
     APR_TAR=${APR}.tar.gz 
     APR_UTIL_TAR=${APR_UTIL}.tar.gz 
+    HTTPD_CONFIG_OPT=--enable-load-all-modules
     APXS_CHECK_CMD="../${HTTPD_VERSION}/apache/bin/apachectl -v"
 before_script:
   - cd ../
@@ -33,7 +35,7 @@ before_script:
   - ln -s ${APR} apr
   - ln -s ${APR_UTIL} apr-util
   - cd ..
-  - ./configure --prefix=`pwd`/apache --with-included-apr
+  - ./configure --prefix=`pwd`/apache --with-included-apr ${HTTPD_CONFIG_OPT}
   - make
   - make install
   - cd ../mod_mruby
