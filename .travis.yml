@@ -5,27 +5,27 @@ compiler:
 before_install:
     - sudo apt-get -qq update
 install:
-    - sudo apt-get -qq install apache2 apache2-prefork-dev rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
+    - sudo apt-get -qq install rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
 env:
-  - HTTPD=httpd-2.4.9 
+  - HTTPD_VERSION=httpd-2.4.9 
     APR=apr-1.5.1 
     APR_UTIL=apr-util-1.5.3 
-    HTTPD_TAR=${HTTPD}.tar.gz 
+    HTTPD_TAR=${HTTPD_VERSION}.tar.gz 
     APR_TAR=${APR}.tar.gz 
     APR_UTIL_TAR=${APR_UTIL}.tar.gz 
-    APXS_CHECK_CMD="../${HTTPD}/apache/bin/apachectl -v"
-  - HTTPD=httpd-2.2.27 
+    APXS_CHECK_CMD="../${HTTPD_VERSION}/apache/bin/apachectl -v"
+  - HTTPD_VERSION=httpd-2.2.27 
     APR=apr-1.5.1 
     APR_UTIL=apr-util-1.5.3 
-    HTTPD_TAR=${HTTPD}.tar.gz 
+    HTTPD_TAR=${HTTPD_VERSION}.tar.gz 
     APR_TAR=${APR}.tar.gz 
     APR_UTIL_TAR=${APR_UTIL}.tar.gz 
-    APXS_CHECK_CMD="../${HTTPD}/apache/bin/apachectl -v"
+    APXS_CHECK_CMD="../${HTTPD_VERSION}/apache/bin/apachectl -v"
 before_script:
   - cd ../
   - wget http://ftp.jaist.ac.jp/pub/apache//httpd/${HTTPD_TAR}
   - tar xf ${HTTPD_TAR}
-  - cd ${HTTPD}/srclib
+  - cd ${HTTPD_VERSION}/srclib
   - wget http://ftp.jaist.ac.jp/pub/apache//apr/${APR_TAR}
   - wget http://ftp.jaist.ac.jp/pub/apache//apr/${APR_UTIL_TAR}
   - tar xf ${APR_TAR}
@@ -41,8 +41,8 @@ before_script:
 script:
   - echo ${APXS_CHECK_CMD}
   - ${APXS_CHECK_CMD}
-  - export APXS_PATH_ENV=--with-apxs=../${HTTPD}/apache/bin/apxs
-  - export APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD}/apache/bin/apachectl
+  - export APXS_PATH_ENV=--with-apxs=../${HTTPD_VERSION}/apache/bin/apxs
+  - export APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD_VERSION}/apache/bin/apachectl
   - sh test.sh
 notifications:
   irc:
