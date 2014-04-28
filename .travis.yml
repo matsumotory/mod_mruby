@@ -39,7 +39,6 @@ before_script:
   - make
   - make install
   - cd ../mod_mruby
-  - sudo service apache2 stop
 script:
   - echo ${APXS_CHECK_CMD}
   - ${APXS_CHECK_CMD}
