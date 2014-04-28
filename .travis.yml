@@ -14,7 +14,6 @@ env:
     APR_TAR=${APR}.tar.gz 
     APR_UTIL_TAR=${APR_UTIL}.tar.gz 
     APXS_CHECK_CMD="../${HTTPD}/apache/bin/apachectl -v"
-    TEST_CMD="APXS_PATH_ENV=--with-apxs=../${HTTPD}/apache/bin/apxs APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD}/apache/bin/apachectl sh test.sh" 
   - HTTPD=httpd-2.2.27 
     APR=apr-1.5.1 
     APR_UTIL=apr-util-1.5.3 
@@ -22,7 +21,6 @@ env:
     APR_TAR=${APR}.tar.gz 
     APR_UTIL_TAR=${APR_UTIL}.tar.gz 
     APXS_CHECK_CMD="../${HTTPD}/apache/bin/apachectl -v"
-    TEST_CMD="APXS_PATH_ENV=--with-apxs=../${HTTPD}/apache/bin/apxs APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD}/apache/bin/apachectl sh test.sh" 
 before_script:
   - cd ../
   - wget http://ftp.jaist.ac.jp/pub/apache//httpd/${HTTPD_TAR}
@@ -43,8 +41,9 @@ before_script:
 script:
   - echo ${APXS_CHECK_CMD}
   - ${APXS_CHECK_CMD}
-  - echo ${TEST_CMD}
-  - ${TEST_CMD}
+  - export APXS_PATH_ENV=--with-apxs=../${HTTPD}/apache/bin/apxs
+  - export APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD}/apache/bin/apachectl
+  - sh test.sh
 notifications:
   irc:
     channels:
