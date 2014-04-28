@@ -7,8 +7,22 @@ before_install:
 install:
     - sudo apt-get -qq install apache2 apache2-prefork-dev rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
 env:
-  - HTTPD=httpd-2.4.9 APR=apr-1.5.1 APR_UTIL=apr-util-1.5.3 HTTPD_TAR=${HTTPD}.tar.gz APR_TAR=${APR}.tar.gz APR_UTIL_TAR=${APR_UTIL}.tar.gz TEST_CMD="APXS_PATH_ENV='--with-apxs=../${HTTPD}/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../${HTTPD}/apache/bin/apachectl' sh test.sh" APXS_CHECK_CMD="../${HTTPD}/apache/bin/apachectl -v"
-  - HTTPD=httpd-2.2.27 APR=apr-1.5.1 APR_UTIL=apr-util-1.5.3 HTTPD_TAR=${HTTPD}.tar.gz APR_TAR=${APR}.tar.gz APR_UTIL_TAR=${APR_UTIL}.tar.gz TEST_CMD="APXS_PATH_ENV='--with-apxs=../${HTTPD}/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../${HTTPD}/apache/bin/apachectl' sh test.sh" APXS_CHECK_CMD="../${HTTPD}/apache/bin/apachectl -v"
+  - HTTPD=httpd-2.4.9 
+    APR=apr-1.5.1 
+    APR_UTIL=apr-util-1.5.3 
+    HTTPD_TAR=${HTTPD}.tar.gz 
+    APR_TAR=${APR}.tar.gz 
+    APR_UTIL_TAR=${APR_UTIL}.tar.gz 
+    APXS_CHECK_CMD="../${HTTPD}/apache/bin/apachectl -v"
+    TEST_CMD="APXS_PATH_ENV=--with-apxs=../${HTTPD}/apache/bin/apxs APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD}/apache/bin/apachectl sh test.sh" 
+  - HTTPD=httpd-2.2.27 
+    APR=apr-1.5.1 
+    APR_UTIL=apr-util-1.5.3 
+    HTTPD_TAR=${HTTPD}.tar.gz 
+    APR_TAR=${APR}.tar.gz 
+    APR_UTIL_TAR=${APR_UTIL}.tar.gz 
+    APXS_CHECK_CMD="../${HTTPD}/apache/bin/apachectl -v"
+    TEST_CMD="APXS_PATH_ENV=--with-apxs=../${HTTPD}/apache/bin/apxs APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD}/apache/bin/apachectl sh test.sh" 
 before_script:
   - cd ../
   - wget http://ftp.jaist.ac.jp/pub/apache//httpd/${HTTPD_TAR}
