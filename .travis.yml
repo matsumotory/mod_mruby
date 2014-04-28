@@ -6,17 +6,24 @@ before_install:
     - sudo apt-get -qq update
 install:
     - sudo apt-get -qq install apache2 apache2-prefork-dev rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
+env:
+  - HTTPD=httpd-2.4.9
+  - APR=apr-1.5.1
+  - APR_UTIL=apr-util-1.5.3
+  - HTTPD_TAR=${HTTPD}.tar.gz
+  - APR_TAR=${APR}.tar.gz
+  - APR_UTIL_TAR=${APR_UTIL}.tar.gz
 before_script:
   - cd ../
-  - wget http://ftp.jaist.ac.jp/pub/apache//httpd/httpd-2.4.9.tar.gz
-  - tar xf httpd-2.4.9.tar.gz
-  - cd httpd-2.4.9/srclib
-  - wget http://ftp.jaist.ac.jp/pub/apache//apr/apr-1.5.1.tar.gz
-  - wget http://ftp.jaist.ac.jp/pub/apache//apr/apr-util-1.5.3.tar.gz
-  - tar xf apr-1.5.1.tar.gz
-  - tar xf apr-util-1.5.3.tar.gz
-  - ln -s apr-1.5.1 apr
-  - ln -s apr-util-1.5.3 apr-util
+  - wget http://ftp.jaist.ac.jp/pub/apache//httpd/${HTTPD_TAR}
+  - tar xf ${HTTPD_TAR}
+  - cd ${HTTPD}/srclib
+  - wget http://ftp.jaist.ac.jp/pub/apache//apr/${APR_TAR}
+  - wget http://ftp.jaist.ac.jp/pub/apache//apr/${APR_UTIL_TAR}
+  - tar xf ${APR_TAR}
+  - tar xf ${APR_UTIL_TAR}
+  - ln -s ${APR} apr
+  - ln -s ${APR_UTIL} apr-util
   - cd ..
   - ./configure --prefix=`pwd`/apache --with-included-apr
   - make
@@ -25,8 +32,8 @@ before_script:
   - sudo service apache2 stop
 script:
   # test for 2.4.x using source installed binary
-  - ../httpd-2.4.9/apache/bin/apachectl -v
-  - APXS_PATH_ENV='--with-apxs=../httpd-2.4.9/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../httpd-2.4.9/apache/bin/apachectl' sh test.sh
+  - ../${HTTPD}/apache/bin/apachectl -v
+  - APXS_PATH_ENV='--with-apxs=../${HTTPD}/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=../${HTTPD}/apache/bin/apachectl' sh test.sh
   # test for 2.2.x using apt-get apache2 default package on travis
   - apachectl -v
   - sh test.sh
