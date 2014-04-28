@@ -21,7 +21,7 @@ env:
     HTTPD_TAR=${HTTPD_VERSION}.tar.gz 
     APR_TAR=${APR}.tar.gz 
     APR_UTIL_TAR=${APR_UTIL}.tar.gz 
-    HTTPD_CONFIG_OPT=--enable-load-all-modules
+    HTTPD_CONFIG_OPT="--enable-proxy --enable-proxy-http"
     APXS_CHECK_CMD="../${HTTPD_VERSION}/apache/bin/apachectl -v"
 before_script:
   - cd ../
