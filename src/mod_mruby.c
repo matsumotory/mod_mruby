@@ -4,32 +4,6 @@
 // See Copyright Notice in mod_mruby.h
 */
 
-/*
-// -------------------------------------------------------------------
-// mod_mruby
-//    This is a mruby module for Apache HTTP Server.
-//
-//    By matsumoto_r (MATSUMOTO, Ryosuke) Sep 2012 in Japan
-//      Academic Center for Computing and Media Studies, Kyoto University
-//      Graduate School of Informatics, Kyoto University
-//      email: matsumoto_r at net.ist.i.kyoto-u.ac.jp
-//
-// Date   2012/04/21
-//
-// change log
-//  2012/04/21 1.00 matsumoto_r first release
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-// How To Compile
-// [Use DSO]
-// make install
-//
-// <add to httpd.conf or conf.d/mruby.conf>
-// LoadModule mruby_module   modules/mod_mruby.so
-//
-// -------------------------------------------------------------------
-*/
 #define CORE_PRIVATE
 
 #include "apr_strings.h"
