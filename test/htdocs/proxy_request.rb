@@ -1,5 +1,5 @@
 backend = "http://127.0.0.1:8081"
-uri = "/proxy_reply"
+uri = "/proxy-reply"
 r = Apache::Request.new
 
 r.handler  = "proxy-server"

@@ -42,18 +42,18 @@ assert('mod_mruby', 'location /header') do
   assert_equal "hoge", res2["x-response-header"]
 end
 
-assert('mod_mruby', 'location /service_unavailable') do
-  res = HttpRequest.new.get base + '/service_unavailable'
+assert('mod_mruby', 'location /service-unavailable') do
+  res = HttpRequest.new.get base + '/service-unavailable'
   assert_equal 503, res.code
 end
 
-assert('mod_mruby', 'location /document_root') do
-  res = HttpRequest.new.get base + '/document_root'
+assert('mod_mruby', 'location /document-root') do
+  res = HttpRequest.new.get base + '/document-root'
   assert_equal "OK", res.body
 end
 
-assert('mod_mruby', 'location /request_body') do
-  res = HttpRequest.new.post base + '/request_body', "request body"
+assert('mod_mruby', 'location /request-body') do
+  res = HttpRequest.new.post base + '/request-body', "request body"
   assert_equal "request body", res.body
 end
 
@@ -68,13 +68,13 @@ assert('mod_mruby', 'location /basic/test') do
   assert_equal "basic auth allowed", res.body
 end
 
-assert('mod_mruby', 'location /conn_ip') do
-  res = HttpRequest.new.post base + '/conn_ip'
+assert('mod_mruby', 'location /conn-ip') do
+  res = HttpRequest.new.post base + '/conn-ip'
   assert_equal "server:127.0.0.1:80,client:127.0.0.1", res.body
 end
 
-assert('mod_mruby', 'location /server_obj') do
-  res = HttpRequest.new.post base + '/server_obj'
+assert('mod_mruby', 'location /server-obj') do
+  res = HttpRequest.new.post base + '/server-obj'
   assert_equal "Apache::Server", res.body
 end
 
@@ -83,8 +83,8 @@ assert('mod_mruby', 'location /env?a=1') do
   assert_equal "QUERY_STRING:a=1", res.body
 end
 
-assert('mod_mruby', 'location /scoreboard_obj') do
-  res = HttpRequest.new.post base + '/scoreboard_obj'
+assert('mod_mruby', 'location /scoreboard-obj') do
+  res = HttpRequest.new.post base + '/scoreboard-obj'
   assert_equal "Apache::Scoreboard", res.body
 end
 
