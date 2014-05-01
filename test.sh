@@ -46,7 +46,7 @@ make
 echo "mod_mruby building ... Done"
 
 echo "mod_mruby testing ..."
-sudo TEST_USER=$USER make test
+make test
 echo "mod_mruby testing ... Done"
 
 echo "test.sh ... successful"
