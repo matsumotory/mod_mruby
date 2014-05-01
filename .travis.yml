@@ -6,7 +6,6 @@ before_install:
     - sudo apt-get -qq update
 install:
     - sudo apt-get -qq install rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
-    - rvm use 1.9.3
 env:
   - HTTPD_VERSION=httpd-2.2.27 
     APR=apr-1.5.1 
@@ -45,6 +44,7 @@ script:
   - ${APXS_CHECK_CMD}
   - export APXS_PATH_ENV=--with-apxs=../${HTTPD_VERSION}/apache/bin/apxs
   - export APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD_VERSION}/apache/bin/apachectl
+  # WARNING Ruby version may be 1.8.x when use 'sudo -u travis' on Travis CI
   - sh test.sh
 notifications:
   irc:
