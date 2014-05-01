@@ -6,6 +6,7 @@ before_install:
     - sudo apt-get -qq update
 install:
     - sudo apt-get -qq install rake bison libcurl4-openssl-dev libhiredis-dev libmarkdown2-dev
+    - rvm use 1.9.3
 env:
   - HTTPD_VERSION=httpd-2.2.27 
     APR=apr-1.5.1 
