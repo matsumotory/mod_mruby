@@ -73,14 +73,14 @@ assert('mod_mruby', 'location /conn-ip') do
   assert_equal "server:127.0.0.1:80,client:127.0.0.1", res.body
 end
 
-assert('mod_mruby', 'location /server-obj') do
-  res = HttpRequest.new.post base + '/server-obj'
-  assert_equal "Apache::Server", res.body
-end
-
 assert('mod_mruby', 'location /env?a=1') do
   res = HttpRequest.new.post base + '/env?a=1'
   assert_equal "QUERY_STRING:a=1", res.body
+end
+
+assert('mod_mruby', 'location /server-obj') do
+  res = HttpRequest.new.post base + '/server-obj'
+  assert_equal "Apache::Server", res.body
 end
 
 assert('mod_mruby', 'location /scoreboard-obj') do
