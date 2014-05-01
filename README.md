@@ -18,7 +18,7 @@ __mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using 
 - You can implement Apache modules by Ruby on Apache httpd.
 - You can implement some Web server software extensions by same Ruby code (as possible) 
 - mod_mruby is to provide an alternative to mod_lua or [ngx_mruby of nginx](http://ngx.mruby.org/).
-- Supported Apache Version: __2.0 2.2 2.4 2.5__
+- Supported Apache Version: __2.2 2.4__
 - Supported Apache MPM: __worker prefork event__
 - Supported OS: __Linux FreeBSD Windows__ and so on.
 
