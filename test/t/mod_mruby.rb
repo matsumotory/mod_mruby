@@ -68,3 +68,23 @@ assert('mod_mruby', 'location /basic/test') do
   assert_equal "basic auth allowed", res.body
 end
 
+assert('mod_mruby', 'location /conn_ip') do
+  res = HttpRequest.new.post base + '/conn_ip'
+  assert_equal "server:127.0.0.1:80,client:127.0.0.1", res.body
+end
+
+assert('mod_mruby', 'location /server_obj') do
+  res = HttpRequest.new.post base + '/server_obj'
+  assert_equal "Apache::Server", res.body
+end
+
+assert('mod_mruby', 'location /env?a=1') do
+  res = HttpRequest.new.post base + '/env?a=1'
+  assert_equal "QUERY_STRING:a=1", res.body
+end
+
+assert('mod_mruby', 'location /scoreboard_obj') do
+  res = HttpRequest.new.post base + '/scoreboard_obj'
+  assert_equal "Apache::Scoreboard", res.body
+end
+
