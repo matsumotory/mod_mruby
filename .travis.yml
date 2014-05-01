@@ -44,7 +44,7 @@ script:
   - ${APXS_CHECK_CMD}
   - export APXS_PATH_ENV=--with-apxs=../${HTTPD_VERSION}/apache/bin/apxs
   - export APACHECTL_PATH_ENV=--with-apachectl=../${HTTPD_VERSION}/apache/bin/apachectl
-  # WARNING Ruby version may be 1.8.x when use 'sudo -u travis' on Travis CI
+  # WARNING Ruby version may be 1.8.x when use 'sudo -u travis' after sudo on Travis CI
   - sh test.sh
 notifications:
   irc:
