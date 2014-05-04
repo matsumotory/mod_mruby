@@ -14,22 +14,13 @@
 #include "http_config.h"
 #include "http_core.h"
 #include "http_protocol.h"
-//#include "apr_table.h"
-//#include "json.h"
-
-
-/*
-static struct mrb_data_type request_rec_type = {
-  "request_rec", 0,
-};
-*/
-
 
 request_rec *mrb_request_rec_state = NULL;
 
 int ap_mrb_push_request(request_rec *r)
 {
-  mrb_request_rec_state = (request_rec *)apr_pcalloc(r->pool, sizeof (*mrb_request_rec_state));
+  mrb_request_rec_state = (request_rec *)apr_pcalloc(r->pool, 
+      sizeof(*mrb_request_rec_state));
   mrb_request_rec_state = r;
   return OK;
 }
@@ -49,63 +40,6 @@ mrb_value ap_mrb_str_to_value(mrb_state *mrb, apr_pool_t *p, const char *str)
   val = apr_pstrdup(p, str);
   return mrb_str_new(mrb, val, strlen(val));
 }
-
-/*
-mrb_value ap_mrb_init_request(mrb_state *mrb, mrb_value str)
-{
-  str = mrb_class_new_instance(mrb, 0, NULL, class_request);
-  mrb_iv_set(mrb
-    , str
-    , mrb_intern(mrb, "request_rec")
-    , mrb_obj_value(Data_Wrap_Struct(mrb
-      , mrb->object_class
-      , &request_rec_type
-      , ap_mrb_get_request())
-    )
-  );
-
-  ap_log_error(APLOG_MARK
-    , APLOG_WARNING
-    , 0
-    , NULL
-    , "%s ERROR %s: Initialied."
-    , MODULE_NAME
-    , __func__
-  );
-
-  return str;
-}
-*/
-
-/*
-mrb_value ap_mrb_get_request_rec_json(mrb_state *mrb, mrb_value str)
-{
-  char *val;
-  request_rec *r = ap_mrb_get_request();
-  json_object *my_object;
-
-  my_object = json_object_new_object();
-  json_object_object_add(my_object, "filename", json_object_new_string(ap_mrb_string_check(r->pool, r->filename)));
-  json_object_object_add(my_object, "uri", json_object_new_string(ap_mrb_string_check(r->pool, r->uri)));
-  json_object_object_add(my_object, "user", json_object_new_string(ap_mrb_string_check(r->pool, r->user)));
-  json_object_object_add(my_object, "content_type", json_object_new_string(ap_mrb_string_check(r->pool, r->content_type)));
-  json_object_object_add(my_object, "protocol", json_object_new_string(ap_mrb_string_check(r->pool, r->protocol)));
-  json_object_object_add(my_object, "vlist_validator", json_object_new_string(ap_mrb_string_check(r->pool, r->vlist_validator)));
-  json_object_object_add(my_object, "ap_auth_type", json_object_new_string(ap_mrb_string_check(r->pool, r->ap_auth_type)));
-  json_object_object_add(my_object, "unparsed_uri", json_object_new_string(ap_mrb_string_check(r->pool, r->unparsed_uri)));
-  json_object_object_add(my_object, "canonical_filename", json_object_new_string(ap_mrb_string_check(r->pool, r->canonical_filename)));
-  json_object_object_add(my_object, "path_info", json_object_new_string(ap_mrb_string_check(r->pool, r->path_info)));
-  json_object_object_add(my_object, "hostname", json_object_new_string(ap_mrb_string_check(r->pool, r->hostname)));
-
-  val = (char *)json_object_to_json_string(my_object);
-
-  if (val == NULL)
-    val = apr_pstrdup(r->pool, "(null)");
-  
-  return mrb_str_new(mrb, val, strlen(val));
-
-}
-*/
 
 static mrb_value ap_mrb_replace_stderr_log(mrb_state *mrb, mrb_value self)
 {
@@ -133,8 +67,8 @@ static mrb_value ap_mrb_get_request_body(mrb_state *mrb, mrb_value str)
 }
 
 #define AP_MRB_GET_REQUEST_VALUE(value) \
-static mrb_value ap_mrb_get_request_##value(mrb_state *mrb, mrb_value self)             \
-{                                                             \
+static mrb_value ap_mrb_get_request_##value(mrb_state *mrb, mrb_value self) \
+{ \
   request_rec *r = ap_mrb_get_request(); \
   return ap_mrb_str_to_value(mrb, r->pool, r->value); \
 }
@@ -164,7 +98,8 @@ AP_MRB_GET_REQUEST_VALUE(method)
 AP_MRB_GET_REQUEST_VALUE(range)
 AP_MRB_GET_REQUEST_VALUE(content_type)
 
-static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb, 
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   mrb_int val = r->clength;
@@ -193,7 +128,8 @@ static mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-static mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, 
+    mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -247,7 +183,8 @@ static mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-static mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, 
+    mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -291,7 +228,8 @@ static mrb_value ap_mrb_set_request_document_root(mrb_state *mrb, mrb_value str)
 #ifdef __APACHE24__
   ap_set_document_root(r, (const char *)mrb_str_to_cstr(mrb, val));
 #else
-  core_server_config *conf = (core_server_config *)ap_get_module_config(r->server->module_config, &core_module);
+  core_server_config *conf = (core_server_config *)ap_get_module_config(
+      r->server->module_config, &core_module);
   conf->ap_document_root = (const char *)mrb_str_to_cstr(mrb, val);
 #endif
   return val;
@@ -342,7 +280,8 @@ static mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-static mrb_value ap_mrb_set_request_content_length(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_content_length(mrb_state *mrb, 
+    mrb_value str)
 {
   mrb_int val;
   request_rec *r = ap_mrb_get_request();
@@ -360,7 +299,8 @@ static mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-static mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, 
+    mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -398,7 +338,8 @@ static mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_set(r->headers_in, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
+  apr_table_set(r->headers_in, mrb_str_to_cstr(mrb, key), 
+      mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -415,7 +356,8 @@ static mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-static mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, 
+    mrb_value str)
 {
   int i;
   mrb_value hash = mrb_hash_new(mrb);
@@ -438,7 +380,8 @@ static mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_set(r->headers_out, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
+  apr_table_set(r->headers_out, mrb_str_to_cstr(mrb, key), 
+      mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -453,7 +396,8 @@ static mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, 
+    mrb_value str)
 {
   int i;
   mrb_value hash = mrb_hash_new(mrb);
@@ -528,13 +472,15 @@ static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, mrb_value s
 //  return mrb_str_new(mrb, val, strlen(val));
 //}
 
-static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, 
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.protection);
 }
 
-static mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, 
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.filetype);
@@ -674,7 +620,8 @@ static mrb_value ap_mrb_get_request_read_chunked(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(val);
 }
 
-static mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb, 
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->used_path_info;
@@ -702,39 +649,6 @@ static mrb_value ap_mrb_get_request_no_local_copy(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(val);
 }
 
-
-//static mrb_value ap_mrb_write_request(mrb_state *mrb, mrb_value str)
-//{   
-//
-//  struct RProc *b;
-//  mrb_value argc, *argv;
-//  char *member, *value;
-//  request_rec *r = ap_mrb_get_request();
-//
-//  mrb_get_args(mrb, "b*", &b, &argv, &argc);
-//  if (mrb_fixnum(argc) != 2) {
-//    ap_log_error(APLOG_MARK
-//      , APLOG_WARNING
-//      , 0
-//      , NULL
-//      , "%s ERROR %s: argument is not 2"
-//      , MODULE_NAME
-//      , __func__
-//    );
-//    return str;
-//  }
-//
-//  member = mrb_str_to_cstr(mrb, argv[0]);
-//  value  = mrb_str_to_cstr(mrb, argv[1]);
-//
-//  if (strcmp(member, "filename") == 0)
-//    r->filename = apr_pstrdup(r->pool, value);
-//  else if (strcmp(member, "uri") == 0)
-//    r->uri = apr_pstrdup(r->pool, value);
-//
-//  return str;
-//}
-
 static mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
 {
   request_rec *r = ap_mrb_get_request();
@@ -755,7 +669,8 @@ static mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self, char *obj_id, char *class_name)
+static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self, 
+    char *obj_id, char *class_name)
 {
   mrb_value obj;
   struct RClass *obj_class, *apache_class;
@@ -763,7 +678,9 @@ static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self, char *obj_
   obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb, obj_id));
   if (mrb_nil_p(obj)) {
     apache_class = mrb_class_get(mrb, "Apache");
-    obj_class = (struct RClass*)mrb_class_ptr(mrb_const_get(mrb, mrb_obj_value(apache_class), mrb_intern_cstr(mrb, class_name)));
+    obj_class = (struct RClass*)mrb_class_ptr(
+        mrb_const_get(mrb, mrb_obj_value(apache_class), 
+          mrb_intern_cstr(mrb, class_name)));
     obj = mrb_obj_new(mrb, obj_class, 0, NULL);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb, obj_id), obj);
   }
@@ -815,8 +732,6 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
 
   mrb_define_method(mrb, class_request, "run_handler", ap_mrb_run_handler, ARGS_NONE());
 
-  //mrb_define_method(mrb, class_request, "Initialize", ap_mrb_init_request, ARGS_NONE());
-  //mrb_define_method(mrb, class_request, "request_rec_json", ap_mrb_get_request_rec_json, ARGS_NONE());
   mrb_define_method(mrb, class_request, "body", ap_mrb_get_request_body, ARGS_NONE());
 
   mrb_define_method(mrb, class_request, "error_log_into", ap_mrb_replace_stderr_log, ARGS_REQ(1));

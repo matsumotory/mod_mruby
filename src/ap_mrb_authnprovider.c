@@ -27,9 +27,11 @@ typedef struct authnprovider_rec_t {
 
 authnprovider_rec *mrb_authnprovider_rec_state = NULL;
 
-int ap_mrb_init_authnprovider_basic(request_rec *r, const char* user, const char* password)
+int ap_mrb_init_authnprovider_basic(request_rec *r, const char* user, 
+    const char* password)
 {
-  mrb_authnprovider_rec_state = (authnprovider_rec *)apr_pcalloc(r->pool, sizeof (*mrb_authnprovider_rec_state));
+  mrb_authnprovider_rec_state = (authnprovider_rec *)apr_pcalloc(r->pool, 
+      sizeof (*mrb_authnprovider_rec_state));
   mrb_authnprovider_rec_state->r = r;
   mrb_authnprovider_rec_state->user = user;
   mrb_authnprovider_rec_state->password = password;
@@ -38,9 +40,11 @@ int ap_mrb_init_authnprovider_basic(request_rec *r, const char* user, const char
   return OK;
 }
 
-int ap_mrb_init_authnprovider_digest(request_rec *r, const char* user, const char* realm)
+int ap_mrb_init_authnprovider_digest(request_rec *r, const char* user, 
+    const char* realm)
 {
-  mrb_authnprovider_rec_state = (authnprovider_rec *)apr_pcalloc(r->pool, sizeof (*mrb_authnprovider_rec_state));
+  mrb_authnprovider_rec_state = (authnprovider_rec *)apr_pcalloc(r->pool, 
+      sizeof (*mrb_authnprovider_rec_state));
   mrb_authnprovider_rec_state->r = r;
   mrb_authnprovider_rec_state->user = user;
   mrb_authnprovider_rec_state->password = NULL;
@@ -65,7 +69,8 @@ static mrb_value ap_mrb_get_authnprovider_user(mrb_state *mrb, mrb_value str)
   return mrb_str_new_or_nil(mrb, anp->user);
 }
 
-static mrb_value ap_mrb_get_authnprovider_password(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_authnprovider_password(mrb_state *mrb, 
+    mrb_value str)
 {
   authnprovider_rec *anp = ap_mrb_get_authnprovider();
   return mrb_str_new_or_nil(mrb, anp->password);

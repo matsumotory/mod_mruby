@@ -110,7 +110,8 @@ static mrb_value ap_mrb_get_conn_keepalives(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(r->connection->keepalives);
 }
 
-static mrb_value ap_mrb_get_conn_data_in_input_filters(mrb_state *mrb, mrb_value str)
+static mrb_value ap_mrb_get_conn_data_in_input_filters(mrb_state *mrb, 
+    mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value(r->connection->data_in_input_filters);
