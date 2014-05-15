@@ -88,6 +88,7 @@ echo "mod_mruby testing ..."
 echo ${APXS_CHECK_CMD}
 ${APXS_CHECK_CMD}
 ./configure $APXS_PATH $APACHECTL_PATH
+make
 make test
 echo "mod_mruby testing ... Done"
 

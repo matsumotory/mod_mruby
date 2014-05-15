@@ -80,7 +80,7 @@ clean:
 
 #   clobber
 clobber: clean
-	-rm -rf tmp vendors config.log config.status autom4te.cache
+	-rm -rf tmp vendors build config.log config.status autom4te.cache
 
 #   reload the module by installing and restarting Apache
 reload: install restart
