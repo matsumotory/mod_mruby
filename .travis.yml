@@ -10,7 +10,7 @@ env:
   - HTTPD_VERSION=httpd-2.2.27 
     APR=apr-1.5.1 
     APR_UTIL=apr-util-1.5.3 
-    HTTPD_CONFIG_OPT="--enable-module=all --enable-mods-shared=all --enable-proxy --enable-proxy-http"
+    HTTPD_CONFIG_OPT='--enable-module=all --enable-mods-shared=all --enable-proxy --enable-proxy-http'
   - HTTPD_VERSION=httpd-2.4.9 
     APR=apr-1.5.1 
     APR_UTIL=apr-util-1.5.3 
