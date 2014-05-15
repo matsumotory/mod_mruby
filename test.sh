@@ -1,10 +1,5 @@
 #!/bin/sh
 
-# ENV example
-#
-#   APXS_PATH_ENV='--with-apxs=/usr/local/apache/bin/apxs' APACHECTL_PATH_ENV='--with-apachectl=/usr/local/apache/bin/apachectl' sh  test.sh
-#
-
 set -e
 
 . ./httpd_version
