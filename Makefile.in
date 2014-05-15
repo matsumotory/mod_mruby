@@ -55,6 +55,7 @@ test:
 	sudo $(APACHECTL) -k stop
 	cp -p $(SYSCONFDIR)/$(APCONFNAME) ./test/conf/httpd.conf.orig
 	cat ./test/conf/httpd.conf.orig > ./test/conf/httpd.conf
+	sed -i 's/^Listen .*80//g' ./test/conf/httpd.conf
 	echo 'LoadModule mruby_module $(MOD_MRUBY_SO)' >> ./test/conf/httpd.conf
 	sed -e 's|__MOD_MRUBY_TEST_DIR__|$(TEST_DIR)|g' \
 		-e 's|__APLIBEXECDIR__|$(APLIBEXECDIR)|g' \

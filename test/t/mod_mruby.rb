@@ -6,7 +6,8 @@ def base64 value
   r.include?("\n") ? r.split("\n").join("") : r
 end
 
-base = 'http://127.0.0.1'
+server_addr = "127.0.0.1:38080"
+base = "http://#{server_addr}"
 
 assert('mod_mruby', 'location /hello-inline') do
   res = HttpRequest.new.get base + '/hello-inline'
@@ -70,7 +71,7 @@ end
 
 assert('mod_mruby', 'location /conn-ip') do
   res = HttpRequest.new.post base + '/conn-ip'
-  assert_equal "server:127.0.0.1:80,client:127.0.0.1", res.body
+  assert_equal "server:#{server_addr},client:127.0.0.1", res.body
 end
 
 assert('mod_mruby', 'location /env?a=1') do
