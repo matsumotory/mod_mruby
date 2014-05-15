@@ -19,7 +19,7 @@ before_script:
   - echo "HTTPD_VERSION=${HTTPD_VERSION}" > httpd_version
   - echo "APR=${APR}" >> httpd_version
   - echo "APR_UTIL=${APR_UTIL}" >> httpd_version
-  - echo "HTTPD_CONFIG_OPT=${HTTPD_CONFIG_OPT}" >> httpd_version
+  - echo "HTTPD_CONFIG_OPT='${HTTPD_CONFIG_OPT}'" >> httpd_version
 script:
   - sh test.sh
 notifications:
