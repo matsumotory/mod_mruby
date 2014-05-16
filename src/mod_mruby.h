@@ -8,7 +8,7 @@
 #define MOD_MRUBY_H
 
 #define MODULE_NAME    "mod_mruby"
-#define MODULE_VERSION   "1.0.0"
+#define MODULE_VERSION   "1.0.1"
 #define UNSET        -1
 #define SET        1
 #define ON         1
