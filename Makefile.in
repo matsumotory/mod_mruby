@@ -52,7 +52,7 @@ TEST_DIR=$(PWD)/test
 
 # 	test
 test:
-	sudo $(APACHECTL) -k stop
+	$(APACHECTL) -k stop
 	cp -p $(SYSCONFDIR)/$(APCONFNAME) ./test/conf/httpd.conf.orig
 	sed -e 's/^Listen .*80//g' ./test/conf/httpd.conf.orig > ./test/conf/httpd.conf
 	echo 'LoadModule mruby_module $(MOD_MRUBY_SO)' >> ./test/conf/httpd.conf
@@ -60,11 +60,11 @@ test:
 		-e 's|__APLIBEXECDIR__|$(APLIBEXECDIR)|g' \
 		-e 's|__APDOCROOT__|$(APDOCROOT)|g' \
 		./test/conf/mod_mruby_test.conf >> ./test/conf/httpd.conf
-	sudo $(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
+	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
 	cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
 	cp -p ./test/t/mod_mruby.rb $(MRUBY_ROOT)/test/t/.
 	cd $(MRUBY_ROOT) && rake clean && rake all test
-	sudo $(APACHECTL) -k stop
+	$(APACHECTL) -k stop
 
 #   install the DSO file into the Apache installation
 #   and activate it in the Apache configuration
