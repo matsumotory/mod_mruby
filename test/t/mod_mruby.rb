@@ -89,3 +89,8 @@ assert('mod_mruby', 'location /scoreboard-obj') do
   assert_equal "Apache::Scoreboard", res.body
 end
 
+assert('mod_mruby', 'location /tid') do
+  res = HttpRequest.new.post base + '/tid'
+  assert_true res.body.to_i > 0
+end
+
