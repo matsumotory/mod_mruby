@@ -6,8 +6,13 @@ def base64 value
   r.include?("\n") ? r.split("\n").join("") : r
 end
 
-server_addr = "127.0.0.1:38080"
-base = "http://#{server_addr}"
+def server_addr
+  "127.0.0.1:38080"
+end
+
+def base
+  "http://#{server_addr}"
+end
 
 assert('mod_mruby', 'location /hello-inline') do
   res = HttpRequest.new.get base + '/hello-inline'
