@@ -4,7 +4,7 @@
 // See Copyright Notice in LEGAL                                                 
 */                                                                               
 
-#ifndef MOD_MURBY_H
+#ifndef MOD_MRUBY_H
 #define MOD_MRUBY_H
 
 #define MODULE_NAME    "mod_mruby"

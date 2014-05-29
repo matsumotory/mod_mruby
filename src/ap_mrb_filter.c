@@ -56,14 +56,6 @@ mrb_value ap_mrb_filter_init(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static void mrb_apr_bucket_brigade_free(mrb_state *mrb, void *p)
-{
-}
-
-static const struct mrb_data_type mrb_apr_bucket_brigade_type = {
-  "apr_bucket_brigade", mrb_apr_bucket_brigade_free,
-};
-
 static void mrb_apr_bucket_free(mrb_state *mrb, void *p)
 {
 }
