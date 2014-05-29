@@ -144,8 +144,6 @@ static mrb_value ap_mrb_syslogger(mrb_state *mrb, mrb_value str)
 {
 
 #ifdef SUPPORT_SYSLOG
-  mrb_value *argv;
-  mrb_int argc;
   mrb_int pri;
   char *msg;
 
