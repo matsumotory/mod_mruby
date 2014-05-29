@@ -29,7 +29,7 @@ module ModMruby
       Apache.echo "- Apache build: #{Apache::server_build}"
       Apache.echo "- module name: #{Apache::module_name}"
       Apache.echo "- module version: #{Apache::module_version}"
-      Apache.syslogger "warn", "mod_mruby warning syslogger test."
+      Apache.syslogger 4, "mod_mruby warning syslogger test."
       Apache.echo "- syslogger function: OK"
       Apache.errlogger 4, "mod_mruby warning errlogger test."
       Apache.echo "- errlogger function: OK"
