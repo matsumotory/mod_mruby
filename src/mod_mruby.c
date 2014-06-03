@@ -1045,7 +1045,7 @@ static void register_hooks(apr_pool_t *p)
       &authn_mruby_provider);
   ap_register_output_filter("mruby", mod_mruby_output_filter, NULL,
       AP_FTYPE_CONTENT_SET);
-  //ap_register_input_filter( "MODMRUBYFILTER", mod_mruby_input_filter,  NULL, 
+  //ap_register_input_filter( "MODMRUBYFILTER", mod_mruby_input_filter,  NULL,
   //AP_FTYPE_CONTENT_SET);
 }
 
