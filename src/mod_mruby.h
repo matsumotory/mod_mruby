@@ -1,14 +1,14 @@
-/*                                                                               
-// mod_mruby.h - mod_mruby core module                                           
-//                                                                               
-// See Copyright Notice in LEGAL                                                 
-*/                                                                               
+/*
+// mod_mruby.h - mod_mruby core module
+//
+// See Copyright Notice in LEGAL
+*/
 
 #ifndef MOD_MRUBY_H
 #define MOD_MRUBY_H
 
 #define MODULE_NAME    "mod_mruby"
-#define MODULE_VERSION   "1.1.1"
+#define MODULE_VERSION   "1.4.1"
 #define UNSET        -1
 #define SET        1
 #define ON         1
@@ -33,7 +33,7 @@
 #ifdef __MOD_MRUBY_DEBUG__
 #define TRACER ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__)
 #else
-#define TRACER 
+#define TRACER
 #endif
 
 #if (AP_SERVER_MINORVERSION_NUMBER > 2)
