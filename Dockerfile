@@ -3,14 +3,29 @@
 #
 
 #
-# Building
-#   docker build -t matsumotory:mod_mruby .
+# Using Docker Image matsumotory/mod-mruby
 #
-# Runing
-#   docker run -d -p 10080:80 matsumotory:mod_mruby
+# Pulling
+#   docker pull matsumotory/mod-mruby
+#
+# Running
+#  docker run -d -p 10080:80 matsumotory/mod-mruby
 #
 # Access
-#   curl http://127.0.0.1:10080/mruby
+#   curl http://127.0.0.1:10080/mruby-hello
+#
+
+#
+# Manual Build
+#
+# Building
+#   docker build -t your_name:mod_mruby .
+#
+# Runing
+#   docker run -d -p 10080:80 your_name:mod_mruby
+#
+# Access
+#   curl http://127.0.0.1:10080/mruby-hello
 #
 
 FROM stackbrew/ubuntu:14.04
