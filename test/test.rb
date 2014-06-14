@@ -41,7 +41,6 @@ module ModMruby
     def request
       Apache.echo "## Request Class Test"
       r = Apache::Request.new()
-      r.content_type = "text/plain"
       Apache.echo "- filename = #{r.filename}"
       Apache.echo "- uri = #{r.uri}"
       Apache.echo "- ---- request_rec changed ----"
