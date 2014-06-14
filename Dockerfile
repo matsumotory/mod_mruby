@@ -32,6 +32,7 @@ RUN apt-get -y install libcgroup-dev
 
 RUN cd /usr/local/src/ && git clone git://github.com/matsumoto-r/mod_mruby.git
 RUN cd /usr/local/src/mod_mruby && sh build.sh && make install
+RUN cd /usr/local/src/mod_mruby/docker && cp -r hook /etc/apache2/.
 RUN cd /usr/local/src/mod_mruby/docker && cp conf/mruby.conf /etc/apache2/mods-available/.
 RUN cd /etc/apache2/mods-enabled && ln -s ../mods-available/mruby.conf mruby.conf
 RUN service apache2 restart && curl http://127.0.0.1/mruby-test && curl http://127.0.0.1/mruby-hello
