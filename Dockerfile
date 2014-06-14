@@ -47,10 +47,6 @@ RUN apt-get -y install libcgroup-dev
 
 RUN cd /usr/local/src/ && git clone git://github.com/matsumoto-r/mod_mruby.git
 RUN cd /usr/local/src/mod_mruby && sh build.sh && make install
-ADD docker/hook /etc/apache2/hook
-ADD docker/conf/mruby.conf /etc/apache2/mods-available/mruby.conf
-RUN cd /etc/apache2/mods-enabled && ln -s ../mods-available/mruby.conf mruby.conf
-RUN service apache2 restart && curl http://127.0.0.1/mruby-test && curl http://127.0.0.1/mruby-hello
 
 EXPOSE 80
 env APACHE_RUN_USER www-data
@@ -60,5 +56,12 @@ env APACHE_RUN_DIR /var/run/apache2
 env APACHE_LOCK_DIR /var/lock/apache2
 env APACHE_LOG_DIR /var/log/apache2
 env LANG C
+
+ADD docker/hook /etc/apache2/hook
+ADD docker/conf/mruby.conf /etc/apache2/mods-available/mruby.conf
+RUN cd /etc/apache2/mods-enabled && ln -s ../mods-available/mruby.conf mruby.conf
+
+# sample check for now
+RUN service apache2 restart && curl http://127.0.0.1/mruby-test && curl http://127.0.0.1/mruby-hello
 
 CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
