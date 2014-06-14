@@ -32,10 +32,9 @@ RUN apt-get -y install libcgroup-dev
 
 RUN cd /usr/local/src/ && git clone git://github.com/matsumoto-r/mod_mruby.git
 RUN cd /usr/local/src/mod_mruby && sh build.sh && make install
-RUN echo "<Location /mruby>" >> /etc/apache2/mods-enabled/mruby.load
-RUN echo "  mrubyHandlerMiddleCode 'Apache.echo \"hello mod_mruby world.\"" >> /etc/apache2/mods-enabled/mruby.load
-RUN echo "</Location>" >> /etc/apache2/mods-enabled/mruby.load
-RUN service apache2 restart && curl http://127.0.0.1/mruby
+RUN cd /usr/local/src/mod_mruby/docker && cp conf/mruby.conf /etc/apache2/mods-available/.
+RUN cd /etc/apache2/mods-enabled && ln -s ../mods-available/mruby.conf mruby.conf
+RUN service apache2 restart && curl http://127.0.0.1/mruby-test && curl http://127.0.0.1/mruby-hello
 
 EXPOSE 80
 env APACHE_RUN_USER www-data
