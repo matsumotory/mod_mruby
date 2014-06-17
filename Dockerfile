@@ -49,13 +49,13 @@ RUN cd /usr/local/src/ && git clone git://github.com/matsumoto-r/mod_mruby.git
 RUN cd /usr/local/src/mod_mruby && sh build.sh && make install
 
 EXPOSE 80
-env APACHE_RUN_USER www-data
-env APACHE_RUN_GROUP www-data
-env APACHE_PID_FILE /var/run/apache2.pid
-env APACHE_RUN_DIR /var/run/apache2
-env APACHE_LOCK_DIR /var/lock/apache2
-env APACHE_LOG_DIR /var/log/apache2
-env LANG C
+ENV APACHE_RUN_USER www-data
+ENV APACHE_RUN_GROUP www-data
+ENV APACHE_PID_FILE /var/run/apache2.pid
+ENV APACHE_RUN_DIR /var/run/apache2
+ENV APACHE_LOCK_DIR /var/lock/apache2
+ENV APACHE_LOG_DIR /var/log/apache2
+ENV LANG C
 
 ADD docker/hook /etc/apache2/hook
 ADD docker/conf/mruby.conf /etc/apache2/mods-available/mruby.conf
