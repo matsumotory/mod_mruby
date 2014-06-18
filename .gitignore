@@ -22,10 +22,10 @@ tmp
 vendors
 
 iij
-mruby
 Makefile
 config.h
 config.log
 config.status
 httpd.conf
 httpd.conf.orig
+build
