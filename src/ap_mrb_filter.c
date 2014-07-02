@@ -15,8 +15,23 @@ void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb,
 {
   ap_mrb_filter_rec *fr = (ap_mrb_filter_rec *)apr_pcalloc(f->r->pool,
       sizeof(ap_mrb_filter_rec));
+  apr_finfo_t finfo;
+  apr_file_t *fd;
+  apr_bucket *b = APR_BRIGADE_FIRST(bb);
+
+  if (APR_BUCKET_IS_FILE(b)) {
+    fr->file_bucket = (apr_bucket_file *)(b->data);
+    fd = fr->file_bucket->fd;
+    if (apr_file_info_get(&finfo, APR_FINFO_NORM, fd) == APR_SUCCESS) {
+      fr->finfo = &finfo;
+    }
+  } else {
+    fr->file_bucket = NULL;
+    fr->finfo = NULL;
+  }
   fr->f = f;
   fr->bb = bb;
+
   apr_pool_userdata_set(fr, "mod_mruby_filter_rec", NULL, pool);
 }
 
@@ -52,7 +67,6 @@ ap_mrb_filter_rec *ap_mrb_get_filter_rec(apr_pool_t *pool)
 
 mrb_value ap_mrb_filter_init(mrb_state *mrb, mrb_value self)
 {
-  //request_rec *r = ap_mrb_get_request();
   return self;
 }
 
@@ -189,6 +203,30 @@ static mrb_value ap_mrb_filter_brigade_empty(mrb_state *mrb, mrb_value self)
 //  return mrb_str_new(mrb, data, len);
 //}
 
+static mrb_value ap_mrb_filter_uid(mrb_state *mrb, mrb_value self)
+{
+  request_rec *r = ap_mrb_get_request();
+  ap_mrb_filter_rec *ff = ap_mrb_get_filter_rec(r->pool);
+  apr_file_t *fd = ff->file_bucket->fd;
+  apr_finfo_t finfo;
+  if (apr_file_info_get(&finfo, APR_FINFO_USER, fd) != APR_SUCCESS) {
+    return mrb_nil_value();
+  }
+  return mrb_fixnum_value(finfo.user);
+}
+
+static mrb_value ap_mrb_filter_gid(mrb_state *mrb, mrb_value self)
+{
+  request_rec *r = ap_mrb_get_request();
+  ap_mrb_filter_rec *ff = ap_mrb_get_filter_rec(r->pool);
+  apr_file_t *fd = ff->file_bucket->fd;
+  apr_finfo_t finfo;
+  if (apr_file_info_get(&finfo, APR_FINFO_GROUP, fd) != APR_SUCCESS) {
+    return mrb_nil_value();
+  }
+  return mrb_fixnum_value(finfo.group);
+}
+
 void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
 {
   struct RClass *class_filter;
@@ -205,6 +243,8 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_filter, "length", ap_mrb_filter_brigade_length, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "empty?", ap_mrb_filter_brigade_empty, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "first_bucket", ap_mrb_filter_brigade_first, ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "uid", ap_mrb_filter_uid, ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "gid", ap_mrb_filter_gid, ARGS_NONE());
   //mrb_define_method(mrb, class_filter, "bucket_read", ap_mrb_filter_bucket_read, ARGS_REQ(1));
 
 }

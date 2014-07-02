@@ -4,8 +4,10 @@
 #include "ap_mrb_request.h"
 
 typedef struct {
-    ap_filter_t *f;
-    apr_bucket_brigade *bb;
+  ap_filter_t *f;
+  apr_bucket_brigade *bb;
+  apr_finfo_t *finfo;
+  apr_bucket_file *file_bucket;
 } ap_mrb_filter_rec;
 
 void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb, apr_pool_t *pool);

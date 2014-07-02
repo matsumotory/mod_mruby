@@ -33,9 +33,15 @@ assert('mod_mruby', 'output filter') do
   res = HttpRequest.new.get base + '/'
   body_ary = res["body"].split("\n")
   head = body_ary.first
+  uid = body_ary[1].to_i
+  gid = body_ary[2].to_i
   tail = body_ary.last
+
+  assert_equal "check", res["body"]
   assert_equal "__mod_mruby_head__", head
   assert_equal "__mod_mruby_tail__", tail
+  assert_true uid >= 0
+  assert_true gid >= 0
 end
 
 assert('mod_mruby', 'location /header') do
@@ -100,4 +106,3 @@ if Uname.sysname == 'Linux'
     assert_true res.body.to_i > 0
   end
 end
-
