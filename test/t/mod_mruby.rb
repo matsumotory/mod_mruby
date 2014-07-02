@@ -37,7 +37,7 @@ assert('mod_mruby', 'output filter') do
   gid = body_ary[2].to_i
   tail = body_ary.last
 
-  assert_equal "check", res["body"]
+  #assert_equal "check", res["body"]
   assert_equal "__mod_mruby_head__", head
   assert_equal "__mod_mruby_tail__", tail
   assert_true uid >= 0
@@ -105,4 +105,9 @@ if Uname.sysname == 'Linux'
     res = HttpRequest.new.post base + '/tid'
     assert_true res.body.to_i > 0
   end
+end
+
+assert('mod_mruby', 'location /error-filter') do
+  res = HttpRequest.new.post base + '/error-filter'
+  assert_equal 503, res.code
 end

@@ -9,6 +9,7 @@
 #include "mruby/string.h"
 #include "mruby/hash.h"
 #include "mruby/variable.h"
+#include "http_protocol.h"
 
 void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb,
     apr_pool_t *pool)
@@ -227,6 +228,25 @@ static mrb_value ap_mrb_filter_gid(mrb_state *mrb, mrb_value self)
   return mrb_fixnum_value(finfo.group);
 }
 
+static mrb_value ap_mrb_filter_error_create(mrb_state *mrb, mrb_value self)
+{
+  request_rec *r = ap_mrb_get_request();
+  ap_mrb_filter_rec *ff = ap_mrb_get_filter_rec(r->pool);
+  ap_filter_t *f = ff->f;
+  apr_bucket *b;
+  mrb_int status;
+
+  mrb_get_args(mrb, "i", &status);
+
+  apr_brigade_cleanup(ff->bb);
+  b = ap_bucket_error_create(status, NULL, f->r->pool, f->c->bucket_alloc);
+  APR_BRIGADE_INSERT_TAIL(ff->bb, b);
+  b = apr_bucket_eos_create(f->c->bucket_alloc);
+  APR_BRIGADE_INSERT_TAIL(ff->bb, b);
+
+  return mrb_fixnum_value(status);
+}
+
 void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
 {
   struct RClass *class_filter;
@@ -245,6 +265,7 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_filter, "first_bucket", ap_mrb_filter_brigade_first, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "uid", ap_mrb_filter_uid, ARGS_NONE());
   mrb_define_method(mrb, class_filter, "gid", ap_mrb_filter_gid, ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "error_create", ap_mrb_filter_error_create, ARGS_REQ(1));
   //mrb_define_method(mrb, class_filter, "bucket_read", ap_mrb_filter_bucket_read, ARGS_REQ(1));
 
 }
