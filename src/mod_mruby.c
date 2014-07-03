@@ -1101,9 +1101,9 @@ static const command_rec mod_mruby_cmds[] = {
   MOD_MRUBY_SET_ALL_CMDS(log_transaction, LogTransaction)
 
   AP_INIT_TAKE12("mrubyAuthnCheckPassword", set_mod_mruby_authn_check_password,
-      NULL, OR_AUTHCFG, "hook for authn basic."),
+      NULL, RSRC_CONF | ACCESS_CONF, "hook for authn basic."),
   AP_INIT_TAKE12("mrubyAuthnGetRealmHash", set_mod_mruby_authn_get_realm_hash,
-      NULL, OR_AUTHCFG, "hook for authn digest."),
+      NULL, RSRC_CONF | ACCESS_CONF, "hook for authn digest."),
   AP_INIT_TAKE12("mrubyOutputFilter", set_mod_mruby_output_filter,
       NULL, RSRC_CONF | ACCESS_CONF, "set mruby output filter script."),
 
