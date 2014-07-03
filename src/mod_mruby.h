@@ -148,6 +148,7 @@ typedef struct {
   mod_mruby_code_t *mod_mruby_insert_filter_middle_code;
   mod_mruby_code_t *mod_mruby_insert_filter_last_code;
   int mruby_cache_table_size;
+  unsigned int mruby_handler_enable;
 
 } mruby_config_t;
 

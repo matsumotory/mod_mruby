@@ -317,8 +317,20 @@ static void *mod_mruby_create_config(apr_pool_t *p, server_rec *server)
   conf->mod_mruby_insert_filter_last_code     = NULL;
 
   conf->mruby_cache_table_size          = 0;
+  conf->mruby_handler_enable = OFF;
 
   return conf;
+}
+
+static const char * set_mod_mruby_handler_enable(cmd_parms *cmd, void *mconfig,
+    int flag)
+{
+  mruby_config_t *conf = (mruby_config_t *) ap_get_module_config(
+      cmd->server->module_config, &mruby_module);
+
+  conf->mruby_handler_enable = flag;
+
+  return NULL;
 }
 
 //
@@ -792,10 +804,16 @@ static int mod_mruby_handler(request_rec *r)
 {
   mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
+  mruby_config_t *conf = ap_get_module_config(r->server->module_config,
+      &mruby_module);
   TRACER;
 
   if (!r->handler)
     return DECLINED;
+
+  if (!conf->mruby_handler_enable) {
+    return DECLINED;
+  }
 
   if (strcmp(r->handler, "mruby-script") == 0)
     dir_conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename,
@@ -1072,6 +1090,9 @@ static void register_hooks(apr_pool_t *p)
 
 static const command_rec mod_mruby_cmds[] = {
 
+  AP_INIT_FLAG("mrubyHandlerEnable", set_mod_mruby_handler_enable, NULL,
+      RSRC_CONF | ACCESS_CONF,
+      "can use addhandler or sethandler for mruby-script. (default Off)"),
   AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL,
       RSRC_CONF | ACCESS_CONF, "hook inline code for handler phase."),
   MOD_MRUBY_SET_ALL_CMDS_INLINE(handler, Handler)
