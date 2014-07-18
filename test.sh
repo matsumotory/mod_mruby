@@ -46,21 +46,21 @@ cd ..
 
 
 echo "${HTTPD_VERSION} building ..."
-if [ -d "./build" ]; then                                                        
-  echo "build directory was found"                                             
-else                                                                             
-  mkdir build                                                                  
-fi                                                                               
+if [ -d "./build" ]; then
+  echo "build directory was found"
+else
+  mkdir build
+fi
 
 cd build/
-if [ ! -e ${HTTPD_TAR} ]; then                                               
+if [ ! -e ${HTTPD_TAR} ]; then
   wget http://ftp.jaist.ac.jp/pub/apache//httpd/${HTTPD_TAR}
   tar xf ${HTTPD_TAR}
-fi                                                                               
+fi
 
 cd ${HTTPD_VERSION}/srclib
 
-if [ ! -e ${APR_TAR} ]; then                                               
+if [ ! -e ${APR_TAR} ]; then
   wget http://ftp.jaist.ac.jp/pub/apache//apr/${APR_TAR}
   tar xf ${APR_TAR}
 fi
