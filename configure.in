@@ -35,9 +35,9 @@ AC_ARG_WITH(mruby, AC_HELP_STRING([--with-mruby=mruby or iij or Git URI],
 AC_SUBST(MRUBY_REPOS)
 case "$with_mruby" in
 mruby|yes|'')   # mruby/mruby
-    MRUBY_REPOS=git://github.com/mruby/mruby.git ;;
+    MRUBY_REPOS=https://github.com/mruby/mruby.git ;;
 iij|extend)     # iij/mruby
-    MRUBY_REPOS=git://github.com/iij/mruby.git ;;
+    MRUBY_REPOS=https://github.com/iij/mruby.git ;;
 *::/*)
     MRUBY_REPOS="$with_mruby" ;;
 *)
