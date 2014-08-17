@@ -3647,9 +3647,9 @@ fi
 
 case "$with_mruby" in
 mruby|yes|'')   # mruby/mruby
-    MRUBY_REPOS=git://github.com/mruby/mruby.git ;;
+    MRUBY_REPOS=https://github.com/mruby/mruby.git ;;
 iij|extend)     # iij/mruby
-    MRUBY_REPOS=git://github.com/iij/mruby.git ;;
+    MRUBY_REPOS=https://github.com/iij/mruby.git ;;
 *::/*)
     MRUBY_REPOS="$with_mruby" ;;
 *)

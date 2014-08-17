@@ -15,5 +15,5 @@ RUN apt-get -y install libmarkdown2-dev
 RUN apt-get -y install libcap-dev
 RUN apt-get -y install libcgroup-dev
 #
-RUN cd /usr/local/src/ && git clone git://github.com/matsumoto-r/mod_mruby.git
+RUN cd /usr/local/src/ && git clone https://github.com/matsumoto-r/mod_mruby.git
 RUN cd /usr/local/src/mod_mruby && sh test.sh
