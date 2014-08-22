@@ -111,3 +111,8 @@ assert('mod_mruby', 'location /error-filter') do
   res = HttpRequest.new.post base + '/error-filter'
   assert_equal 503, res.code
 end
+
+assert('mod_mruby', 'location /body-filter') do
+  res = HttpRequest.new.post base + '/body-filter'
+  assert_equal "body-filter", res.body
+end
