@@ -1,6 +1,13 @@
 ##
 # mod_mruby test
 
+# assert.rb global setteings
+$ok_test = 0
+$ko_test = 0
+$kill_test = 0
+$asserts  = []
+$test_start = Time.now if Object.const_defined?(:Time)
+
 def base64 value
   r = [ value ].pack 'm'
   r.include?("\n") ? r.split("\n").join("") : r
@@ -115,4 +122,10 @@ end
 assert('mod_mruby', 'location /body-filter') do
   res = HttpRequest.new.post base + '/body-filter'
   assert_equal "body-filter", res.body
+end
+
+# test report
+report
+if $ko_test > 0 or $kill_test > 0
+    raise "mrbtest failed (KO:#{$ko_test}, Crash:#{$kill_test})"
 end
