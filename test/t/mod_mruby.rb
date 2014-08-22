@@ -8,6 +8,11 @@ $kill_test = 0
 $asserts  = []
 $test_start = Time.now if Object.const_defined?(:Time)
 
+puts "---------------------"
+puts "mod_mruby test start."
+puts "---------------------"
+puts ""
+
 def base64 value
   r = [ value ].pack 'm'
   r.include?("\n") ? r.split("\n").join("") : r
@@ -125,7 +130,9 @@ assert('mod_mruby', 'location /body-filter') do
 end
 
 # test report
+puts ""
 report
+puts ""
 if $ko_test > 0 or $kill_test > 0
     raise "mrbtest failed (KO:#{$ko_test}, Crash:#{$kill_test})"
 end
