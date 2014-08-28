@@ -62,8 +62,6 @@ test:
 		./test/conf/mod_mruby_test.conf >> ./test/conf/httpd.conf
 	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
 	cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
-	mkdir -p $(MRUBY_ROOT)/build/mrbgems/mod_mruby/test/
-	cp -p ./test/t/assert.rb $(MRUBY_ROOT)/build/mrbgems/mruby-mod-mruby-ext/mrblib/.
 	cd $(MRUBY_ROOT) && rake clean && rake
 	$(MRUBY_ROOT)/bin/mruby ./test/t/mod_mruby.rb
 	$(APACHECTL) -k stop
