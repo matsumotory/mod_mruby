@@ -490,7 +490,6 @@ static void ap_mruby_code_clean(mrb_state *mrb, struct RProc *proc,
     mod_mruby_code_t *code, request_rec *r)
 {
   TRACER;
-  mrb_irep_decref(mrb, proc->body.irep);
   mrbc_context_free(mrb, code->ctx);
 }
 
