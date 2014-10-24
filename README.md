@@ -1,4 +1,4 @@
-# Welcome to mod_mruby Pages  [![Build Status](https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master)](https://travis-ci.org/matsumoto-r/mod_mruby)
+# Welcome to mod_mruby Pages  [![Build Status](https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master)](https://travis-ci.org/matsumoto-r/mod_mruby) [![wercker status](https://app.wercker.com/status/b1759ed571827bd44891a1f454ea9ec4/s "wercker status")](https://app.wercker.com/project/bykey/b1759ed571827bd44891a1f454ea9ec4)
 
 [![ngx_mruby mod_mruby performance](https://github.com/matsumoto-r/mod_mruby/raw/master/images/performance_20140301.png)](http://blog.matsumoto-r.jp/?p=3974)
 
@@ -16,7 +16,7 @@ __mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using 
 
 - Unified Ruby Code between Apache(mod_mruby), nginx(ngx_mruby) and other Web server software(plan) for Web server extensions.
 - You can implement Apache modules by Ruby on Apache httpd.
-- You can implement some Web server software extensions by same Ruby code (as possible) 
+- You can implement some Web server software extensions by same Ruby code (as possible)
 - mod_mruby is to provide an alternative to mod_lua or [ngx_mruby of nginx](http://ngx.mruby.org/).
 - Supported Apache Version: __2.2 2.4__
 - Supported Apache MPM: __worker prefork event__
@@ -33,7 +33,7 @@ backends = [
   "http://192.168.0.103:8888/",
   "http://192.168.0.104:8888/",
 ]
- 
+
 # write balancing algorithm here.
 
 r = Apache::Request.new()
@@ -47,14 +47,14 @@ Apache::return(Apache::OK)
 
 - see [example](https://github.com/matsumoto-r/mod_mruby/tree/master/example)
 - __Sample of Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby) for Web server extensions__
-- You can implement some Web server software extensions by same Ruby code (as possible) 
+- You can implement some Web server software extensions by same Ruby code (as possible)
 
 ```ruby
 # Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby)
 # for Web server extensions.
 #
 # Apache httpd.conf by mod_mruby
-# 
+#
 # <Location /mruby>
 #     mrubyHandlerMiddle "/path/to/unified_hello.rb"
 # </Location>
