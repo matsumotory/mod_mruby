@@ -584,8 +584,9 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code,
   mrb_run(mrb, code->proc, mrb_top_self(mrb));
   mrb_gc_arena_restore(mrb, ai);
 
-  if (mrb->exc)
+  if (mrb->exc) {
     ap_mrb_raise_error(mrb, mrb_obj_value(mrb->exc), code);
+  }
 
   ap_log_rerror(APLOG_MARK
     , APLOG_DEBUG
@@ -612,7 +613,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code,
   ap_mruby_state_clean(mrb);
 
   // mutex unlock
-  if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
+  if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS) {
     ap_log_rerror(APLOG_MARK
       , APLOG_ERR
       , 0
@@ -666,7 +667,7 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r,
   mrb_gc_arena_restore(mrb, ai);
   ap_mruby_state_clean(mrb);
   // mutex unlock
-  if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS){
+  if (apr_thread_mutex_unlock(mod_mruby_mutex) != APR_SUCCESS) {
     ap_log_rerror(APLOG_MARK
       , APLOG_ERR
       , 0
@@ -703,7 +704,7 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
   apr_status_t status = apr_thread_mutex_create(&mod_mruby_mutex,
       APR_THREAD_MUTEX_DEFAULT, p);
   TRACER;
-  if(status != APR_SUCCESS){
+  if (status != APR_SUCCESS) {
     ap_log_error(APLOG_MARK
       , APLOG_ERR
       , 0
@@ -730,9 +731,10 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
 
   apr_pool_userdata_get(&data, userdata_key, p);
 
-  if (!data)
+  if (!data) {
     apr_pool_userdata_set((const void *)1, userdata_key, apr_pool_cleanup_null,
         p);
+  }
 
   ap_log_error(APLOG_MARK
     , APLOG_NOTICE
@@ -807,18 +809,21 @@ static int mod_mruby_handler(request_rec *r)
       &mruby_module);
   TRACER;
 
-  if (!r->handler)
+  if (!r->handler) {
     return DECLINED;
+  }
 
   if (!conf->mruby_handler_enable) {
     return DECLINED;
   }
 
-  if (strcmp(r->handler, "mruby-script") == 0)
+  if (strcmp(r->handler, "mruby-script") == 0) {
     dir_conf->mod_mruby_handler_code = ap_mrb_set_file(r->pool, r->filename,
         NULL, "mruby-script");
-  else
+  }
+  else {
     return DECLINED;
+  }
 
   return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r,
       dir_conf->mod_mruby_handler_code, DECLINED);
@@ -911,8 +916,9 @@ static authn_status mod_mruby_authn_check_password(request_rec *r,
 {
   mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
-  if (dir_conf->mod_mruby_authn_check_password_code == NULL)
+  if (dir_conf->mod_mruby_authn_check_password_code == NULL) {
     return AUTH_GENERAL_ERROR;
+  }
 
   ap_mrb_init_authnprovider_basic(r, user, password);
   return ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r,
@@ -925,8 +931,9 @@ static authn_status mod_mruby_authn_get_realm_hash(request_rec *r,
   authn_status ret;
   mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
-  if (dir_conf->mod_mruby_authn_get_realm_hash_code == NULL)
+  if (dir_conf->mod_mruby_authn_get_realm_hash_code == NULL) {
     return AUTH_GENERAL_ERROR;
+  }
 
   ap_mrb_init_authnprovider_digest(r, user, realm);
   ret = ap_mruby_run(ap_mrb_get_mrb_state(r->server->process->pconf), r,
@@ -943,8 +950,9 @@ static apr_status_t mod_mruby_output_filter(ap_filter_t* f,
   mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
 
-  if (dir_conf->mod_mruby_output_filter_code == NULL)
+  if (dir_conf->mod_mruby_output_filter_code == NULL) {
     return ap_pass_brigade(f->next, bb);
+  }
 
   ap_mrb_set_filter_rec(f, bb, r->pool);
   ap_mrb_push_request(r);
@@ -966,8 +974,9 @@ static int mod_mruby_handler_inline(request_rec *r)
   mruby_dir_config_t *dir_conf = ap_get_module_config(r->per_dir_config,
       &mruby_module);
 
-  if (strcmp(r->handler, "mruby-native-script") != 0)
+  if (strcmp(r->handler, "mruby-native-script") != 0) {
     return DECLINED;
+  }
 
   return ap_mruby_run_inline(ap_mrb_get_mrb_state(r->server->process->pconf),
       r, dir_conf->mod_mruby_handler_inline_code);
