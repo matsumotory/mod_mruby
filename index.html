@@ -2,9 +2,9 @@
 <html>
 
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="mod_mruby : A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd" />
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="mod_mruby : A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -32,8 +32,9 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a name="welcome-to-mod_mruby-pages--" class="anchor" href="#welcome-to-mod_mruby-pages--"><span class="octicon octicon-link"></span></a>Welcome to mod_mruby Pages  <a href="https://travis-ci.org/matsumoto-r/mod_mruby"><img src="https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master" alt="Build Status"></a>
-</h1>
+<a name="welcome-to-mod_mruby-pages" class="anchor" href="#welcome-to-mod_mruby-pages"><span class="octicon octicon-link"></span></a>Welcome to mod_mruby Pages</h1>
+
+<p><a href="https://travis-ci.org/matsumoto-r/mod_mruby"><img src="https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master" alt="Build Status"></a> <a href="https://app.wercker.com/project/bykey/b1759ed571827bd44891a1f454ea9ec4"><img src="https://app.wercker.com/status/b1759ed571827bd44891a1f454ea9ec4/s" alt="wercker status" title="wercker status"></a></p>
 
 <p><a href="http://blog.matsumoto-r.jp/?p=3974"><img src="https://github.com/matsumoto-r/mod_mruby/raw/master/images/performance_20140301.png" alt="ngx_mruby mod_mruby performance"></a></p>
 
@@ -48,7 +49,9 @@
 <li><a href="https://github.com/matsumoto-r/mod_mruby/wiki/Directives">Directives</a></li>
 <li><a href="https://github.com/matsumoto-r/mod_mruby/wiki/Class-and-Method">Class and Method</a></li>
 <li><a href="https://github.com/matsumoto-r/mod_mruby/wiki/Use-Case">Use Case</a></li>
-</ul><h2>
+</ul>
+
+<h2>
 <a name="whats-mod_mruby" class="anchor" href="#whats-mod_mruby"><span class="octicon octicon-link"></span></a>What's mod_mruby</h2>
 
 <p><strong>mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd.</strong></p>
@@ -56,14 +59,16 @@
 <ul>
 <li>Unified Ruby Code between Apache(mod_mruby), nginx(ngx_mruby) and other Web server software(plan) for Web server extensions.</li>
 <li>You can implement Apache modules by Ruby on Apache httpd.</li>
-<li>You can implement some Web server software extensions by same Ruby code (as possible) </li>
+<li>You can implement some Web server software extensions by same Ruby code (as possible)</li>
 <li>mod_mruby is to provide an alternative to mod_lua or <a href="http://ngx.mruby.org/">ngx_mruby of nginx</a>.</li>
 <li>Supported Apache Version: <strong>2.2 2.4</strong>
 </li>
 <li>Supported Apache MPM: <strong>worker prefork event</strong>
 </li>
 <li>Supported OS: <strong>Linux FreeBSD Windows</strong> and so on.</li>
-</ul><div class="highlight highlight-ruby"><pre><span class="c1"># Apache httpd.conf</span>
+</ul>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># Apache httpd.conf</span>
 <span class="c1"># mrubyTranslateNameMiddle "/path/to/proxy.rb"</span>
 <span class="c1">#</span>
 
@@ -89,12 +94,14 @@
 <li>see <a href="https://github.com/matsumoto-r/mod_mruby/tree/master/example">example</a>
 </li>
 <li><strong>Sample of Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby) for Web server extensions</strong></li>
-<li>You can implement some Web server software extensions by same Ruby code (as possible) </li>
-</ul><div class="highlight highlight-ruby"><pre><span class="c1"># Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby)</span>
+<li>You can implement some Web server software extensions by same Ruby code (as possible)</li>
+</ul>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby)</span>
 <span class="c1"># for Web server extensions.</span>
 <span class="c1">#</span>
 <span class="c1"># Apache httpd.conf by mod_mruby</span>
-<span class="c1"># </span>
+<span class="c1">#</span>
 <span class="c1"># &lt;Location /mruby&gt;</span>
 <span class="c1">#     mrubyHandlerMiddle "/path/to/unified_hello.rb"</span>
 <span class="c1"># &lt;/Location&gt;</span>
