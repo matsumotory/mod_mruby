@@ -20,6 +20,7 @@
 #include <mruby.h>
 #include <mruby/proc.h>
 #include <mruby/compile.h>
+#include <mruby/version.h>
 
 #include <unistd.h>
 #include <sys/stat.h>
@@ -740,11 +741,11 @@ static int mod_mruby_init(apr_pool_t *p, apr_pool_t *plog, apr_pool_t *ptemp,
     , APLOG_NOTICE
     , 0
     , ap_server_conf
-    , APLOGNO(05003) "%s %s: %s / %s mechanism enabled."
-    , MODULE_NAME
-    , __func__
+    , APLOGNO(05003) "%s/%s (%s/%s) mechanism enabled"
     , MODULE_NAME
     , MODULE_VERSION
+    , MRUBY_RUBY_ENGINE
+    , MRUBY_VERSION
   );
 
   return DECLINED;
