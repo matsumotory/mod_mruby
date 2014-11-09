@@ -192,7 +192,7 @@ static void mod_mruby_compile_code(mrb_state *mrb, mod_mruby_code_t *c,
           , APLOG_ERR
           , 0
           , s
-          , "%s ERROR %s: mrb file oepn failed: %s"
+          , "%s ERROR %s: mrb file open failed: %s"
           , MODULE_NAME
           , __func__
           , c->code.path
