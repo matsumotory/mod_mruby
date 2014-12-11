@@ -1,4 +1,4 @@
-# Welcome to mod_mruby Pages  
+# Welcome to mod_mruby Pages
 [![Build Status](https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master)](https://travis-ci.org/matsumoto-r/mod_mruby) [![wercker status](https://app.wercker.com/status/b1759ed571827bd44891a1f454ea9ec4/s "wercker status")](https://app.wercker.com/project/bykey/b1759ed571827bd44891a1f454ea9ec4)
 
 [![ngx_mruby mod_mruby performance](https://github.com/matsumoto-r/mod_mruby/raw/master/images/performance_20140301.png)](http://blog.matsumoto-r.jp/?p=3974)
@@ -67,11 +67,7 @@ Apache::return(Apache::OK)
 # }
 #
 
-if server_name == "NGINX"
-  Server = Nginx
-elsif server_name == "Apache"
-  Server = Apache
-end
+Server = get_server_class
 
 Server::rputs "Hello #{Server::module_name}/#{Server::module_version} world!"
 # mod_mruby => "Hello mod_mruby/0.9.3 world!"
