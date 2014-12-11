@@ -119,4 +119,9 @@ t.assert('mod_mruby', 'location /body-filter') do
   t.assert_equal "body-filter", res.body
 end
 
+t.assert('mod_mruby', 'location /server_class') do
+  res = HttpRequest.new.get base + '/server_class'
+  t.assert_equal "Apache", res.body
+end
+
 t.report
