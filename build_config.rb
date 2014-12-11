@@ -35,7 +35,7 @@ MRuby::Build.new do |conf|
   #conf.gem :github => 'ksss/mruby-file-stat'
 
   # mod_mruby extended class
-  conf.gem :github => 'matsumoto-r/mruby-mod-mruby-ext'
+  conf.gem '../mrbgems/mod_mruby_mrblib'
 
   # use markdown on mod_mruby
   #conf.gem :github => 'matsumoto-r/mruby-discount'
