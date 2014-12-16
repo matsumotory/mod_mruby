@@ -1,4 +1,6 @@
 # Welcome to mod_mruby Pages
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/matsumoto-r/mod_mruby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master)](https://travis-ci.org/matsumoto-r/mod_mruby) [![wercker status](https://app.wercker.com/status/b1759ed571827bd44891a1f454ea9ec4/s "wercker status")](https://app.wercker.com/project/bykey/b1759ed571827bd44891a1f454ea9ec4)
 
 [![ngx_mruby mod_mruby performance](https://github.com/matsumoto-r/mod_mruby/raw/master/images/performance_20140301.png)](http://blog.matsumoto-r.jp/?p=3974)
