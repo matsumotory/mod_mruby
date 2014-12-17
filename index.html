@@ -32,16 +32,17 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a name="welcome-to-mod_mruby-pages" class="anchor" href="#welcome-to-mod_mruby-pages"><span class="octicon octicon-link"></span></a>Welcome to mod_mruby Pages</h1>
+<a id="welcome-to-mod_mruby-pages" class="anchor" href="#welcome-to-mod_mruby-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to mod_mruby Pages</h1>
 
-<p><a href="https://travis-ci.org/matsumoto-r/mod_mruby"><img src="https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master" alt="Build Status"></a> <a href="https://app.wercker.com/project/bykey/b1759ed571827bd44891a1f454ea9ec4"><img src="https://app.wercker.com/status/b1759ed571827bd44891a1f454ea9ec4/s" alt="wercker status" title="wercker status"></a></p>
+<p><a href="https://gitter.im/matsumoto-r/mod_mruby?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter"></a>
+<a href="https://travis-ci.org/matsumoto-r/mod_mruby"><img src="https://travis-ci.org/matsumoto-r/mod_mruby.svg?branch=master" alt="Build Status"></a> <a href="https://app.wercker.com/project/bykey/b1759ed571827bd44891a1f454ea9ec4"><img src="https://app.wercker.com/status/b1759ed571827bd44891a1f454ea9ec4/s" alt="wercker status" title="wercker status"></a></p>
 
 <p><a href="http://blog.matsumoto-r.jp/?p=3974"><img src="https://github.com/matsumoto-r/mod_mruby/raw/master/images/performance_20140301.png" alt="ngx_mruby mod_mruby performance"></a></p>
 
 <p>※ <a href="http://blog.matsumoto-r.jp/?p=3974">hello world simple benchmark, see details of blog entry.</a></p>
 
 <h2>
-<a name="documents" class="anchor" href="#documents"><span class="octicon octicon-link"></span></a>Documents</h2>
+<a id="documents" class="anchor" href="#documents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documents</h2>
 
 <ul>
 <li><a href="https://github.com/matsumoto-r/mod_mruby/wiki/Install">Install</a></li>
@@ -52,7 +53,7 @@
 </ul>
 
 <h2>
-<a name="whats-mod_mruby" class="anchor" href="#whats-mod_mruby"><span class="octicon octicon-link"></span></a>What's mod_mruby</h2>
+<a id="whats-mod_mruby" class="anchor" href="#whats-mod_mruby" aria-hidden="true"><span class="octicon octicon-link"></span></a>What's mod_mruby</h2>
 
 <p><strong>mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd.</strong></p>
 
@@ -68,27 +69,26 @@
 <li>Supported OS: <strong>Linux FreeBSD Windows</strong> and so on.</li>
 </ul>
 
-<div class="highlight highlight-ruby"><pre><span class="c1"># Apache httpd.conf</span>
-<span class="c1"># mrubyTranslateNameMiddle "/path/to/proxy.rb"</span>
-<span class="c1">#</span>
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># Apache httpd.conf</span>
+<span class="pl-c"># mrubyTranslateNameMiddle "/path/to/proxy.rb"</span>
+<span class="pl-c">#</span>
 
-<span class="n">backends</span> <span class="o">=</span> <span class="o">[</span>
-  <span class="s2">"http://192.168.0.101:8888/"</span><span class="p">,</span>
-  <span class="s2">"http://192.168.0.102:8888/"</span><span class="p">,</span>
-  <span class="s2">"http://192.168.0.103:8888/"</span><span class="p">,</span>
-  <span class="s2">"http://192.168.0.104:8888/"</span><span class="p">,</span>
-<span class="o">]</span>
+backends <span class="pl-k">=</span> [
+  <span class="pl-s1"><span class="pl-pds">"</span>http://192.168.0.101:8888/<span class="pl-pds">"</span></span>,
+  <span class="pl-s1"><span class="pl-pds">"</span>http://192.168.0.102:8888/<span class="pl-pds">"</span></span>,
+  <span class="pl-s1"><span class="pl-pds">"</span>http://192.168.0.103:8888/<span class="pl-pds">"</span></span>,
+  <span class="pl-s1"><span class="pl-pds">"</span>http://192.168.0.104:8888/<span class="pl-pds">"</span></span>,
+]
 
-<span class="c1"># write balancing algorithm here.</span>
+<span class="pl-c"># write balancing algorithm here.</span>
 
-<span class="n">r</span> <span class="o">=</span> <span class="no">Apache</span><span class="o">::</span><span class="no">Request</span><span class="o">.</span><span class="n">new</span><span class="p">()</span>
+r <span class="pl-k">=</span> <span class="pl-s3">Apache</span>::<span class="pl-s3">Request</span>.<span class="pl-k">new</span>()
 
-<span class="n">r</span><span class="o">.</span><span class="n">handler</span>  <span class="o">=</span> <span class="s2">"proxy-server"</span>
-<span class="n">r</span><span class="o">.</span><span class="n">proxyreq</span> <span class="o">=</span> <span class="no">Apache</span><span class="o">::</span><span class="no">PROXYREQ_REVERSE</span>
-<span class="n">r</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="s2">"proxy:"</span> <span class="o">+</span> <span class="n">backends</span><span class="o">[</span><span class="nb">rand</span><span class="p">(</span><span class="n">backends</span><span class="o">.</span><span class="n">length</span><span class="p">)</span><span class="o">]</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">uri</span>
+r.handler  <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>proxy-server<span class="pl-pds">"</span></span>
+r.proxyreq <span class="pl-k">=</span> <span class="pl-s3">Apache</span>::<span class="pl-vo">PROXYREQ_REVERSE</span>
+r.filename <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">"</span>proxy:<span class="pl-pds">"</span></span> <span class="pl-k">+</span> backends[rand(backends.length)] <span class="pl-k">+</span> r.uri
 
-<span class="no">Apache</span><span class="o">::</span><span class="k">return</span><span class="p">(</span><span class="no">Apache</span><span class="o">::</span><span class="no">OK</span><span class="p">)</span>
-</pre></div>
+<span class="pl-s3">Apache</span>::<span class="pl-k">return</span>(<span class="pl-s3">Apache</span>::<span class="pl-vo">OK</span>)</pre></div>
 
 <ul>
 <li>see <a href="https://github.com/matsumoto-r/mod_mruby/tree/master/example">example</a>
@@ -97,40 +97,35 @@
 <li>You can implement some Web server software extensions by same Ruby code (as possible)</li>
 </ul>
 
-<div class="highlight highlight-ruby"><pre><span class="c1"># Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby)</span>
-<span class="c1"># for Web server extensions.</span>
-<span class="c1">#</span>
-<span class="c1"># Apache httpd.conf by mod_mruby</span>
-<span class="c1">#</span>
-<span class="c1"># &lt;Location /mruby&gt;</span>
-<span class="c1">#     mrubyHandlerMiddle "/path/to/unified_hello.rb"</span>
-<span class="c1"># &lt;/Location&gt;</span>
-<span class="c1">#</span>
-<span class="c1"># nginx ngxin.conf by ngx_mruby</span>
-<span class="c1">#</span>
-<span class="c1"># location /mruby {</span>
-<span class="c1">#     mruby_content_handler "/path/to/unified_hello.rb";</span>
-<span class="c1"># }</span>
-<span class="c1">#</span>
+<div class="highlight highlight-ruby"><pre><span class="pl-c"># Unified Ruby Code between Apache(mod_mruby) and nginx(ngx_mruby)</span>
+<span class="pl-c"># for Web server extensions.</span>
+<span class="pl-c">#</span>
+<span class="pl-c"># Apache httpd.conf by mod_mruby</span>
+<span class="pl-c">#</span>
+<span class="pl-c"># &lt;Location /mruby&gt;</span>
+<span class="pl-c">#     mrubyHandlerMiddle "/path/to/unified_hello.rb"</span>
+<span class="pl-c"># &lt;/Location&gt;</span>
+<span class="pl-c">#</span>
+<span class="pl-c"># nginx ngxin.conf by ngx_mruby</span>
+<span class="pl-c">#</span>
+<span class="pl-c"># location /mruby {</span>
+<span class="pl-c">#     mruby_content_handler "/path/to/unified_hello.rb";</span>
+<span class="pl-c"># }</span>
+<span class="pl-c">#</span>
 
-<span class="k">if</span> <span class="n">server_name</span> <span class="o">==</span> <span class="s2">"NGINX"</span>
-  <span class="no">Server</span> <span class="o">=</span> <span class="no">Nginx</span>
-<span class="k">elsif</span> <span class="n">server_name</span> <span class="o">==</span> <span class="s2">"Apache"</span>
-  <span class="no">Server</span> <span class="o">=</span> <span class="no">Apache</span>
-<span class="k">end</span>
+<span class="pl-vo">Server</span> <span class="pl-k">=</span> get_server_class
 
-<span class="no">Server</span><span class="o">::</span><span class="n">rputs</span> <span class="s2">"Hello </span><span class="si">#{</span><span class="no">Server</span><span class="o">::</span><span class="n">module_name</span><span class="si">}</span><span class="s2">/</span><span class="si">#{</span><span class="no">Server</span><span class="o">::</span><span class="n">module_version</span><span class="si">}</span><span class="s2"> world!"</span>
-<span class="c1"># mod_mruby =&gt; "Hello mod_mruby/0.9.3 world!"</span>
-<span class="c1"># ngx_mruby =&gt; "Hello ngx_mruby/0.0.1 world!"</span>
-</pre></div>
+<span class="pl-s3">Server</span>::rputs <span class="pl-s1"><span class="pl-pds">"</span>Hello <span class="pl-pse">#{</span><span class="pl-s2"><span class="pl-s3">Server</span>::module_name</span><span class="pl-pse"><span class="pl-s2">}</span></span>/<span class="pl-pse">#{</span><span class="pl-s2"><span class="pl-s3">Server</span>::module_version</span><span class="pl-pse"><span class="pl-s2">}</span></span> world!<span class="pl-pds">"</span></span>
+<span class="pl-c"># mod_mruby =&gt; "Hello mod_mruby/0.9.3 world!"</span>
+<span class="pl-c"># ngx_mruby =&gt; "Hello ngx_mruby/0.0.1 world!"</span></pre></div>
 
 <h2>
-<a name="abstract" class="anchor" href="#abstract"><span class="octicon octicon-link"></span></a>Abstract</h2>
+<a id="abstract" class="anchor" href="#abstract" aria-hidden="true"><span class="octicon octicon-link"></span></a>Abstract</h2>
 
 <p>As the increase of large-scale and complex Web services, not only a development of Web applications but also an implementation of Web server extensions is required in many cases. The Web server extensions were mainly implemented in C language because of fast and memory-efficient behavior, but extension methods using scripting language are proposed with consideration of maintainability and productivity. However, if the existing methods primarily intended to enhance not the implementation of Web applications but the implementation of internal processing of the Web server, the problem remains in terms of fast, memory-efficiency and safety. Therefore, we propose a fast and memory-efficient Web server extension mechanism using scripting language. We design the architecture that a server process create the region to save the state of the interpreter at the server process startup, and multiple scripts share the region in order to process fast when the script is called as internal processing from a Web server process. The server process free the global variables table, the exception flag and the byte-code which cause the increase of memory usage mainly, in order to reduce the memory usage and extend safely by preventing interference between each scripts because of sharing the region. We implement the mechanism that can extend the internal processing of Apache easily by Ruby scripts using Apache and embeddable scripting language mruby. It's called "mod_mruby".</p>
 
 <h1>
-<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
 
 <p>under the MIT License:</p>
 
