@@ -133,8 +133,8 @@ static mrb_value ap_mrb_errlogger(mrb_state *mrb, mrb_value str)
     return str;
   }
 
-  ap_log_error(APLOG_MARK, mrb_fixnum(argv[0]), 0, NULL, "%s",
-      mrb_str_to_cstr(mrb, argv[1]));
+  ap_log_error(APLOG_MARK, mrb_fixnum(argv[0]), 0,
+      (ap_mrb_get_request())->server, "%s", mrb_str_to_cstr(mrb, argv[1]));
 
   return str;
 }

@@ -124,4 +124,8 @@ t.assert('mod_mruby', 'location /server_class') do
   t.assert_equal "Apache", res.body
 end
 
+t.assert('mod_mruby', 'location /logger') do
+  res = HttpRequest.new.get base + '/logger'
+end
+
 t.report
