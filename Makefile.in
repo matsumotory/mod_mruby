@@ -3,6 +3,9 @@
 ##	  MATSUMOTO, Ryosuke
 ##
 
+MAKE=make
+RAKE=rake -j $(NUM_THREADS)
+
 # target module source
 TARGET=src/mod_mruby.c src/ap_mrb_*.c @FEATURE_TARGETS@
 
@@ -62,7 +65,7 @@ test:
 		./test/conf/mod_mruby_test.conf >> ./test/conf/httpd.conf
 	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
 	cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
-	cd $(MRUBY_ROOT) && rake clean && rake
+	cd $(MRUBY_ROOT) && rake clean && $(RAKE)
 	$(MRUBY_ROOT)/bin/mruby ./test/t/mod_mruby.rb
 	$(APACHECTL) -k stop
 

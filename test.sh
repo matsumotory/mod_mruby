@@ -21,6 +21,16 @@ if [ $APACHECTL_PATH_ENV ]; then
   APACHECTL_PATH=$APACHECTL_PATH_ENV
 fi
 
+if [ "$NUM_THREADS_ENV" != "" ]; then
+    NUM_THREADS=$NUM_THREADS_ENV
+else
+    NUM_THREADS=$(expr `getconf _NPROCESSORS_ONLN` / 2)
+    if [ $NUM_THREADS -eq "0" ]; then
+        NUM_THREADS=1
+    fi
+fi
+
+echo "NUM_THREADS=$NUM_THREADS"
 echo "apxs="$APXS_PATH "apachectl="$APACHECTL_PATH
 
 if [ ! -d "./mruby/src" ]; then
@@ -40,7 +50,7 @@ fi
 echo "mruby building ..."
 mv build_config.rb build_config.rb.orig
 cp ../build_config.rb .
-BUILD_TYPE='debug' ./minirake
+rake BUILD_TYPE='debug' NUM_THREADS=$NUM_THREADS -j $NUM_THREADS
 echo "mruby building ... Done"
 cd ..
 
@@ -75,16 +85,16 @@ ln -sf ${APR_UTIL} apr-util
 
 cd ..
 ./configure --prefix=`pwd`/apache --with-included-apr ${HTTPD_CONFIG_OPT}
-make
-make install
+make NUM_THREADS=$NUM_THREADS -j $NUM_THREADS
+make install NUM_THREADS=$NUM_THREADS -j $NUM_THREADS
 cd ../..
 
 echo "mod_mruby testing ..."
 echo ${APXS_CHECK_CMD}
 ${APXS_CHECK_CMD}
 ./configure $APXS_PATH $APACHECTL_PATH
-make
-make test
+make NUM_THREADS=$NUM_THREADS -j $NUM_THREADS
+make test NUM_THREADS=$NUM_THREADS
 echo "mod_mruby testing ... Done"
 
 echo "test.sh ... successful"
