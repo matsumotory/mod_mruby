@@ -1,4 +1,4 @@
 HTTPD_VERSION=httpd-2.4.12
-APR=apr-1.5.1
+APR=apr-1.5.2
 APR_UTIL=apr-util-1.5.4
 HTTPD_CONFIG_OPT=
