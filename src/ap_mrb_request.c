@@ -93,6 +93,24 @@ static mrb_value ap_mrb_get_request_document_root(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
+static mrb_value ap_mrb_get_request_main(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+  return (r->main) ? mrb_true_value() : mrb_false_value();
+}
+
+static mrb_value ap_mrb_get_request_prev(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+  return (r->prev) ? mrb_true_value() : mrb_false_value();
+}
+
+static mrb_value ap_mrb_get_request_next(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+  return (r->next) ? mrb_true_value() : mrb_false_value();
+}
+
 AP_MRB_GET_REQUEST_VALUE(status_line)
 AP_MRB_GET_REQUEST_VALUE(method)
 AP_MRB_GET_REQUEST_VALUE(range)
@@ -792,6 +810,11 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_request, "eos_sent", ap_mrb_get_request_eos_sent, ARGS_NONE());
   mrb_define_method(mrb, class_request, "no_cache", ap_mrb_get_request_no_cache, ARGS_NONE());
   mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, ARGS_NONE());
+
+  mrb_define_method(mrb, class_request, "main?", ap_mrb_get_request_main, ARGS_NONE());
+  mrb_define_method(mrb, class_request, "prev?", ap_mrb_get_request_prev, ARGS_NONE());
+  mrb_define_method(mrb, class_request, "next?", ap_mrb_get_request_next, ARGS_NONE());
+
   // method for loading other class object
   mrb_define_method(mrb, class_request, "notes", ap_mrb_notes_obj, ARGS_NONE());
   mrb_define_method(mrb, class_request, "headers_in", ap_mrb_headers_in_obj, ARGS_NONE());
