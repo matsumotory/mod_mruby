@@ -239,9 +239,17 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_ERR);
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_WARNING);
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_NOTICE);
-  AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_NOTICE);
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_INFO);
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_DEBUG);
+
+  mrb_define_const(mrb, class_core, "LOG_EMERG", mrb_fixnum_value(APLOG_EMERG));
+  mrb_define_const(mrb, class_core, "LOG_ALERT", mrb_fixnum_value(APLOG_ALERT));
+  mrb_define_const(mrb, class_core, "LOG_CRIT", mrb_fixnum_value(APLOG_CRIT));
+  mrb_define_const(mrb, class_core, "LOG_ERR", mrb_fixnum_value(APLOG_ERR));
+  mrb_define_const(mrb, class_core, "LOG_WARN", mrb_fixnum_value(APLOG_WARNING));
+  mrb_define_const(mrb, class_core, "LOG_NOTICE", mrb_fixnum_value(APLOG_NOTICE));
+  mrb_define_const(mrb, class_core, "LOG_INFO", mrb_fixnum_value(APLOG_INFO));
+  mrb_define_const(mrb, class_core, "LOG_DEBUG", mrb_fixnum_value(APLOG_DEBUG));
 
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(M_GET);
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(M_PUT);
