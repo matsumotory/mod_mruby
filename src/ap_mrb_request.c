@@ -19,7 +19,7 @@ request_rec *mrb_request_rec_state = NULL;
 
 int ap_mrb_push_request(request_rec *r)
 {
-  mrb_request_rec_state = (request_rec *)apr_pcalloc(r->pool, 
+  mrb_request_rec_state = (request_rec *)apr_pcalloc(r->pool,
       sizeof(*mrb_request_rec_state));
   mrb_request_rec_state = r;
   return OK;
@@ -116,7 +116,7 @@ AP_MRB_GET_REQUEST_VALUE(method)
 AP_MRB_GET_REQUEST_VALUE(range)
 AP_MRB_GET_REQUEST_VALUE(content_type)
 
-static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb, 
+static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb,
     mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
@@ -146,7 +146,7 @@ static mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-static mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb, 
+static mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb,
     mrb_value str)
 {
   mrb_value val;
@@ -201,7 +201,7 @@ static mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-static mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb, 
+static mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb,
     mrb_value str)
 {
   mrb_value val;
@@ -298,7 +298,7 @@ static mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-static mrb_value ap_mrb_set_request_content_length(mrb_state *mrb, 
+static mrb_value ap_mrb_set_request_content_length(mrb_state *mrb,
     mrb_value str)
 {
   mrb_int val;
@@ -317,7 +317,7 @@ static mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
   return val;
 }
 
-static mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb, 
+static mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb,
     mrb_value str)
 {
   mrb_value val;
@@ -356,7 +356,7 @@ static mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_set(r->headers_in, mrb_str_to_cstr(mrb, key), 
+  apr_table_set(r->headers_in, mrb_str_to_cstr(mrb, key),
       mrb_str_to_cstr(mrb, val));
   return val;
 }
@@ -374,7 +374,7 @@ static mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-static mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb, 
+static mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb,
     mrb_value str)
 {
   int i;
@@ -398,7 +398,7 @@ static mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
   request_rec *r = ap_mrb_get_request();
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_set(r->headers_out, mrb_str_to_cstr(mrb, key), 
+  apr_table_set(r->headers_out, mrb_str_to_cstr(mrb, key),
       mrb_str_to_cstr(mrb, val));
   return val;
 }
@@ -414,7 +414,7 @@ static mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
   return mrb_str_new(mrb, val, strlen(val));
 }
 
-static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb, 
+static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb,
     mrb_value str)
 {
   int i;
@@ -442,12 +442,12 @@ static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb,
 ////struct apr_finfo_t {
 ////  /* Allocates memory and closes lingering handles in the specified pool */
 ////  apr_pool_t *pool;
-////  /** The bitmask describing valid fields of this apr_finfo_t structure 
+////  /** The bitmask describing valid fields of this apr_finfo_t structure
 ////   *  including all available 'wanted' fields and potentially more */
 ////  apr_int32_t valid;
 ////  /** The access permissions of the file.  Mimics Unix access rights. */
 ////  apr_fileperms_t protection;
-////  /** The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE, 
+////  /** The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE,
 ////   * APR_LNK or APR_SOCK.  If the type is undetermined, the value is APR_NOFILE.
 ////   * If the type cannot be determined, the value is APR_UNKFILE.
 ////   */
@@ -490,14 +490,14 @@ static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb,
 //  return mrb_str_new(mrb, val, strlen(val));
 //}
 
-static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, 
+static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb,
     mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.protection);
 }
 
-static mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, 
+static mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb,
     mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
@@ -638,7 +638,7 @@ static mrb_value ap_mrb_get_request_read_chunked(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(val);
 }
 
-static mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb, 
+static mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb,
     mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
@@ -687,7 +687,7 @@ static mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self, 
+static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self,
     char *obj_id, char *class_name)
 {
   mrb_value obj;
@@ -697,7 +697,7 @@ static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self,
   if (mrb_nil_p(obj)) {
     apache_class = mrb_class_get(mrb, "Apache");
     obj_class = (struct RClass*)mrb_class_ptr(
-        mrb_const_get(mrb, mrb_obj_value(apache_class), 
+        mrb_const_get(mrb, mrb_obj_value(apache_class),
           mrb_intern_cstr(mrb, class_name)));
     obj = mrb_obj_new(mrb, obj_class, 0, NULL);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb, obj_id), obj);
@@ -706,22 +706,22 @@ static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self,
 }
 
 static mrb_value ap_mrb_notes_obj(mrb_state *mrb, mrb_value self)
-{   
+{
   return ap_mrb_get_class_obj(mrb, self, "notes_obj", "Notes");
 }
 
 static mrb_value ap_mrb_headers_in_obj(mrb_state *mrb, mrb_value self)
-{   
+{
   return ap_mrb_get_class_obj(mrb, self, "headers_in_obj", "Headers_in");
 }
 
 static mrb_value ap_mrb_headers_out_obj(mrb_state *mrb, mrb_value self)
-{   
+{
   return ap_mrb_get_class_obj(mrb, self, "headers_out_obj", "Headers_out");
 }
 
 static mrb_value ap_mrb_finfo_obj(mrb_state *mrb, mrb_value self)
-{   
+{
   return ap_mrb_get_class_obj(mrb, self, "finfo_obj", "Finfo");
 }
 
@@ -812,8 +812,11 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, ARGS_NONE());
 
   mrb_define_method(mrb, class_request, "main?", ap_mrb_get_request_main, ARGS_NONE());
+  mrb_define_method(mrb, class_request, "sub_request?", ap_mrb_get_request_main, ARGS_NONE());
   mrb_define_method(mrb, class_request, "prev?", ap_mrb_get_request_prev, ARGS_NONE());
+  mrb_define_method(mrb, class_request, "internal_redirect?", ap_mrb_get_request_prev, ARGS_NONE());
   mrb_define_method(mrb, class_request, "next?", ap_mrb_get_request_next, ARGS_NONE());
+  mrb_define_method(mrb, class_request, "external_redirect?", ap_mrb_get_request_next, ARGS_NONE());
 
   // method for loading other class object
   mrb_define_method(mrb, class_request, "notes", ap_mrb_notes_obj, ARGS_NONE());
