@@ -231,7 +231,7 @@ static mrb_value ap_mrb_f_get_tid(mrb_state *mrb, mrb_value self)
 void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
 {
 
-  mrb_define_method(mrb, mrb->kernel_module, "server_name", ap_mrb_server_name, ARGS_NONE());
+  mrb_define_method(mrb, mrb->kernel_module, "server_name", ap_mrb_server_name, MRB_ARGS_NONE());
 
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_EMERG);
   AP_MRB_DEFINE_CORE_CONST_FIXNUM(APLOG_ALERT);
@@ -342,21 +342,21 @@ void ap_mruby_core_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_const(mrb, class_core, "PROXYREQ_REVERSE", mrb_fixnum_value(PROXYREQ_REVERSE));
   mrb_define_const(mrb, class_core, "PROXYREQ_RESPONSE", mrb_fixnum_value(PROXYREQ_RESPONSE));
 
-  mrb_define_class_method(mrb, class_core, "sleep", ap_mrb_sleep, ARGS_ANY());
-  mrb_define_class_method(mrb, class_core, "rputs", ap_mrb_rputs, ARGS_ANY());
-  mrb_define_class_method(mrb, class_core, "echo", ap_mrb_echo, ARGS_ANY());
-  mrb_define_class_method(mrb, class_core, "return", ap_mrb_return, ARGS_ANY());
-  mrb_define_class_method(mrb, class_core, "errlogger", ap_mrb_errlogger, ARGS_ANY());
-  mrb_define_class_method(mrb, class_core, "log", ap_mrb_errlogger, ARGS_ANY());
-  mrb_define_class_method(mrb, class_core, "syslogger", ap_mrb_syslogger, ARGS_ANY());
-  mrb_define_class_method(mrb, class_core, "syslog", ap_mrb_syslogger, ARGS_ANY());
-  //mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, ARGS_ANY());
-  mrb_define_class_method(mrb, class_core, "module_name", ap_mrb_get_mod_mruby_name, ARGS_NONE());
-  mrb_define_class_method(mrb, class_core, "module_version", ap_mrb_get_mod_mruby_version, ARGS_NONE());
-  mrb_define_class_method(mrb, class_core, "server_version", ap_mrb_get_server_version, ARGS_NONE());
-  mrb_define_class_method(mrb, class_core, "server_build", ap_mrb_get_server_build, ARGS_NONE());
-  mrb_define_class_method(mrb, class_core, "remove_global_variable", ap_mrb_f_global_remove, ARGS_REQ(1));
-  mrb_define_class_method(mrb, class_core, "count_arena", ap_mrb_f_count_arena, ARGS_NONE());
-  mrb_define_class_method(mrb, class_core, "get_tid", ap_mrb_f_get_tid, ARGS_NONE());
+  mrb_define_class_method(mrb, class_core, "sleep", ap_mrb_sleep, MRB_ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "rputs", ap_mrb_rputs, MRB_ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "echo", ap_mrb_echo, MRB_ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "return", ap_mrb_return, MRB_ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "errlogger", ap_mrb_errlogger, MRB_ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "log", ap_mrb_errlogger, MRB_ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "syslogger", ap_mrb_syslogger, MRB_ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "syslog", ap_mrb_syslogger, MRB_ARGS_ANY());
+  //mrb_define_class_method(mrb, class, "write_request", ap_mrb_write_request, MRB_ARGS_ANY());
+  mrb_define_class_method(mrb, class_core, "module_name", ap_mrb_get_mod_mruby_name, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, class_core, "module_version", ap_mrb_get_mod_mruby_version, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, class_core, "server_version", ap_mrb_get_server_version, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, class_core, "server_build", ap_mrb_get_server_build, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, class_core, "remove_global_variable", ap_mrb_f_global_remove, MRB_ARGS_REQ(1));
+  mrb_define_class_method(mrb, class_core, "count_arena", ap_mrb_f_count_arena, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, class_core, "get_tid", ap_mrb_f_get_tid, MRB_ARGS_NONE());
 
 }
