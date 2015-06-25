@@ -107,9 +107,9 @@ void ap_mruby_authnprovider_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_const(mrb, class_authnprovider, "AUTH_USER_FOUND", mrb_fixnum_value(AUTH_USER_FOUND));
   mrb_define_const(mrb, class_authnprovider, "AUTH_USER_NOT_FOUND", mrb_fixnum_value(AUTH_USER_NOT_FOUND));
   mrb_define_const(mrb, class_authnprovider, "AUTH_GENERAL_ERROR", mrb_fixnum_value(AUTH_GENERAL_ERROR));
-  mrb_define_method(mrb, class_authnprovider, "user", ap_mrb_get_authnprovider_user, ARGS_NONE());
-  mrb_define_method(mrb, class_authnprovider, "password", ap_mrb_get_authnprovider_password, ARGS_NONE());
-  mrb_define_method(mrb, class_authnprovider, "realm", ap_mrb_get_authnprovider_realm, ARGS_NONE());
-  mrb_define_method(mrb, class_authnprovider, "rethash", ap_mrb_get_authnprovider_rethash, ARGS_NONE());
-  mrb_define_method(mrb, class_authnprovider, "rethash=", ap_mrb_set_authnprovider_rethash, ARGS_ANY());
+  mrb_define_method(mrb, class_authnprovider, "user", ap_mrb_get_authnprovider_user, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_authnprovider, "password", ap_mrb_get_authnprovider_password, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_authnprovider, "realm", ap_mrb_get_authnprovider_realm, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_authnprovider, "rethash", ap_mrb_get_authnprovider_rethash, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_authnprovider, "rethash=", ap_mrb_set_authnprovider_rethash, MRB_ARGS_ANY());
 }
