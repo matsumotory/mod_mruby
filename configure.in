@@ -51,7 +51,7 @@ AS_ECHO(["--with-mruby: [$MRUBY_REPOS] will be used."])
 
 # Checks for rake or ruby
 AC_PATH_PROGS(RAKE_PATH, rake1.9.1 rake ruby1.9.1 ruby, no,
-        /usr/bin:/usr/local/bin)
+        $PATH)
 case $(basename "$RAKE_PATH") in
 ruby*)
         RAKE_PATH="$RAKE_PATH ./minirake" ;;
