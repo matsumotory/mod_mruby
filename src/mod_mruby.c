@@ -966,7 +966,7 @@ static void register_hooks(apr_pool_t *p)
       AP_INIT_TAKE1("mruby" #dir_name "LastCode",                              \
                     set_mod_mruby_##hook##_last_inline, NULL,                  \
                     RSRC_CONF | ACCESS_CONF,                                   \
-                    "hook inline code for " #hook " last phase."),
+                    "hook inline code for " #hook " last phase.")
 
 #define MOD_MRUBY_SET_ALL_CMDS(hook, dir_name)                                 \
   AP_INIT_TAKE12("mruby" #dir_name "First", set_mod_mruby_##hook##_first,      \
@@ -978,7 +978,7 @@ static void register_hooks(apr_pool_t *p)
                      "hook Ruby file for " #hook " middle phase."),            \
       AP_INIT_TAKE12("mruby" #dir_name "Last", set_mod_mruby_##hook##_last,    \
                      NULL, RSRC_CONF | ACCESS_CONF,                            \
-                     "hook Ruby file for " #hook " last phase."),
+                     "hook Ruby file for " #hook " last phase.")
 
 static const command_rec mod_mruby_cmds[] = {
 
@@ -989,45 +989,36 @@ static const command_rec mod_mruby_cmds[] = {
     AP_INIT_TAKE1("mrubyHandlerCode", set_mod_mruby_handler_inline, NULL,
                   RSRC_CONF | ACCESS_CONF,
                   "hook inline code for handler phase."),
-    MOD_MRUBY_SET_ALL_CMDS_INLINE(
-        handler, Handler) MOD_MRUBY_SET_ALL_CMDS_INLINE(post_read_request,
-                                                        PostReadRequest)
-        MOD_MRUBY_SET_ALL_CMDS_INLINE(translate_name, TranslateName)
-            MOD_MRUBY_SET_ALL_CMDS_INLINE(map_to_storage, MapToStorage)
-                MOD_MRUBY_SET_ALL_CMDS_INLINE(access_checker, AccessChecker)
-                    MOD_MRUBY_SET_ALL_CMDS_INLINE(check_user_id, CheckUserId)
-                        MOD_MRUBY_SET_ALL_CMDS_INLINE(auth_checker, AuthChecker)
-                            MOD_MRUBY_SET_ALL_CMDS_INLINE(fixups, Fixups)
-                                MOD_MRUBY_SET_ALL_CMDS_INLINE(log_transaction,
-                                                              LogTransaction)
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(handler, Handler),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(post_read_request, PostReadRequest),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(translate_name, TranslateName),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(map_to_storage, MapToStorage),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(access_checker, AccessChecker),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(check_user_id, CheckUserId),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(auth_checker, AuthChecker),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(fixups, Fixups),
+    MOD_MRUBY_SET_ALL_CMDS_INLINE(log_transaction, LogTransaction),
 
-                                    AP_INIT_TAKE12("mrubyHandler",
-                                                   set_mod_mruby_handler, NULL,
-                                                   RSRC_CONF | ACCESS_CONF,
-                                                   "hook for handler phase."),
-    MOD_MRUBY_SET_ALL_CMDS(handler, Handler) MOD_MRUBY_SET_ALL_CMDS(post_config,
-                                                                    PostConfig)
-        MOD_MRUBY_SET_ALL_CMDS(child_init, ChildInit) MOD_MRUBY_SET_ALL_CMDS(
-            post_read_request,
-            PostReadRequest) MOD_MRUBY_SET_ALL_CMDS(quick_handler, QuickHandler)
-            MOD_MRUBY_SET_ALL_CMDS(translate_name, TranslateName)
-                MOD_MRUBY_SET_ALL_CMDS(map_to_storage, MapToStorage)
-                    MOD_MRUBY_SET_ALL_CMDS(access_checker, AccessChecker)
-                        MOD_MRUBY_SET_ALL_CMDS(check_user_id, CheckUserId)
-                            MOD_MRUBY_SET_ALL_CMDS(
-                                auth_checker,
-                                AuthChecker) MOD_MRUBY_SET_ALL_CMDS(fixups,
-                                                                    Fixups)
-                                MOD_MRUBY_SET_ALL_CMDS(insert_filter,
-                                                       InsertFilter)
-                                    MOD_MRUBY_SET_ALL_CMDS(log_transaction,
-                                                           LogTransaction)
+    AP_INIT_TAKE12("mrubyHandler", set_mod_mruby_handler, NULL,
+                   RSRC_CONF | ACCESS_CONF, "hook for handler phase."),
 
-                                        AP_INIT_TAKE12(
-                                            "mrubyAuthnCheckPassword",
-                                            set_mod_mruby_authn_check_password,
-                                            NULL, RSRC_CONF | ACCESS_CONF,
-                                            "hook for authn basic."),
+    MOD_MRUBY_SET_ALL_CMDS(handler, Handler),
+    MOD_MRUBY_SET_ALL_CMDS(post_config, PostConfig),
+    MOD_MRUBY_SET_ALL_CMDS(child_init, ChildInit),
+    MOD_MRUBY_SET_ALL_CMDS(post_read_request, PostReadRequest),
+    MOD_MRUBY_SET_ALL_CMDS(quick_handler, QuickHandler),
+    MOD_MRUBY_SET_ALL_CMDS(translate_name, TranslateName),
+    MOD_MRUBY_SET_ALL_CMDS(map_to_storage, MapToStorage),
+    MOD_MRUBY_SET_ALL_CMDS(access_checker, AccessChecker),
+    MOD_MRUBY_SET_ALL_CMDS(check_user_id, CheckUserId),
+    MOD_MRUBY_SET_ALL_CMDS(auth_checker, AuthChecker),
+    MOD_MRUBY_SET_ALL_CMDS(fixups, Fixups),
+    MOD_MRUBY_SET_ALL_CMDS(insert_filter, InsertFilter),
+    MOD_MRUBY_SET_ALL_CMDS(log_transaction, LogTransaction),
+
+    AP_INIT_TAKE12("mrubyAuthnCheckPassword",
+                   set_mod_mruby_authn_check_password, NULL,
+                   RSRC_CONF | ACCESS_CONF, "hook for authn basic."),
     AP_INIT_TAKE12("mrubyAuthnGetRealmHash", set_mod_mruby_authn_get_realm_hash,
                    NULL, RSRC_CONF | ACCESS_CONF, "hook for authn digest."),
     AP_INIT_TAKE12("mrubyOutputFilter", set_mod_mruby_output_filter, NULL,
