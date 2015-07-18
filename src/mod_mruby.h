@@ -7,15 +7,15 @@
 #ifndef MOD_MRUBY_H
 #define MOD_MRUBY_H
 
-#define MODULE_NAME    "mod_mruby"
-#define MODULE_VERSION   "1.11.9"
-#define UNSET        -1
-#define SET        1
-#define ON         1
-#define OFF        0
+#define MODULE_NAME "mod_mruby"
+#define MODULE_VERSION "1.11.9"
+#define UNSET -1
+#define SET 1
+#define ON 1
+#define OFF 0
 
 #ifdef HAVE_CONFIG_H
-#  include "config.h"
+#include "config.h"
 #endif
 
 #include "mruby.h"
@@ -28,32 +28,31 @@
 #include "ap_release.h"
 
 #define CACHE_DISABLE 0
-#define CACHE_ENABLE  1
+#define CACHE_ENABLE 1
 
 #ifdef __MOD_MRUBY_DEBUG__
-#define TRACER ap_log_error(APLOG_MARK , APLOG_NOTICE , 0 , NULL, "%s CHECKING %s" , MODULE_NAME , __func__)
+#define TRACER                                                                 \
+  ap_log_error(APLOG_MARK, APLOG_NOTICE, 0, NULL, "%s CHECKING %s",            \
+               MODULE_NAME, __func__)
 #else
 #define TRACER
 #endif
 
 #if (AP_SERVER_MINORVERSION_NUMBER > 2)
-  #define __APACHE24__
+#define __APACHE24__
 #endif
 
 #if (AP_SERVER_MAJORVERSION_NUMBER == 2)
-  #define APLOGNO(n)        "AH" #n ": "
+#define APLOGNO(n) "AH" #n ": "
 #endif
 
 #ifdef __APACHE24__
-  #include "http_main.h"
+#include "http_main.h"
 #else
-  #define ap_server_conf      NULL
+#define ap_server_conf NULL
 #endif
 
-enum code_type {
-  MOD_MRUBY_STRING,
-  MOD_MRUBY_FILE
-};
+enum code_type { MOD_MRUBY_STRING, MOD_MRUBY_FILE };
 
 typedef struct {
   union code {
@@ -167,6 +166,5 @@ typedef struct cache_shm_table {
   cache_code_t *cache_code_slot;
 
 } cache_table_t;
-
 
 #endif

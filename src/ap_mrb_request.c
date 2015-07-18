@@ -19,8 +19,8 @@ request_rec *mrb_request_rec_state = NULL;
 
 int ap_mrb_push_request(request_rec *r)
 {
-  mrb_request_rec_state = (request_rec *)apr_pcalloc(r->pool,
-      sizeof(*mrb_request_rec_state));
+  mrb_request_rec_state =
+      (request_rec *)apr_pcalloc(r->pool, sizeof(*mrb_request_rec_state));
   mrb_request_rec_state = r;
   return OK;
 }
@@ -66,12 +66,12 @@ static mrb_value ap_mrb_get_request_body(mrb_state *mrb, mrb_value str)
   return mrb_nil_value();
 }
 
-#define AP_MRB_GET_REQUEST_VALUE(value) \
-static mrb_value ap_mrb_get_request_##value(mrb_state *mrb, mrb_value self) \
-{ \
-  request_rec *r = ap_mrb_get_request(); \
-  return ap_mrb_str_to_value(mrb, r->pool, r->value); \
-}
+#define AP_MRB_GET_REQUEST_VALUE(value)                                        \
+  static mrb_value ap_mrb_get_request_##value(mrb_state *mrb, mrb_value self)  \
+  {                                                                            \
+    request_rec *r = ap_mrb_get_request();                                     \
+    return ap_mrb_str_to_value(mrb, r->pool, r->value);                        \
+  }
 
 AP_MRB_GET_REQUEST_VALUE(the_request)
 AP_MRB_GET_REQUEST_VALUE(protocol)
@@ -117,7 +117,7 @@ AP_MRB_GET_REQUEST_VALUE(range)
 AP_MRB_GET_REQUEST_VALUE(content_type)
 
 static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb,
-    mrb_value str)
+                                                   mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   mrb_int val = r->clength;
@@ -126,7 +126,6 @@ static mrb_value ap_mrb_get_request_content_length(mrb_state *mrb,
 
 AP_MRB_GET_REQUEST_VALUE(handler)
 AP_MRB_GET_REQUEST_VALUE(content_encoding)
-
 
 static mrb_value ap_mrb_set_request_the_request(mrb_state *mrb, mrb_value str)
 {
@@ -147,7 +146,7 @@ static mrb_value ap_mrb_set_request_protocol(mrb_state *mrb, mrb_value str)
 }
 
 static mrb_value ap_mrb_set_request_vlist_validator(mrb_state *mrb,
-    mrb_value str)
+                                                    mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -202,7 +201,7 @@ static mrb_value ap_mrb_set_request_filename(mrb_state *mrb, mrb_value str)
 }
 
 static mrb_value ap_mrb_set_request_canonical_filename(mrb_state *mrb,
-    mrb_value str)
+                                                       mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -299,7 +298,7 @@ static mrb_value ap_mrb_set_request_content_type(mrb_state *mrb, mrb_value str)
 }
 
 static mrb_value ap_mrb_set_request_content_length(mrb_state *mrb,
-    mrb_value str)
+                                                   mrb_value str)
 {
   mrb_int val;
   request_rec *r = ap_mrb_get_request();
@@ -318,7 +317,7 @@ static mrb_value ap_mrb_set_request_handler(mrb_state *mrb, mrb_value str)
 }
 
 static mrb_value ap_mrb_set_request_content_encoding(mrb_state *mrb,
-    mrb_value str)
+                                                     mrb_value str)
 {
   mrb_value val;
   request_rec *r = ap_mrb_get_request();
@@ -357,7 +356,7 @@ static mrb_value ap_mrb_set_request_headers_in(mrb_state *mrb, mrb_value str)
 
   mrb_get_args(mrb, "oo", &key, &val);
   apr_table_set(r->headers_in, mrb_str_to_cstr(mrb, key),
-      mrb_str_to_cstr(mrb, val));
+                mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -375,7 +374,7 @@ static mrb_value ap_mrb_get_request_headers_in(mrb_state *mrb, mrb_value str)
 }
 
 static mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb,
-    mrb_value str)
+                                                    mrb_value str)
 {
   int i;
   mrb_value hash = mrb_hash_new(mrb);
@@ -383,11 +382,8 @@ static mrb_value ap_mrb_get_request_headers_in_hash(mrb_state *mrb,
   const apr_array_header_t *arr = apr_table_elts(r->headers_in);
   apr_table_entry_t *elts = (apr_table_entry_t *)arr->elts;
   for (i = 0; i < arr->nelts; i++) {
-    mrb_hash_set(mrb
-      , hash
-      , mrb_str_new(mrb, elts[i].key, strlen(elts[i].key))
-      , mrb_str_new(mrb, elts[i].val, strlen(elts[i].val))
-    );
+    mrb_hash_set(mrb, hash, mrb_str_new(mrb, elts[i].key, strlen(elts[i].key)),
+                 mrb_str_new(mrb, elts[i].val, strlen(elts[i].val)));
   }
   return hash;
 }
@@ -399,7 +395,7 @@ static mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
 
   mrb_get_args(mrb, "oo", &key, &val);
   apr_table_set(r->headers_out, mrb_str_to_cstr(mrb, key),
-      mrb_str_to_cstr(mrb, val));
+                mrb_str_to_cstr(mrb, val));
   return val;
 }
 
@@ -415,7 +411,7 @@ static mrb_value ap_mrb_get_request_headers_out(mrb_state *mrb, mrb_value str)
 }
 
 static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb,
-    mrb_value str)
+                                                     mrb_value str)
 {
   int i;
   mrb_value hash = mrb_hash_new(mrb);
@@ -423,11 +419,8 @@ static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb,
   const apr_array_header_t *arr = apr_table_elts(r->headers_out);
   apr_table_entry_t *elts = (apr_table_entry_t *)arr->elts;
   for (i = 0; i < arr->nelts; i++) {
-    mrb_hash_set(mrb
-      , hash
-      , mrb_str_new(mrb, elts[i].key, strlen(elts[i].key))
-      , mrb_str_new(mrb, elts[i].val, strlen(elts[i].val))
-    );
+    mrb_hash_set(mrb, hash, mrb_str_new(mrb, elts[i].key, strlen(elts[i].key)),
+                 mrb_str_new(mrb, elts[i].val, strlen(elts[i].val)));
   }
   return hash;
 }
@@ -436,7 +429,7 @@ static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb,
 // Apache::Finfo (r->finfo)
 //
 
-//static mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
+// static mrb_value ap_mrb_get_request_finfo(mrb_state *mrb, mrb_value str)
 //{
 //// TODO
 ////struct apr_finfo_t {
@@ -447,8 +440,10 @@ static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb,
 ////  apr_int32_t valid;
 ////  /** The access permissions of the file.  Mimics Unix access rights. */
 ////  apr_fileperms_t protection;
-////  /** The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE,
-////   * APR_LNK or APR_SOCK.  If the type is undetermined, the value is APR_NOFILE.
+////  /** The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK,
+///APR_PIPE,
+////   * APR_LNK or APR_SOCK.  If the type is undetermined, the value is
+///APR_NOFILE.
 ////   * If the type cannot be determined, the value is APR_UNKFILE.
 ////   */
 ////  apr_filetype_e filetype;
@@ -491,14 +486,14 @@ static mrb_value ap_mrb_get_request_headers_out_hash(mrb_state *mrb,
 //}
 
 static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb,
-    mrb_value str)
+                                                     mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.protection);
 }
 
 static mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb,
-    mrb_value str)
+                                                   mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   return mrb_fixnum_value((mrb_int)r->finfo.filetype);
@@ -639,7 +634,7 @@ static mrb_value ap_mrb_get_request_read_chunked(mrb_state *mrb, mrb_value str)
 }
 
 static mrb_value ap_mrb_get_request_used_path_info(mrb_state *mrb,
-    mrb_value str)
+                                                   mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
   int val = r->used_path_info;
@@ -673,14 +668,8 @@ static mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
   apr_status_t result = ap_invoke_handler(r);
 
   if (result != APR_SUCCESS) {
-    ap_log_error(APLOG_MARK
-      , APLOG_WARNING
-      , 0
-      , NULL
-      , "%s ERROR %s: ap_run_handler failed"
-      , MODULE_NAME
-      , __func__
-    );
+    ap_log_error(APLOG_MARK, APLOG_WARNING, 0, NULL,
+                 "%s ERROR %s: ap_run_handler failed", MODULE_NAME, __func__);
     r->connection->aborted = 1;
   }
 
@@ -688,7 +677,7 @@ static mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
 }
 
 static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self,
-    char *obj_id, char *class_name)
+                                      char *obj_id, char *class_name)
 {
   mrb_value obj;
   struct RClass *obj_class, *apache_class;
@@ -696,9 +685,8 @@ static mrb_value ap_mrb_get_class_obj(mrb_state *mrb, mrb_value self,
   obj = mrb_iv_get(mrb, self, mrb_intern_cstr(mrb, obj_id));
   if (mrb_nil_p(obj)) {
     apache_class = mrb_class_get(mrb, "Apache");
-    obj_class = (struct RClass*)mrb_class_ptr(
-        mrb_const_get(mrb, mrb_obj_value(apache_class),
-          mrb_intern_cstr(mrb, class_name)));
+    obj_class = (struct RClass *)mrb_class_ptr(mrb_const_get(
+        mrb, mrb_obj_value(apache_class), mrb_intern_cstr(mrb, class_name)));
     obj = mrb_obj_new(mrb, obj_class, 0, NULL);
     mrb_iv_set(mrb, self, mrb_intern_cstr(mrb, obj_id), obj);
   }
@@ -746,119 +734,215 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   struct RClass *class_headers_out;
   struct RClass *class_finfo;
 
-  class_request = mrb_define_class_under(mrb, class_core, "Request", mrb->object_class);
+  class_request =
+      mrb_define_class_under(mrb, class_core, "Request", mrb->object_class);
 
-  mrb_define_method(mrb, class_request, "run_handler", ap_mrb_run_handler, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "run_handler", ap_mrb_run_handler,
+                    MRB_ARGS_NONE());
 
-  mrb_define_method(mrb, class_request, "body", ap_mrb_get_request_body, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "body", ap_mrb_get_request_body,
+                    MRB_ARGS_NONE());
 
-  mrb_define_method(mrb, class_request, "error_log_into", ap_mrb_replace_stderr_log, MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, class_request, "error_log", ap_mrb_request_error_log, MRB_ARGS_REQ(2));
-  mrb_define_method(mrb, class_request, "log", ap_mrb_request_error_log, MRB_ARGS_REQ(2));
-  mrb_define_method(mrb, class_request, "the_request=", ap_mrb_set_request_the_request, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "the_request", ap_mrb_get_request_the_request, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "protocol=", ap_mrb_set_request_protocol, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "protocol", ap_mrb_get_request_protocol, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "vlist_validator=", ap_mrb_set_request_vlist_validator, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "vlist_validator", ap_mrb_get_request_vlist_validator, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "user=", ap_mrb_set_request_user, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "user", ap_mrb_get_request_user, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "ap_auth_type=", ap_mrb_set_request_ap_auth_type, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "ap_auth_type", ap_mrb_get_request_ap_auth_type, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "unparsed_uri=", ap_mrb_set_request_unparsed_uri, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "unparsed_uri", ap_mrb_get_request_unparsed_uri, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "uri=", ap_mrb_set_request_uri, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "uri", ap_mrb_get_request_uri, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "filename=", ap_mrb_set_request_filename, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "filename", ap_mrb_get_request_filename, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "canonical_filename=", ap_mrb_set_request_canonical_filename, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "canonical_filename", ap_mrb_get_request_canonical_filename, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "path_info=", ap_mrb_set_request_path_info, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "path_info", ap_mrb_get_request_path_info, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "args=", ap_mrb_set_request_args, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "args", ap_mrb_get_request_args, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "hostname=", ap_mrb_set_request_hostname, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "hostname", ap_mrb_get_request_hostname, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "document_root=", ap_mrb_set_request_document_root, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "document_root", ap_mrb_get_request_document_root, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "status_line=", ap_mrb_set_request_status_line, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "status_line", ap_mrb_get_request_status_line, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "method=", ap_mrb_set_request_method, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "method", ap_mrb_get_request_method, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "range=", ap_mrb_set_request_range, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "range", ap_mrb_get_request_range, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "content_type=", ap_mrb_set_request_content_type, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "content_type", ap_mrb_get_request_content_type, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "content_length=", ap_mrb_set_request_content_length, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "content_length", ap_mrb_get_request_content_length, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "handler=", ap_mrb_set_request_handler, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "handler", ap_mrb_get_request_handler, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "content_encoding=", ap_mrb_set_request_content_encoding, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "content_encoding", ap_mrb_get_request_content_encoding, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "assbackwards", ap_mrb_get_request_assbackwards, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "proxyreq=", ap_mrb_set_request_proxyreq, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "proxyreq", ap_mrb_get_request_proxyreq, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "header_only", ap_mrb_get_request_header_only, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "proto_num", ap_mrb_get_request_proto_num, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "status=", ap_mrb_set_request_status, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_request, "status", ap_mrb_get_request_status, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "method_number", ap_mrb_get_request_method_number, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "chunked", ap_mrb_get_request_chunked, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "read_body", ap_mrb_get_request_read_body, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "read_chunked", ap_mrb_get_request_read_chunked, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "used_path_info", ap_mrb_get_request_used_path_info, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "eos_sent", ap_mrb_get_request_eos_sent, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "no_cache", ap_mrb_get_request_no_cache, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "error_log_into",
+                    ap_mrb_replace_stderr_log, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, class_request, "error_log", ap_mrb_request_error_log,
+                    MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, class_request, "log", ap_mrb_request_error_log,
+                    MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, class_request, "the_request=",
+                    ap_mrb_set_request_the_request, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "the_request",
+                    ap_mrb_get_request_the_request, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "protocol=",
+                    ap_mrb_set_request_protocol, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "protocol", ap_mrb_get_request_protocol,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "vlist_validator=",
+                    ap_mrb_set_request_vlist_validator, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "vlist_validator",
+                    ap_mrb_get_request_vlist_validator, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "user=", ap_mrb_set_request_user,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "user", ap_mrb_get_request_user,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "ap_auth_type=",
+                    ap_mrb_set_request_ap_auth_type, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "ap_auth_type",
+                    ap_mrb_get_request_ap_auth_type, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "unparsed_uri=",
+                    ap_mrb_set_request_unparsed_uri, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "unparsed_uri",
+                    ap_mrb_get_request_unparsed_uri, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "uri=", ap_mrb_set_request_uri,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "uri", ap_mrb_get_request_uri,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "filename=",
+                    ap_mrb_set_request_filename, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "filename", ap_mrb_get_request_filename,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "canonical_filename=",
+                    ap_mrb_set_request_canonical_filename, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "canonical_filename",
+                    ap_mrb_get_request_canonical_filename, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "path_info=",
+                    ap_mrb_set_request_path_info, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "path_info",
+                    ap_mrb_get_request_path_info, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "args=", ap_mrb_set_request_args,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "args", ap_mrb_get_request_args,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "hostname=",
+                    ap_mrb_set_request_hostname, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "hostname", ap_mrb_get_request_hostname,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "document_root=",
+                    ap_mrb_set_request_document_root, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "document_root",
+                    ap_mrb_get_request_document_root, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "status_line=",
+                    ap_mrb_set_request_status_line, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "status_line",
+                    ap_mrb_get_request_status_line, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "method=", ap_mrb_set_request_method,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "method", ap_mrb_get_request_method,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "range=", ap_mrb_set_request_range,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "range", ap_mrb_get_request_range,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "content_type=",
+                    ap_mrb_set_request_content_type, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "content_type",
+                    ap_mrb_get_request_content_type, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "content_length=",
+                    ap_mrb_set_request_content_length, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "content_length",
+                    ap_mrb_get_request_content_length, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "handler=", ap_mrb_set_request_handler,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "handler", ap_mrb_get_request_handler,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "content_encoding=",
+                    ap_mrb_set_request_content_encoding, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "content_encoding",
+                    ap_mrb_get_request_content_encoding, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "assbackwards",
+                    ap_mrb_get_request_assbackwards, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "proxyreq=",
+                    ap_mrb_set_request_proxyreq, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "proxyreq", ap_mrb_get_request_proxyreq,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "header_only",
+                    ap_mrb_get_request_header_only, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "proto_num",
+                    ap_mrb_get_request_proto_num, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "status=", ap_mrb_set_request_status,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_request, "status", ap_mrb_get_request_status,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "method_number",
+                    ap_mrb_get_request_method_number, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "chunked", ap_mrb_get_request_chunked,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "read_body",
+                    ap_mrb_get_request_read_body, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "read_chunked",
+                    ap_mrb_get_request_read_chunked, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "used_path_info",
+                    ap_mrb_get_request_used_path_info, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "eos_sent", ap_mrb_get_request_eos_sent,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "no_cache", ap_mrb_get_request_no_cache,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "no_local_copy",
+                    ap_mrb_get_request_no_local_copy, MRB_ARGS_NONE());
 
-  mrb_define_method(mrb, class_request, "main?", ap_mrb_get_request_main, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "sub_request?", ap_mrb_get_request_main, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "prev?", ap_mrb_get_request_prev, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "internal_redirect?", ap_mrb_get_request_prev, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "next?", ap_mrb_get_request_next, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "external_redirect?", ap_mrb_get_request_next, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "main?", ap_mrb_get_request_main,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "sub_request?", ap_mrb_get_request_main,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "prev?", ap_mrb_get_request_prev,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "internal_redirect?",
+                    ap_mrb_get_request_prev, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "next?", ap_mrb_get_request_next,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "external_redirect?",
+                    ap_mrb_get_request_next, MRB_ARGS_NONE());
 
   // method for loading other class object
-  mrb_define_method(mrb, class_request, "notes", ap_mrb_notes_obj, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "headers_in", ap_mrb_headers_in_obj, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "headers_out", ap_mrb_headers_out_obj, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_request, "finfo", ap_mrb_finfo_obj, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "notes", ap_mrb_notes_obj,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "headers_in", ap_mrb_headers_in_obj,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "headers_out", ap_mrb_headers_out_obj,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "finfo", ap_mrb_finfo_obj,
+                    MRB_ARGS_NONE());
 
-  class_notes = mrb_define_class_under(mrb, class_core, "Notes", mrb->object_class);
-  mrb_define_method(mrb, class_notes, "[]=", ap_mrb_set_request_notes, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_notes, "[]", ap_mrb_get_request_notes, MRB_ARGS_ANY());
+  class_notes =
+      mrb_define_class_under(mrb, class_core, "Notes", mrb->object_class);
+  mrb_define_method(mrb, class_notes, "[]=", ap_mrb_set_request_notes,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_notes, "[]", ap_mrb_get_request_notes,
+                    MRB_ARGS_ANY());
 
-  class_headers_in = mrb_define_class_under(mrb, class_core, "Headers_in", mrb->object_class);
-  mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_headers_in, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_headers_in, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_headers_in, "all", ap_mrb_get_request_headers_in_hash, MRB_ARGS_ANY());
+  class_headers_in =
+      mrb_define_class_under(mrb, class_core, "Headers_in", mrb->object_class);
+  mrb_define_method(mrb, class_headers_in, "[]=", ap_mrb_set_request_headers_in,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_headers_in, "[]", ap_mrb_get_request_headers_in,
+                    MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_headers_in, "all",
+                    ap_mrb_get_request_headers_in_hash, MRB_ARGS_ANY());
 
-  class_headers_out = mrb_define_class_under(mrb, class_core, "Headers_out", mrb->object_class);
-  mrb_define_method(mrb, class_headers_out, "[]=", ap_mrb_set_request_headers_out, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_headers_out, "[]", ap_mrb_get_request_headers_out, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_headers_out, "all", ap_mrb_get_request_headers_out_hash, MRB_ARGS_ANY());
+  class_headers_out =
+      mrb_define_class_under(mrb, class_core, "Headers_out", mrb->object_class);
+  mrb_define_method(mrb, class_headers_out, "[]=",
+                    ap_mrb_set_request_headers_out, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_headers_out, "[]",
+                    ap_mrb_get_request_headers_out, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_headers_out, "all",
+                    ap_mrb_get_request_headers_out_hash, MRB_ARGS_ANY());
 
-  class_finfo = mrb_define_class_under(mrb, class_core, "Finfo", mrb->object_class);
-  mrb_define_const(mrb,  class_finfo, "APR_NOFILE", mrb_fixnum_value(APR_NOFILE));
-  mrb_define_const(mrb,  class_finfo, "APR_REG", mrb_fixnum_value(APR_REG));
-  mrb_define_const(mrb,  class_finfo, "APR_DIR", mrb_fixnum_value(APR_DIR));
-  mrb_define_const(mrb,  class_finfo, "APR_CHR", mrb_fixnum_value(APR_CHR));
-  mrb_define_const(mrb,  class_finfo, "APR_BLK", mrb_fixnum_value(APR_BLK));
-  mrb_define_const(mrb,  class_finfo, "APR_PIPE", mrb_fixnum_value(APR_PIPE));
-  mrb_define_const(mrb,  class_finfo, "APR_LNK", mrb_fixnum_value(APR_LNK));
-  mrb_define_const(mrb,  class_finfo, "APR_SOCK", mrb_fixnum_value(APR_SOCK));
-  mrb_define_const(mrb,  class_finfo, "APR_UNKFILE", mrb_fixnum_value(APR_UNKFILE));
-  mrb_define_method(mrb, class_finfo, "permission",  ap_mrb_get_request_finfo_protection,  MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "filetype",  ap_mrb_get_request_finfo_filetype,  MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "group",  ap_mrb_get_request_finfo_group,  MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "user",   ap_mrb_get_request_finfo_user,   MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "device",   ap_mrb_get_request_finfo_device, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "inode",   ap_mrb_get_request_finfo_inode, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "nlink",   ap_mrb_get_request_finfo_nlink, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "size",   ap_mrb_get_request_finfo_size,   MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "csize",   ap_mrb_get_request_finfo_csize, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "atime",  ap_mrb_get_request_finfo_atime,  MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "ctime",  ap_mrb_get_request_finfo_ctime,  MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_finfo, "mtime",  ap_mrb_get_request_finfo_mtime,  MRB_ARGS_NONE());
+  class_finfo =
+      mrb_define_class_under(mrb, class_core, "Finfo", mrb->object_class);
+  mrb_define_const(mrb, class_finfo, "APR_NOFILE",
+                   mrb_fixnum_value(APR_NOFILE));
+  mrb_define_const(mrb, class_finfo, "APR_REG", mrb_fixnum_value(APR_REG));
+  mrb_define_const(mrb, class_finfo, "APR_DIR", mrb_fixnum_value(APR_DIR));
+  mrb_define_const(mrb, class_finfo, "APR_CHR", mrb_fixnum_value(APR_CHR));
+  mrb_define_const(mrb, class_finfo, "APR_BLK", mrb_fixnum_value(APR_BLK));
+  mrb_define_const(mrb, class_finfo, "APR_PIPE", mrb_fixnum_value(APR_PIPE));
+  mrb_define_const(mrb, class_finfo, "APR_LNK", mrb_fixnum_value(APR_LNK));
+  mrb_define_const(mrb, class_finfo, "APR_SOCK", mrb_fixnum_value(APR_SOCK));
+  mrb_define_const(mrb, class_finfo, "APR_UNKFILE",
+                   mrb_fixnum_value(APR_UNKFILE));
+  mrb_define_method(mrb, class_finfo, "permission",
+                    ap_mrb_get_request_finfo_protection, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "filetype",
+                    ap_mrb_get_request_finfo_filetype, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "group", ap_mrb_get_request_finfo_group,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "user", ap_mrb_get_request_finfo_user,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "device", ap_mrb_get_request_finfo_device,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "inode", ap_mrb_get_request_finfo_inode,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "nlink", ap_mrb_get_request_finfo_nlink,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "size", ap_mrb_get_request_finfo_size,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "csize", ap_mrb_get_request_finfo_csize,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "atime", ap_mrb_get_request_finfo_atime,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "ctime", ap_mrb_get_request_finfo_ctime,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_finfo, "mtime", ap_mrb_get_request_finfo_mtime,
+                    MRB_ARGS_NONE());
 }
-

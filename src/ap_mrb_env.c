@@ -18,7 +18,6 @@ static mrb_value ap_mrb_init_env(mrb_state *mrb, mrb_value self)
   return self;
 }
 
-
 static mrb_value ap_mrb_set_env(mrb_state *mrb, mrb_value str)
 {
   mrb_value key, val;
@@ -56,11 +55,8 @@ static mrb_value ap_mrb_get_env_hash(mrb_state *mrb, mrb_value str)
   apr_table_entry_t *elts = (apr_table_entry_t *)arr->elts;
   ai = mrb_gc_arena_save(mrb);
   for (i = 0; i < arr->nelts; i++) {
-    mrb_hash_set(mrb
-      , hash
-      , mrb_str_new(mrb, elts[i].key, strlen(elts[i].key))
-      , mrb_str_new(mrb, elts[i].val, strlen(elts[i].val))
-    );
+    mrb_hash_set(mrb, hash, mrb_str_new(mrb, elts[i].key, strlen(elts[i].key)),
+                 mrb_str_new(mrb, elts[i].val, strlen(elts[i].val)));
     mrb_gc_arena_restore(mrb, ai);
   }
   return hash;
@@ -72,9 +68,11 @@ void ap_mruby_env_init(mrb_state *mrb, struct RClass *class_core)
 
   int ai = mrb_gc_arena_save(mrb);
   class_env = mrb_define_class_under(mrb, class_core, "Env", mrb->object_class);
-  mrb_define_method(mrb, class_env, "initialize", ap_mrb_init_env, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_env, "initialize", ap_mrb_init_env,
+                    MRB_ARGS_NONE());
   mrb_define_method(mrb, class_env, "[]=", ap_mrb_set_env, MRB_ARGS_ANY());
   mrb_define_method(mrb, class_env, "[]", ap_mrb_get_env, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_env, "all", ap_mrb_get_env_hash, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_env, "all", ap_mrb_get_env_hash,
+                    MRB_ARGS_NONE());
   mrb_gc_arena_restore(mrb, ai);
 }

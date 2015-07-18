@@ -10,9 +10,10 @@ typedef struct {
   apr_bucket_file *file_bucket;
 } ap_mrb_filter_rec;
 
-void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb, apr_pool_t *pool);
+void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb,
+                           apr_pool_t *pool);
 ap_mrb_filter_rec *ap_mrb_get_filter_rec(apr_pool_t *pool);
 
-//void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core);
+// void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core);
 
 #endif
