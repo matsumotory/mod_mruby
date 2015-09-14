@@ -128,4 +128,11 @@ t.assert('mod_mruby', 'location /logger') do
   res = HttpRequest.new.get base + '/logger'
 end
 
+t.assert('mod_mruby', 'location /rack_base') do
+  res = HttpRequest.new.get base + '/rack_base'
+  t.assert_equal "rack body", res["body"]
+  t.assert_equal "foo", res["x-hoge"]
+  t.assert_equal 200, res.code
+end
+
 t.report
