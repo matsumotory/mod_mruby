@@ -16,6 +16,8 @@ end
 
 t = SimpleTest.new "mod_mruby test"
 
+server_version = HttpRequest.new.get(base + '/server-version')["body"]
+
 t.assert('mod_mruby', 'location /hello-inline') do
   res = HttpRequest.new.get base + '/hello-inline'
   t.assert_equal 'hello', res["body"]
@@ -126,6 +128,79 @@ end
 
 t.assert('mod_mruby', 'location /logger') do
   res = HttpRequest.new.get base + '/logger'
+end
+
+t.assert('mod_mruby', 'location /rack_base') do
+  res = HttpRequest.new.get base + '/rack_base'
+  t.assert_equal "rack body", res["body"]
+  t.assert_equal "foo", res["x-hoge"]
+  t.assert_equal 200, res.code
+end
+
+t.assert('mod_mruby', 'location /rack_base1') do
+  res = HttpRequest.new.get base + '/rack_base1'
+  t.assert_equal "rack body", res["body"]
+  t.assert_equal "foo", res["x-hoge"]
+  t.assert_equal "hoge", res["x-foo"]
+  t.assert_equal 200, res.code
+end
+
+t.assert('mod_mruby', 'location /rack_base2') do
+  res = HttpRequest.new.get base + '/rack_base2'
+  t.assert_equal "rack body", res["body"]
+  t.assert_equal "foo", res["x-hoge"]
+  t.assert_equal "hoge", res["x-foo"]
+  t.assert_equal 200, res.code
+end
+
+t.assert('mod_mruby', 'location /rack_base3') do
+  res = HttpRequest.new.get base + '/rack_base3'
+  t.assert_equal 404, res.code
+end
+
+t.assert('mod_mruby', 'location /rack_base_env') do
+  res = HttpRequest.new.get base + '/rack_base_env?a=1&b=1', nil, {"Host" => "apache.example.com:38080", "x-hoge" => "foo"}
+  body = JSON.parse res["body"]
+
+  t.assert_equal "GET", body["REQUEST_METHOD"]
+  t.assert_equal "", body["SCRIPT_NAME"]
+  t.assert_equal "/rack_base_env", body["PATH_INFO"]
+  t.assert_equal "/rack_base_env?a=1&b=1", body["REQUEST_URI"]
+  t.assert_equal "a=1&b=1", body["QUERY_STRING"]
+  t.assert_equal "apache.example.com", body["SERVER_NAME"]
+  t.assert_equal "127.0.0.1", body["SERVER_ADDR"]
+  t.assert_equal "38080", body["SERVER_PORT"]
+  t.assert_equal "127.0.0.1", body["REMOTE_ADDR"]
+  t.assert_equal "http", body["rack.url_scheme"]
+  t.assert_false body["rack.multithread"]
+  t.assert_true  body["rack.multiprocess"]
+  t.assert_false body["rack.run_once"]
+  t.assert_false body["rack.hijack?"]
+  t.assert_equal "Apache", body["server.name"]
+  t.assert_equal server_version, body["server.version"]
+  t.assert_equal "*/*", body["HTTP_ACCEPT"]
+  t.assert_equal "close", body["HTTP_CONNECTION"]
+  t.assert_equal "apache.example.com:38080", body["HTTP_HOST"]
+  t.assert_equal "foo", body["HTTP_X_HOGE"]
+  t.assert_equal 200, res.code
+end
+
+t.assert('mod_mruby', 'location /rack_base_2phase') do
+  res = HttpRequest.new.get base + '/rack_base_2phase', nil, {"auth-token" => "aaabbbccc"}
+  t.assert_equal "OK", res["body"]
+  t.assert_equal "127.0.0.1", res["x-client-ip"]
+  t.assert_equal 200, res.code
+end
+
+t.assert('mod_mruby', 'location /rack_base_2phase') do
+  res = HttpRequest.new.get base + '/rack_base_2phase', nil, {"auth-token" => "cccbbbaaa"}
+  t.assert_equal 403, res.code
+end
+
+t.assert('mod_mruby', 'location /rack_base_push/index.txt') do
+  res = HttpRequest.new.get base + '/rack_base_push/index.txt'
+  t.assert_equal 200, res.code
+  t.assert_equal "</index.js>; rel=preload", res["link"]
 end
 
 t.report
