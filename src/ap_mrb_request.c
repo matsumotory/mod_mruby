@@ -80,6 +80,14 @@ AP_MRB_GET_REQUEST_VALUE(user)
 AP_MRB_GET_REQUEST_VALUE(ap_auth_type)
 AP_MRB_GET_REQUEST_VALUE(unparsed_uri)
 AP_MRB_GET_REQUEST_VALUE(uri)
+
+static mrb_value ap_mrb_get_request_scheme(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+  char *val = ap_http_scheme(r);
+  return mrb_str_new(mrb, val, strlen(val));
+}
+
 AP_MRB_GET_REQUEST_VALUE(filename)
 AP_MRB_GET_REQUEST_VALUE(canonical_filename)
 AP_MRB_GET_REQUEST_VALUE(path_info)
@@ -776,6 +784,8 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_request, "uri=", ap_mrb_set_request_uri,
                     MRB_ARGS_ANY());
   mrb_define_method(mrb, class_request, "uri", ap_mrb_get_request_uri,
+                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "scheme", ap_mrb_get_request_scheme,
                     MRB_ARGS_NONE());
   mrb_define_method(mrb, class_request, "filename=",
                     ap_mrb_set_request_filename, MRB_ARGS_ANY());
