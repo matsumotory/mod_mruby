@@ -45,7 +45,12 @@ module Kernel
       else
         raise TypeError, "response body arg type must be Array"
       end
-      Server.return res[0].to_i
+
+      if res[0].to_i == 200
+        Server.return Server::OK
+      else
+        Server.return res[0].to_i
+      end
     end
   end
 
