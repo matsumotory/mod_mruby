@@ -15,6 +15,7 @@ APACHECTL=@APACHECTL_PATH@
 
 #   additional user defines, includes and libraries
 MRUBY_ROOT=@MRUBY_ROOT@
+MRUBY_TEST_ROOT=@MRUBY_ROOT@_test
 DEFS=@DEFS@
 INC=-I. -I$(MRUBY_ROOT)/src -I$(MRUBY_ROOT)/include
 LIB=@LIBS@
@@ -65,9 +66,9 @@ test:
 		-e 's|__APDOCROOT__|$(APDOCROOT)|g' \
 		./test/conf/mod_mruby_test.conf >> ./test/conf/httpd.conf
 	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
-	cp -p ./test/build_config.rb $(MRUBY_ROOT)/.
-	cd $(MRUBY_ROOT) && rake clean && $(RAKE)
-	$(MRUBY_ROOT)/bin/mruby ./test/t/mod_mruby.rb
+	cp -p ./test/build_config.rb $(MRUBY_TEST_ROOT)/.
+	cd $(MRUBY_TEST_ROOT) && rake clean && $(RAKE)
+	$(MRUBY_TEST_ROOT)/bin/mruby ./test/t/mod_mruby.rb
 	$(APACHECTL) -k stop
 
 #   install the DSO file into the Apache installation
