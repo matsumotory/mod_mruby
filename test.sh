@@ -42,6 +42,13 @@ if [ ! -d "./mruby/src" ]; then
   echo "mruby Downloading ... Done"
 fi
 
+if [ ! -d "./mruby_test/src" ]; then
+  echo "mruby Downloading ..."
+  git submodule init
+  git submodule update
+  echo "mruby Downloading ... Done"
+fi
+
 cd mruby
 if [ -d "./build" ]; then
   echo "mruby Cleaning ..."
