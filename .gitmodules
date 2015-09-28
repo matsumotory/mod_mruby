@@ -1,7 +1,6 @@
 [submodule "mruby"]
 	path = mruby
 	url = https://github.com/mruby/mruby.git
-
 [submodule "mruby_test"]
 	path = mruby_test
 	url = https://github.com/mruby/mruby.git
