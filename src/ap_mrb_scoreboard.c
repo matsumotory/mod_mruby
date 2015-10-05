@@ -158,8 +158,7 @@ static sc_clocks_t ap_mrb_get_sc_clocks()
             proc.tcu += tmp.tcu;
             proc.tcs += tmp.tcs;
           } else {
-            if (tmp.tu > proc.tu || tmp.ts > proc.ts || tmp.tcu > proc.tcu ||
-                tmp.tcs > proc.tcs) {
+            if (tmp.tu > proc.tu || tmp.ts > proc.ts || tmp.tcu > proc.tcu || tmp.tcs > proc.tcs) {
               proc.tu = tmp.tu;
               proc.ts = tmp.ts;
               proc.tcu = tmp.tcu;
@@ -197,8 +196,7 @@ static apr_interval_time_t sb_get_uptime()
     return 0;
 
   nowtime = apr_time_now();
-  up_time = (apr_uint32_t)apr_time_sec(
-      nowtime - ap_scoreboard_image->global->restart_time);
+  up_time = (apr_uint32_t)apr_time_sec(nowtime - ap_scoreboard_image->global->restart_time);
 
   return up_time;
 }
@@ -229,8 +227,7 @@ static int sb_get_process_worker()
       if (!ps_record->quiescing && ps_record->pid) {
         if (res == SERVER_READY && ps_record->generation == ap_my_generation)
           continue;
-        else if (res != SERVER_DEAD && res != SERVER_STARTING &&
-                 res != SERVER_IDLE_KILL)
+        else if (res != SERVER_DEAD && res != SERVER_STARTING && res != SERVER_IDLE_KILL)
           process++;
       }
     }
@@ -366,8 +363,7 @@ static mrb_value ap_mrb_get_scoreboard_cpu_load(mrb_state *mrb, mrb_value self)
   t = ap_mrb_get_sc_clocks();
   /* Allow for OS/2 not having CPU stats */
   if (t.ts || t.tu || t.tcu || t.tcs)
-    return mrb_float_value(mrb, (mrb_float)((t.tu + t.ts + t.tcu + t.tcs) /
-                                            tick / sb_get_uptime() * 100.));
+    return mrb_float_value(mrb, (mrb_float)((t.tu + t.ts + t.tcu + t.tcs) / tick / sb_get_uptime() * 100.));
 #endif
   return self;
 }
@@ -386,20 +382,17 @@ static mrb_value ap_mrb_get_scoreboard_loadavg(mrb_state *mrb, mrb_value self)
   return ary;
 }
 
-static mrb_value ap_mrb_get_scoreboard_idle_worker(mrb_state *mrb,
-                                                   mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_idle_worker(mrb_state *mrb, mrb_value str)
 {
   return mrb_fixnum_value((mrb_int)sb_get_idle_worker());
 }
 
-static mrb_value ap_mrb_get_scoreboard_process_worker(mrb_state *mrb,
-                                                      mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_process_worker(mrb_state *mrb, mrb_value str)
 {
   return mrb_fixnum_value((mrb_int)sb_get_process_worker());
 }
 
-static mrb_value ap_mrb_get_scoreboard_restart_time(mrb_state *mrb,
-                                                    mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_restart_time(mrb_state *mrb, mrb_value str)
 {
   return mrb_float_value(mrb, (mrb_float)sb_get_restart_time());
 }
@@ -409,22 +402,19 @@ static mrb_value ap_mrb_get_scoreboard_pid(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(getpid());
 }
 
-static mrb_value ap_mrb_get_scoreboard_server_limit(mrb_state *mrb,
-                                                    mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_server_limit(mrb_state *mrb, mrb_value str)
 {
   ap_mpm_query(AP_MPMQ_HARD_LIMIT_DAEMONS, &mruby_server_limit);
   return mrb_fixnum_value(mruby_server_limit);
 }
 
-static mrb_value ap_mrb_get_scoreboard_thread_limit(mrb_state *mrb,
-                                                    mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_thread_limit(mrb_state *mrb, mrb_value str)
 {
   ap_mpm_query(AP_MPMQ_HARD_LIMIT_THREADS, &mruby_thread_limit);
   return mrb_fixnum_value(mruby_thread_limit);
 }
 
-static mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb,
-                                                      mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_access_counter(mrb_state *mrb, mrb_value str)
 {
   int i, j;
   mrb_int pid;
@@ -449,14 +439,12 @@ static mrb_value ap_mrb_get_scoreboard_uptime(mrb_state *mrb, mrb_value str)
   return mrb_float_value(mrb, (mrb_float)sb_get_uptime());
 }
 
-static mrb_value ap_mrb_get_scoreboard_total_kbyte(mrb_state *mrb,
-                                                   mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_total_kbyte(mrb_state *mrb, mrb_value str)
 {
   return mrb_float_value(mrb, (mrb_float)sb_get_kbcount());
 }
 
-static mrb_value ap_mrb_get_scoreboard_total_access(mrb_state *mrb,
-                                                    mrb_value str)
+static mrb_value ap_mrb_get_scoreboard_total_access(mrb_state *mrb, mrb_value str)
 {
   return mrb_float_value(mrb, (mrb_float)sb_get_access_count());
 }
@@ -478,40 +466,26 @@ static mrb_value ap_mrb_get_scoreboard_status(mrb_state *mrb, mrb_value str)
       ai = mrb_gc_arena_save(mrb);
       switch (ws_record->status) {
       case SERVER_BUSY_READ:
-        mrb_hash_set(
-            mrb, hash,
-            mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
-            mrb_str_new(mrb, "SERVER_BUSY_READ", strlen("SERVER_BUSY_READ")));
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
+                     mrb_str_new(mrb, "SERVER_BUSY_READ", strlen("SERVER_BUSY_READ")));
       case SERVER_BUSY_WRITE:
-        mrb_hash_set(
-            mrb, hash,
-            mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
-            mrb_str_new(mrb, "SERVER_BUSY_WRITE", strlen("SERVER_BUSY_WRITE")));
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
+                     mrb_str_new(mrb, "SERVER_BUSY_WRITE", strlen("SERVER_BUSY_WRITE")));
       case SERVER_BUSY_KEEPALIVE:
-        mrb_hash_set(mrb, hash, mrb_str_new(mrb, ws_record->client,
-                                            strlen(ws_record->client)),
-                     mrb_str_new(mrb, "SERVER_BUSY_KEEPALIVE",
-                                 strlen("SERVER_BUSY_KEEPALIVE")));
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
+                     mrb_str_new(mrb, "SERVER_BUSY_KEEPALIVE", strlen("SERVER_BUSY_KEEPALIVE")));
       case SERVER_BUSY_LOG:
-        mrb_hash_set(
-            mrb, hash,
-            mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
-            mrb_str_new(mrb, "SERVER_BUSY_LOG", strlen("SERVER_BUSY_LOG")));
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
+                     mrb_str_new(mrb, "SERVER_BUSY_LOG", strlen("SERVER_BUSY_LOG")));
       case SERVER_BUSY_DNS:
-        mrb_hash_set(
-            mrb, hash,
-            mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
-            mrb_str_new(mrb, "SERVER_BUSY_DNS", strlen("SERVER_BUSY_DNS")));
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
+                     mrb_str_new(mrb, "SERVER_BUSY_DNS", strlen("SERVER_BUSY_DNS")));
       case SERVER_CLOSING:
-        mrb_hash_set(
-            mrb, hash,
-            mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
-            mrb_str_new(mrb, "SERVER_CLOSING", strlen("SERVER_CLOSING")));
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
+                     mrb_str_new(mrb, "SERVER_CLOSING", strlen("SERVER_CLOSING")));
       case SERVER_GRACEFUL:
-        mrb_hash_set(
-            mrb, hash,
-            mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
-            mrb_str_new(mrb, "SERVER_GRACEFUL", strlen("SERVER_GRACEFUL")));
+        mrb_hash_set(mrb, hash, mrb_str_new(mrb, ws_record->client, strlen(ws_record->client)),
+                     mrb_str_new(mrb, "SERVER_GRACEFUL", strlen("SERVER_GRACEFUL")));
 
       default:
         break;
@@ -592,39 +566,18 @@ static mrb_value ap_mrb_get_scoreboard_counter(mrb_state *mrb, mrb_value str)
     }
   }
   ai = mrb_gc_arena_save(mrb);
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_READY", strlen("SERVER_READY")),
-               mrb_fixnum_value(ready));
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_STARTING", strlen("SERVER_STARTING")),
-               mrb_fixnum_value(start));
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_BUSY_READ", strlen("SERVER_BUSY_READ")),
-               mrb_fixnum_value(bread));
-  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_BUSY_WRITE",
-                                      strlen("SERVER_BUSY_WRITE")),
-               mrb_fixnum_value(bwrite));
-  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_BUSY_KEEPALIVE",
-                                      strlen("SERVER_BUSY_KEEPALIVE")),
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_READY", strlen("SERVER_READY")), mrb_fixnum_value(ready));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_STARTING", strlen("SERVER_STARTING")), mrb_fixnum_value(start));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_BUSY_READ", strlen("SERVER_BUSY_READ")), mrb_fixnum_value(bread));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_BUSY_WRITE", strlen("SERVER_BUSY_WRITE")), mrb_fixnum_value(bwrite));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_BUSY_KEEPALIVE", strlen("SERVER_BUSY_KEEPALIVE")),
                mrb_fixnum_value(bkeep));
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_BUSY_LOG", strlen("SERVER_BUSY_LOG")),
-               mrb_fixnum_value(blog));
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_BUSY_DNS", strlen("SERVER_BUSY_DNS")),
-               mrb_fixnum_value(bdns));
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_CLOSING", strlen("SERVER_CLOSING")),
-               mrb_fixnum_value(close));
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_DEAD", strlen("SERVER_DEAD")),
-               mrb_fixnum_value(dead));
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_GRACEFUL", strlen("SERVER_GRACEFUL")),
-               mrb_fixnum_value(grace));
-  mrb_hash_set(mrb, hash,
-               mrb_str_new(mrb, "SERVER_IDLE_KILL", strlen("SERVER_IDLE_KILL")),
-               mrb_fixnum_value(idlek));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_BUSY_LOG", strlen("SERVER_BUSY_LOG")), mrb_fixnum_value(blog));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_BUSY_DNS", strlen("SERVER_BUSY_DNS")), mrb_fixnum_value(bdns));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_CLOSING", strlen("SERVER_CLOSING")), mrb_fixnum_value(close));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_DEAD", strlen("SERVER_DEAD")), mrb_fixnum_value(dead));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_GRACEFUL", strlen("SERVER_GRACEFUL")), mrb_fixnum_value(grace));
+  mrb_hash_set(mrb, hash, mrb_str_new(mrb, "SERVER_IDLE_KILL", strlen("SERVER_IDLE_KILL")), mrb_fixnum_value(idlek));
   mrb_gc_arena_restore(mrb, ai);
 
   return hash;
@@ -635,35 +588,20 @@ void ap_mruby_scoreboard_init(mrb_state *mrb, struct RClass *class_core)
   struct RClass *class_scoreboard;
 
   int ai = mrb_gc_arena_save(mrb);
-  class_scoreboard =
-      mrb_define_class_under(mrb, class_core, "Scoreboard", mrb->object_class);
-  mrb_define_method(mrb, class_scoreboard, "status",
-                    ap_mrb_get_scoreboard_status, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_scoreboard, "counter",
-                    ap_mrb_get_scoreboard_counter, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_scoreboard, "pid", ap_mrb_get_scoreboard_pid,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_scoreboard, "cpu_load",
-                    ap_mrb_get_scoreboard_cpu_load, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_scoreboard, "loadavg",
-                    ap_mrb_get_scoreboard_loadavg, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_scoreboard, "server_limit",
-                    ap_mrb_get_scoreboard_server_limit, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_scoreboard, "thread_limit",
-                    ap_mrb_get_scoreboard_thread_limit, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_scoreboard, "access_counter",
-                    ap_mrb_get_scoreboard_access_counter, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_scoreboard, "total_kbyte",
-                    ap_mrb_get_scoreboard_total_kbyte, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_scoreboard, "total_access",
-                    ap_mrb_get_scoreboard_total_access, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_scoreboard, "uptime",
-                    ap_mrb_get_scoreboard_uptime, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_scoreboard, "restart_time",
-                    ap_mrb_get_scoreboard_restart_time, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_scoreboard, "idle_worker",
-                    ap_mrb_get_scoreboard_idle_worker, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_scoreboard, "busy_worker",
-                    ap_mrb_get_scoreboard_process_worker, MRB_ARGS_ANY());
+  class_scoreboard = mrb_define_class_under(mrb, class_core, "Scoreboard", mrb->object_class);
+  mrb_define_method(mrb, class_scoreboard, "status", ap_mrb_get_scoreboard_status, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_scoreboard, "counter", ap_mrb_get_scoreboard_counter, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_scoreboard, "pid", ap_mrb_get_scoreboard_pid, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_scoreboard, "cpu_load", ap_mrb_get_scoreboard_cpu_load, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_scoreboard, "loadavg", ap_mrb_get_scoreboard_loadavg, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_scoreboard, "server_limit", ap_mrb_get_scoreboard_server_limit, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_scoreboard, "thread_limit", ap_mrb_get_scoreboard_thread_limit, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_scoreboard, "access_counter", ap_mrb_get_scoreboard_access_counter, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_scoreboard, "total_kbyte", ap_mrb_get_scoreboard_total_kbyte, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_scoreboard, "total_access", ap_mrb_get_scoreboard_total_access, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_scoreboard, "uptime", ap_mrb_get_scoreboard_uptime, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_scoreboard, "restart_time", ap_mrb_get_scoreboard_restart_time, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_scoreboard, "idle_worker", ap_mrb_get_scoreboard_idle_worker, MRB_ARGS_ANY());
+  mrb_define_method(mrb, class_scoreboard, "busy_worker", ap_mrb_get_scoreboard_process_worker, MRB_ARGS_ANY());
   mrb_gc_arena_restore(mrb, ai);
 }

@@ -11,11 +11,9 @@
 #include "mruby/variable.h"
 #include "http_protocol.h"
 
-void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb,
-                           apr_pool_t *pool)
+void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb, apr_pool_t *pool)
 {
-  ap_mrb_filter_rec *fr =
-      (ap_mrb_filter_rec *)apr_pcalloc(f->r->pool, sizeof(ap_mrb_filter_rec));
+  ap_mrb_filter_rec *fr = (ap_mrb_filter_rec *)apr_pcalloc(f->r->pool, sizeof(ap_mrb_filter_rec));
   apr_finfo_t finfo;
   apr_file_t *fd;
   apr_bucket *b = APR_BRIGADE_FIRST(bb);
@@ -39,20 +37,16 @@ void ap_mrb_set_filter_rec(ap_filter_t *f, apr_bucket_brigade *bb,
 ap_mrb_filter_rec *ap_mrb_get_filter_rec(apr_pool_t *pool)
 {
   ap_mrb_filter_rec *fr = NULL;
-  if (apr_pool_userdata_get((void **)&fr, "mod_mruby_filter_rec", pool) ==
-      APR_SUCCESS) {
+  if (apr_pool_userdata_get((void **)&fr, "mod_mruby_filter_rec", pool) == APR_SUCCESS) {
     if (fr == NULL) {
-      ap_log_error(
-          APLOG_MARK, APLOG_ERR, 0, NULL,
-          "%s ERROR %s: apr_pool_userdata_get mod_mruby_filter_rec success, "
-          "but fr is NULL",
-          MODULE_NAME, __func__);
+      ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, "%s ERROR %s: apr_pool_userdata_get mod_mruby_filter_rec success, "
+                                                   "but fr is NULL",
+                   MODULE_NAME, __func__);
       return NULL;
     }
     return fr;
   }
-  ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL,
-               "%s ERROR %s: apr_pool_userdata_get mod_mruby_filter_rec faled",
+  ap_log_error(APLOG_MARK, APLOG_ERR, 0, NULL, "%s ERROR %s: apr_pool_userdata_get mod_mruby_filter_rec faled",
                MODULE_NAME, __func__);
   return NULL;
 }
@@ -75,8 +69,7 @@ static mrb_value ap_mrb_filter_brigade_first(mrb_state *mrb, mrb_value self)
   request_rec *r = ap_mrb_get_request();
   ap_mrb_filter_rec *ff = ap_mrb_get_filter_rec(r->pool);
   const apr_bucket *bkt = APR_BRIGADE_FIRST(ff->bb);
-  return mrb_obj_value(Data_Wrap_Struct(mrb, mrb->object_class,
-                                        &mrb_apr_bucket_type, (void *)bkt));
+  return mrb_obj_value(Data_Wrap_Struct(mrb, mrb->object_class, &mrb_apr_bucket_type, (void *)bkt));
 }
 
 static mrb_value ap_mrb_filter_puts(mrb_state *mrb, mrb_value self)
@@ -118,8 +111,7 @@ static mrb_value ap_mrb_filter_insert_eos(mrb_state *mrb, mrb_value self)
 {
   request_rec *r = ap_mrb_get_request();
   ap_mrb_filter_rec *ff = ap_mrb_get_filter_rec(r->pool);
-  APR_BRIGADE_INSERT_TAIL(ff->bb,
-                          apr_bucket_eos_create(ff->f->c->bucket_alloc));
+  APR_BRIGADE_INSERT_TAIL(ff->bb, apr_bucket_eos_create(ff->f->c->bucket_alloc));
   return self;
 }
 
@@ -241,36 +233,21 @@ void ap_mruby_filter_init(mrb_state *mrb, struct RClass *class_core)
 {
   struct RClass *class_filter;
 
-  class_filter =
-      mrb_define_class_under(mrb, class_core, "Filter", mrb->object_class);
-  mrb_define_method(mrb, class_filter, "initialize", ap_mrb_filter_init,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "puts", ap_mrb_filter_puts,
-                    MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, class_filter, "insert_tail", ap_mrb_filter_insert_tail,
-                    MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, class_filter, "insert_head", ap_mrb_filter_insert_head,
-                    MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, class_filter, "insert_eos", ap_mrb_filter_insert_eos,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "destroy", ap_mrb_filter_brigade_destroy,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "cleanup", ap_mrb_filter_brigade_cleanup,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "flatten",
-                    ap_mrb_filter_brigade_pflatten, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "length", ap_mrb_filter_brigade_length,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "empty?", ap_mrb_filter_brigade_empty,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "first_bucket",
-                    ap_mrb_filter_brigade_first, MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "uid", ap_mrb_filter_uid,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "gid", ap_mrb_filter_gid,
-                    MRB_ARGS_NONE());
-  mrb_define_method(mrb, class_filter, "error_create",
-                    ap_mrb_filter_error_create, MRB_ARGS_REQ(1));
+  class_filter = mrb_define_class_under(mrb, class_core, "Filter", mrb->object_class);
+  mrb_define_method(mrb, class_filter, "initialize", ap_mrb_filter_init, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "puts", ap_mrb_filter_puts, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, class_filter, "insert_tail", ap_mrb_filter_insert_tail, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, class_filter, "insert_head", ap_mrb_filter_insert_head, MRB_ARGS_REQ(1));
+  mrb_define_method(mrb, class_filter, "insert_eos", ap_mrb_filter_insert_eos, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "destroy", ap_mrb_filter_brigade_destroy, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "cleanup", ap_mrb_filter_brigade_cleanup, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "flatten", ap_mrb_filter_brigade_pflatten, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "length", ap_mrb_filter_brigade_length, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "empty?", ap_mrb_filter_brigade_empty, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "first_bucket", ap_mrb_filter_brigade_first, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "uid", ap_mrb_filter_uid, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "gid", ap_mrb_filter_gid, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_filter, "error_create", ap_mrb_filter_error_create, MRB_ARGS_REQ(1));
   // mrb_define_method(mrb, class_filter, "bucket_read",
   // ap_mrb_filter_bucket_read, MRB_ARGS_REQ(1));
 }

@@ -7,10 +7,8 @@
 #include "http_request.h"
 #include "mod_auth.h"
 
-int ap_mrb_init_authnprovider_basic(request_rec *r, const char *user,
-                                    const char *password);
-int ap_mrb_init_authnprovider_digest(request_rec *r, const char *user,
-                                     const char *realm);
+int ap_mrb_init_authnprovider_basic(request_rec *r, const char *user, const char *password);
+int ap_mrb_init_authnprovider_digest(request_rec *r, const char *user, const char *realm);
 
 char *ap_mrb_get_authnprovider_digest_rethash();
 

@@ -68,11 +68,9 @@ void ap_mruby_env_init(mrb_state *mrb, struct RClass *class_core)
 
   int ai = mrb_gc_arena_save(mrb);
   class_env = mrb_define_class_under(mrb, class_core, "Env", mrb->object_class);
-  mrb_define_method(mrb, class_env, "initialize", ap_mrb_init_env,
-                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_env, "initialize", ap_mrb_init_env, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_env, "[]=", ap_mrb_set_env, MRB_ARGS_ANY());
   mrb_define_method(mrb, class_env, "[]", ap_mrb_get_env, MRB_ARGS_ANY());
-  mrb_define_method(mrb, class_env, "all", ap_mrb_get_env_hash,
-                    MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_env, "all", ap_mrb_get_env_hash, MRB_ARGS_NONE());
   mrb_gc_arena_restore(mrb, ai);
 }
