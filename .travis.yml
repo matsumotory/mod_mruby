@@ -7,11 +7,11 @@ before_install:
 install:
     - sudo apt-get -qq install rake bison libcurl4-openssl-dev libmarkdown2-dev
 env:
-  - HTTPD_VERSION=httpd-2.2.31
+  - HTTPD_VERSION=httpd-2.2.32
     APR=apr-1.5.2
     APR_UTIL=apr-util-1.5.4
     HTTPD_CONFIG_OPT='--enable-module=all --enable-mods-shared=all --enable-proxy --enable-proxy-http'
-  - HTTPD_VERSION=httpd-2.4.17
+  - HTTPD_VERSION=httpd-2.4.18
     APR=apr-1.5.2
     APR_UTIL=apr-util-1.5.4
     HTTPD_CONFIG_OPT=
@@ -22,16 +22,3 @@ before_script:
   - echo "HTTPD_CONFIG_OPT='${HTTPD_CONFIG_OPT}'" >> httpd_version
 script:
   - sh test.sh
-notifications:
-  irc:
-    channels:
-      - "irc.freenode.org#hosting-ja"
-    on_success: always
-    on_failure: always
-    use_notice: true
-    skip_join: true
-    template:
-        - "[%{message}] %{repository} (%{commit}) by %{author}: See %{build_url}"
-  webhooks:
-    - secure: "BYpv6AjLGEtNMX67AaUEbirIQRX9Tl6ovPA/2+BDdHiNEMr1+xZVhp1rOBEP7nli1opvKe7OfJFNaJ2HRMmECmh3ZtfIiGQ8t3LtKd2kl+6tL9rdYuWo7M9PjGKsVXhcsJlK3FpeYXGGqmxRelapMAs+yn3EWz9S54Yy7QWqO/Q="
-
