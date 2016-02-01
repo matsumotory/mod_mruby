@@ -4,11 +4,11 @@
 ** See Copyright Notice in mruby.h
 */
 
-#include "mruby.h"
-#include "mruby/variable.h"
-#include "mruby/class.h"
-#include "mruby/data.h"
-#include "mruby/array.h"
+#include <mruby.h>
+#include <mruby/variable.h>
+#include <mruby/class.h>
+#include <mruby/data.h>
+#include <mruby/array.h>
 #include "mt19937ar.h"
 
 #include <time.h>
@@ -79,10 +79,10 @@ get_opt(mrb_state* mrb)
   mrb_get_args(mrb, "|o", &arg);
 
   if (!mrb_nil_p(arg)) {
-    if (!mrb_fixnum_p(arg)) {
+    arg = mrb_check_convert_type(mrb, arg, MRB_TT_FIXNUM, "Fixnum", "to_int");
+    if (mrb_nil_p(arg)) {
       mrb_raise(mrb, E_ARGUMENT_ERROR, "invalid argument type");
     }
-    arg = mrb_check_convert_type(mrb, arg, MRB_TT_FIXNUM, "Fixnum", "to_int");
     if (mrb_fixnum(arg) < 0) {
       arg = mrb_fixnum_value(0 - mrb_fixnum(arg));
     }
