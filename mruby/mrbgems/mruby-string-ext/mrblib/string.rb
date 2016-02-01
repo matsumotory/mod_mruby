@@ -1,6 +1,25 @@
 class String
 
   ##
+  #  call-seq:
+  #     String.try_convert(obj) -> string or nil
+  #
+  # Try to convert <i>obj</i> into a String, using to_str method.
+  # Returns converted string or nil if <i>obj</i> cannot be converted
+  # for any reason.
+  #
+  #     String.try_convert("str")     #=> "str"
+  #     String.try_convert(/re/)      #=> nil
+  #
+  def self.try_convert(obj)
+    if obj.respond_to?(:to_str)
+      obj.to_str
+    else
+      nil
+    end
+  end
+
+  ##
   # call-seq:
   #    string.clear    ->  string
   #
@@ -266,6 +285,29 @@ class String
       newstr << padstr
     end
     return newstr.slice(0,idx)
+  end
+
+  ##
+  #  call-seq:
+  #     str.rjust(integer, padstr=' ')   -> new_str
+  #
+  #  If <i>integer</i> is greater than the length of <i>str</i>, returns a new
+  #  <code>String</code> of length <i>integer</i> with <i>str</i> right justified
+  #  and padded with <i>padstr</i>; otherwise, returns <i>str</i>.
+  #
+  #     "hello".rjust(4)            #=> "hello"
+  #     "hello".rjust(20)           #=> "               hello"
+  #     "hello".rjust(20, '1234')   #=> "123412341234123hello"
+  def rjust(idx, padstr = ' ')
+    if idx <= self.size
+      return self
+    end
+      padsize = idx - self.size
+      newstr = padstr.dup
+      while newstr.size <= padsize
+        newstr << padstr
+      end
+    return newstr.slice(0,padsize) + self
   end
 
   #     str.upto(other_str, exclusive=false) {|s| block }   -> str
