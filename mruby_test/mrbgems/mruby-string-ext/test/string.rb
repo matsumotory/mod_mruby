@@ -3,6 +3,13 @@
 
 UTF8STRING = ("\343\201\202".size == 1)
 
+assert('String.try_convert') do
+  assert_nil String.try_convert(nil)
+  assert_nil String.try_convert(:foo)
+  assert_equal "", String.try_convert("")
+  assert_equal "1,2,3", String.try_convert("1,2,3")
+end
+
 assert('String#getbyte') do
   str1 = "hello"
   bytes1 = [104, 101, 108, 108, 111]
@@ -412,6 +419,13 @@ assert('String#ljust') do
   assert_equal "hello               ", "hello".ljust(20)
   assert_equal "hello123412341234123", "hello".ljust(20, '1234')
   assert_equal "hello", "hello".ljust(-3)
+end
+
+assert('String#rjust') do
+  assert_equal "hello", "hello".rjust(4)
+  assert_equal "               hello", "hello".rjust(20)
+  assert_equal "123412341234123hello", "hello".rjust(20, '1234')
+  assert_equal "hello", "hello".rjust(-3)
 end
 
 assert('String#upto') do
