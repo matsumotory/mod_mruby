@@ -6,17 +6,17 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include "mruby.h"
-#include "mruby/array.h"
-#include "mruby/class.h"
-#include "mruby/data.h"
-#include "mruby/hash.h"
-#include "mruby/proc.h"
-#include "mruby/range.h"
-#include "mruby/string.h"
-#include "mruby/variable.h"
-#include "mruby/gc.h"
-#include "mruby/error.h"
+#include <mruby.h>
+#include <mruby/array.h>
+#include <mruby/class.h>
+#include <mruby/data.h>
+#include <mruby/hash.h>
+#include <mruby/proc.h>
+#include <mruby/range.h>
+#include <mruby/string.h>
+#include <mruby/variable.h>
+#include <mruby/gc.h>
+#include <mruby/error.h>
 
 /*
   = Tri-color Incremental Garbage Collection
@@ -215,6 +215,7 @@ mrb_realloc(mrb_state *mrb, void *p, size_t len)
   p2 = mrb_realloc_simple(mrb, p, len);
   if (!p2 && len) {
     if (mrb->gc.out_of_memory) {
+      mrb_exc_raise(mrb, mrb_obj_value(mrb->nomem_err));
       /* mrb_panic(mrb); */
     }
     else {
@@ -613,14 +614,11 @@ gc_mark_children(mrb_state *mrb, mrb_gc *gc, struct RBasic *obj)
   case MRB_TT_ENV:
     {
       struct REnv *e = (struct REnv*)obj;
+      mrb_int i, len;
 
-      if (!MRB_ENV_STACK_SHARED_P(e)) {
-        mrb_int i, len;
-
-        len = MRB_ENV_STACK_LEN(e);
-        for (i=0; i<len; i++) {
-          mrb_gc_mark_value(mrb, e->stack[i]);
-        }
+      len = MRB_ENV_STACK_LEN(e);
+      for (i=0; i<len; i++) {
+        mrb_gc_mark_value(mrb, e->stack[i]);
       }
     }
     break;
@@ -725,9 +723,18 @@ obj_free(mrb_state *mrb, struct RBasic *obj)
   case MRB_TT_FIBER:
     {
       struct mrb_context *c = ((struct RFiber*)obj)->cxt;
+      if (c && c != mrb->root_c) {
+        mrb_callinfo *ci = c->ci;
+        mrb_callinfo *ce = c->cibase;
 
-      if (c != mrb->root_c)
-        mrb_free_context(mrb, c);
+        while (ce <= ci) {
+          struct REnv *e = ci->env;
+          if (e && !is_dead(&mrb->gc, e) && MRB_ENV_STACK_SHARED_P(e)) {
+            mrb_env_unshare(mrb, e);
+          }
+          ci--;
+        }
+      }
     }
     break;
 
@@ -1425,7 +1432,7 @@ gc_each_objects(mrb_state *mrb, mrb_gc *gc, mrb_each_object_callback *callback, 
 void
 mrb_objspace_each_objects(mrb_state *mrb, mrb_each_object_callback *callback, void *data)
 {
-  return gc_each_objects(mrb, &mrb->gc, callback, data);
+  gc_each_objects(mrb, &mrb->gc, callback, data);
 }
 
 #ifdef GC_TEST
