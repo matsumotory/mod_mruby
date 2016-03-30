@@ -20,7 +20,7 @@ MRuby::Build.new do |conf|
   conf.gem :github => 'matsumoto-r/mruby-sleep'
   conf.gem :github => 'matsumoto-r/mruby-userdata'
   conf.gem :github => 'matsumoto-r/mruby-uname'
-  conf.gem :github => 'matsumoto-r/mruby-cache'
+  conf.gem :github => 'matsumoto-r/mruby-localmemcache'
   conf.gem :github => 'matsumoto-r/mruby-mutex'
 
   # mod_mruby extended class
