@@ -23,6 +23,9 @@ assert('Struct#==', '15.2.18.4.1') do
   cc1 = c.new(1,2)
   cc2 = c.new(1,2)
   assert_true cc1 == cc2
+
+  Struct.new(:m1, :m2) { def foo; end }
+  assert_raise(NoMethodError) { Struct.new(:m1).new.foo }
 end
 
 assert('Struct#[]', '15.2.18.4.2') do
@@ -111,6 +114,14 @@ assert('wrong struct arg count') do
   end
 end
 
+assert('struct dup') do
+  c = Struct.new(:m1, :m2, :m3, :m4, :m5)
+  cc = c.new(1,2,3,4,5)
+  assert_nothing_raised {
+    assert_equal(cc, cc.dup)
+  }
+end
+
 assert('struct inspect') do
   c = Struct.new(:m1, :m2, :m3, :m4, :m5)
   cc = c.new(1,2,3,4,5)
@@ -139,4 +150,11 @@ assert('Struct#values_at') do
   assert_equal ['aki'], a.values_at(0)
   assert_equal ['io', 'aki'], a.values_at(1, 0)
   assert_raise(IndexError) { a.values_at 2 }
+end
+
+assert("Struct#dig") do
+  a = Struct.new(:blue, :purple).new('aki', Struct.new(:red).new(1))
+  assert_equal 'aki', a.dig(:blue)
+  assert_equal 1, a.dig(:purple, :red)
+  assert_equal 1, a.dig(1, 0)
 end
