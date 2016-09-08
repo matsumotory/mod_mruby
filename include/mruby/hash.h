@@ -56,6 +56,11 @@ MRB_API mrb_value mrb_check_hash_type(mrb_state *mrb, mrb_value hash);
 MRB_API mrb_value mrb_hash_empty_p(mrb_state *mrb, mrb_value self);
 
 /*
+ * Gets an array of values.
+ */
+MRB_API mrb_value mrb_hash_values(mrb_state *mrb, mrb_value hash);
+
+/*
  * Clears the hash.
  */
 MRB_API mrb_value mrb_hash_clear(mrb_state *mrb, mrb_value hash);
@@ -76,7 +81,9 @@ KHASH_DECLARE(ht, mrb_value, mrb_hash_value, TRUE)
 #define RHASH_PROCDEFAULT(h)  RHASH_IFNONE(h)
 MRB_API struct kh_ht * mrb_hash_tbl(mrb_state *mrb, mrb_value hash);
 
-#define MRB_HASH_PROC_DEFAULT 256
+#define MRB_HASH_DEFAULT      1
+#define MRB_HASH_PROC_DEFAULT 2
+#define MRB_RHASH_DEFAULT_P(h) (RHASH(h)->flags & MRB_HASH_DEFAULT)
 #define MRB_RHASH_PROCDEFAULT_P(h) (RHASH(h)->flags & MRB_HASH_PROC_DEFAULT)
 
 /* GC functions */
