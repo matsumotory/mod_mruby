@@ -118,15 +118,19 @@ typedef struct {
   const char *filename;
   int lineno;
   struct RClass *klass;
-  const char *sep;
+  char sep;
   mrb_sym method_id;
 } mrb_backtrace_entry;
 
 typedef void (*mrb_atexit_func)(struct mrb_state*);
 
+#define MRB_STATE_NO_REGEXP 1
+#define MRB_STATE_REGEXP    2
+
 typedef struct mrb_state {
   struct mrb_jmpbuf *jmp;
 
+  uint32_t flags;
   mrb_allocf allocf;                      /* memory allocation function */
   void *allocf_ud;                        /* auxiliary data of allocf */
 

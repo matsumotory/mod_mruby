@@ -17,7 +17,7 @@
 
 #define BIT_DIGITS(N)   (((N)*146)/485 + 1)  /* log2(10) =~ 146/485 */
 #define BITSPERDIG MRB_INT_BIT
-#define EXTENDSIGN(n, l) (((~0 << (n)) >> (((n)*(l)) % BITSPERDIG)) & ~(~0 << (n)))
+#define EXTENDSIGN(n, l) (((~0U << (n)) >> (((n)*(l)) % BITSPERDIG)) & ~(~0U << (n)))
 
 mrb_value mrb_str_format(mrb_state *, int, const mrb_value *, mrb_value);
 static void fmt_setup(char*,size_t,int,int,mrb_int,mrb_int);
@@ -770,15 +770,7 @@ retry:
         switch (*p) {
           case 'd':
           case 'i':
-          case 'u':
             sign = 1; break;
-          case 'o':
-          case 'x':
-          case 'X':
-          case 'b':
-          case 'B':
-            if (flags&(FPLUS|FSPACE)) sign = 1;
-            break;
           default:
             break;
         }
@@ -836,18 +828,15 @@ retry:
           }
         }
         if (sign) {
-          if (v < 0) {
-            v = -v;
-            sc = '-';
-            width--;
-          }
-          else if (flags & FPLUS) {
-            sc = '+';
-            width--;
-          }
-          else if (flags & FSPACE) {
-            sc = ' ';
-            width--;
+          if (v > 0) {
+            if (flags & FPLUS) {
+              sc = '+';
+              width--;
+            }
+            else if (flags & FSPACE) {
+              sc = ' ';
+              width--;
+            }
           }
           switch (base) {
           case 2:
