@@ -93,7 +93,14 @@ ln -sf ${APR} apr
 ln -sf ${APR_UTIL} apr-util
 
 cd ..
-./configure --prefix=`pwd`/apache --with-included-apr ${HTTPD_CONFIG_OPT}
+
+# when run the test on mac with brew openssl
+#
+# sh test.sh --with-ssl=/usr/local/Cellar/openssl/1.0.2h_1
+#
+
+./configure --prefix=`pwd`/apache --with-included-apr ${HTTPD_CONFIG_OPT} $@
+
 make NUM_THREADS=$NUM_THREADS -j $NUM_THREADS
 make install NUM_THREADS=$NUM_THREADS -j $NUM_THREADS
 cd ../..
