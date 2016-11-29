@@ -318,7 +318,8 @@ end
 assert('Array#hash', '15.2.12.5.35') do
   a = [ 1, 2, 3 ]
 
-  assert_true(a.hash.is_a? Integer)
+  #assert_true(a.hash.is_a? Integer)
+  assert_true(a.hash.is_a? Integral)  # mruby special
   assert_equal([1,2].hash, [1,2].hash)
 end
 
@@ -346,4 +347,16 @@ assert("Array (Longish inline array)") do
   h = Hash.new(0)
   ary.each {|p| h[p.class] += 1}
   assert_equal({Array=>200}, h)
+end
+
+assert("Array#rindex") do
+  class Sneaky
+    def ==(*)
+      $a.clear
+      $a.replace([1])
+      false
+    end
+  end
+  $a = [2, 3, 4, 5, 6, 7, 8, 9, 10, Sneaky.new]
+  assert_equal 0, $a.rindex(1)
 end

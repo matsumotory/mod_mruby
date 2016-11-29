@@ -11,6 +11,7 @@
 #include <mruby/string.h>
 #include <mruby/variable.h>
 #include <mruby/error.h>
+#include <mruby/istruct.h>
 
 typedef enum {
   NOEX_PUBLIC    = 0x00,
@@ -300,6 +301,9 @@ init_copy(mrb_state *mrb, mrb_value dest, mrb_value obj)
     case MRB_TT_DATA:
     case MRB_TT_EXCEPTION:
       mrb_iv_copy(mrb, dest, obj);
+      break;
+    case MRB_TT_ISTRUCT:
+      mrb_istruct_copy(dest, obj);
       break;
 
     default:
@@ -960,10 +964,11 @@ obj_respond_to(mrb_state *mrb, mrb_value self)
   if (!respond_to_p) {
     rtm_id = mrb_intern_lit(mrb, "respond_to_missing?");
     if (basic_obj_respond_to(mrb, self, rtm_id, !priv)) {
-      mrb_value args[2];
+      mrb_value args[2], v;
       args[0] = mid;
       args[1] = mrb_bool_value(priv);
-      return mrb_funcall_argv(mrb, self, rtm_id, 2, args);
+      v = mrb_funcall_argv(mrb, self, rtm_id, 2, args);
+      return mrb_bool_value(mrb_bool(v));
     }
   }
   return mrb_bool_value(respond_to_p);
@@ -1073,7 +1078,8 @@ mrb_local_variables(mrb_state *mrb, mrb_value self)
     struct REnv *e = proc->env;
 
     while (e) {
-      if (!MRB_PROC_CFUNC_P(mrb->c->cibase[e->cioff].proc)) {
+      if (MRB_ENV_STACK_SHARED_P(e) &&
+          !MRB_PROC_CFUNC_P(mrb->c->cibase[e->cioff].proc)) {
         irep = mrb->c->cibase[e->cioff].proc->body.irep;
         if (irep->lv) {
           for (i = 0; i + 1 < irep->nlocals; ++i) {

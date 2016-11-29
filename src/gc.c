@@ -65,7 +65,7 @@
 
   mruby implementer and C extension library writer must insert a write
   barrier when updating a reference from a field of an object.
-  When updating a reference from a field of object A to object B, 
+  When updating a reference from a field of object A to object B,
   two different types of write barrier are available:
 
     * mrb_field_write_barrier - target B object for a mark.
@@ -736,7 +736,8 @@ obj_free(mrb_state *mrb, struct RBasic *obj)
 
         while (ce <= ci) {
           struct REnv *e = ci->env;
-          if (e && !is_dead(&mrb->gc, e) && MRB_ENV_STACK_SHARED_P(e)) {
+          if (e && !is_dead(&mrb->gc, e) &&
+              e->tt == MRB_TT_ENV && MRB_ENV_STACK_SHARED_P(e)) {
             mrb_env_unshare(mrb, e);
           }
           ci--;
