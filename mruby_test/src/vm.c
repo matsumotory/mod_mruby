@@ -719,13 +719,20 @@ argnum_error(mrb_state *mrb, mrb_int num)
 #define CODE_FETCH_HOOK(mrb, irep, pc, regs)
 #endif
 
+#ifdef MRB_BYTECODE_DECODE_OPTION
+#define BYTECODE_DECODER(x) ((mrb)->bytecode_decoder)?(mrb)->bytecode_decoder((mrb), (x)):(x)
+#else
+#define BYTECODE_DECODER(x) (x)
+#endif
+
+
 #if defined __GNUC__ || defined __clang__ || defined __INTEL_COMPILER
 #define DIRECT_THREADED
 #endif
 
 #ifndef DIRECT_THREADED
 
-#define INIT_DISPATCH for (;;) { i = *pc; CODE_FETCH_HOOK(mrb, irep, pc, regs); switch (GET_OPCODE(i)) {
+#define INIT_DISPATCH for (;;) { i = BYTECODE_DECODER(*pc); CODE_FETCH_HOOK(mrb, irep, pc, regs); switch (GET_OPCODE(i)) {
 #define CASE(op) case op:
 #define NEXT pc++; break
 #define JUMP break
@@ -735,8 +742,8 @@ argnum_error(mrb_state *mrb, mrb_int num)
 
 #define INIT_DISPATCH JUMP; return mrb_nil_value();
 #define CASE(op) L_ ## op:
-#define NEXT i=*++pc; CODE_FETCH_HOOK(mrb, irep, pc, regs); goto *optable[GET_OPCODE(i)]
-#define JUMP i=*pc; CODE_FETCH_HOOK(mrb, irep, pc, regs); goto *optable[GET_OPCODE(i)]
+#define NEXT i=BYTECODE_DECODER(*++pc); CODE_FETCH_HOOK(mrb, irep, pc, regs); goto *optable[GET_OPCODE(i)]
+#define JUMP i=BYTECODE_DECODER(*pc); CODE_FETCH_HOOK(mrb, irep, pc, regs); goto *optable[GET_OPCODE(i)]
 
 #define END_DISPATCH
 
@@ -1087,14 +1094,22 @@ RETRY_TRY_BLOCK:
       mrb_callinfo *ci;
       mrb_value recv, result;
       mrb_sym mid = syms[GETARG_B(i)];
+      int bidx;
 
       recv = regs[a];
+      if (n == CALL_MAXARGS) {
+        bidx = a+2;
+      }
+      else {
+        bidx = a+n+1;
+      }
       if (GET_OPCODE(i) != OP_SENDB) {
-        if (n == CALL_MAXARGS) {
-          SET_NIL_VALUE(regs[a+2]);
-        }
-        else {
-          SET_NIL_VALUE(regs[a+n+1]);
+        SET_NIL_VALUE(regs[bidx]);
+      }
+      else {
+        mrb_value blk = regs[bidx];
+        if (!mrb_nil_p(blk) && mrb_type(blk) != MRB_TT_PROC) {
+          regs[bidx] = mrb_convert_type(mrb, blk, MRB_TT_PROC, "Proc", "to_proc");
         }
       }
       c = mrb_class(mrb, recv);
@@ -1413,9 +1428,6 @@ RETRY_TRY_BLOCK:
       int len = m1 + o + r + m2;
       mrb_value *blk = &argv[argc < 0 ? 1 : argc];
 
-      if (!mrb_nil_p(*blk) && mrb_type(*blk) != MRB_TT_PROC) {
-        *blk = mrb_convert_type(mrb, *blk, MRB_TT_PROC, "Proc", "to_proc");
-      }
       if (argc < 0) {
         struct RArray *ary = mrb_ary_ptr(regs[1]);
         argv = ary->ptr;
@@ -1501,6 +1513,7 @@ RETRY_TRY_BLOCK:
       /* A B     return R(A) (B=normal,in-block return/break) */
       if (mrb->exc) {
         mrb_callinfo *ci;
+        mrb_value *stk;
         int eidx;
 
       L_RAISE:
@@ -1512,6 +1525,7 @@ RETRY_TRY_BLOCK:
           if (ci->ridx == 0) goto L_STOP;
           goto L_RESCUE;
         }
+        stk = mrb->c->stack;
         while (ci[0].ridx == ci[-1].ridx) {
           cipop(mrb);
           ci = mrb->c->ci;
@@ -1521,6 +1535,7 @@ RETRY_TRY_BLOCK:
             MRB_THROW(prev_jmp);
           }
           if (ci == mrb->c->cibase) {
+            mrb->c->stack = stk;
             while (eidx > 0) {
               ecall(mrb, --eidx);
             }
@@ -2246,7 +2261,7 @@ RETRY_TRY_BLOCK:
 
     CASE(OP_CLASS) {
       /* A B    R(A) := newclass(R(A),Syms(B),R(A+1)) */
-      struct RClass *c = 0;
+      struct RClass *c = 0, *baseclass;
       int a = GETARG_A(i);
       mrb_value base, super;
       mrb_sym id = syms[GETARG_B(i)];
@@ -2254,7 +2269,10 @@ RETRY_TRY_BLOCK:
       base = regs[a];
       super = regs[a+1];
       if (mrb_nil_p(base)) {
-        base = mrb_obj_value(mrb->c->ci->target_class);
+        baseclass = mrb->c->ci->proc->target_class;
+        if (!baseclass) baseclass = mrb->c->ci->target_class;
+
+        base = mrb_obj_value(baseclass);
       }
       c = mrb_vm_define_class(mrb, base, super, id);
       regs[a] = mrb_obj_value(c);
@@ -2264,14 +2282,17 @@ RETRY_TRY_BLOCK:
 
     CASE(OP_MODULE) {
       /* A B            R(A) := newmodule(R(A),Syms(B)) */
-      struct RClass *c = 0;
+      struct RClass *c = 0, *baseclass;
       int a = GETARG_A(i);
       mrb_value base;
       mrb_sym id = syms[GETARG_B(i)];
 
       base = regs[a];
       if (mrb_nil_p(base)) {
-        base = mrb_obj_value(mrb->c->ci->target_class);
+        baseclass = mrb->c->ci->proc->target_class;
+        if (!baseclass) baseclass = mrb->c->ci->target_class;
+
+        base = mrb_obj_value(baseclass);
       }
       c = mrb_vm_define_module(mrb, base, id);
       regs[a] = mrb_obj_value(c);
@@ -2286,6 +2307,9 @@ RETRY_TRY_BLOCK:
       mrb_value recv = regs[a];
       struct RProc *p;
 
+      /* prepare closure */
+      p = mrb_closure_new(mrb, irep->reps[GETARG_Bx(i)]);
+
       /* prepare stack */
       ci = cipush(mrb);
       ci->pc = pc + 1;
@@ -2298,7 +2322,7 @@ RETRY_TRY_BLOCK:
       /* prepare stack */
       mrb->c->stack += a;
 
-      p = mrb_proc_new(mrb, irep->reps[GETARG_Bx(i)]);
+      /* setup closure */
       p->target_class = ci->target_class;
       ci->proc = p;
 

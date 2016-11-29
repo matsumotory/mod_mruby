@@ -41,6 +41,7 @@ static void yyerror(parser_state *p, const char *s);
 static void yywarn(parser_state *p, const char *s);
 static void yywarning(parser_state *p, const char *s);
 static void backref_error(parser_state *p, node *n);
+static void void_expr_error(parser_state *p, node *n);
 static void tokadd(parser_state *p, int32_t c);
 
 #define identchar(c) (ISALNUM(c) || (c) == '_' || !ISASCII(c))
@@ -1089,7 +1090,7 @@ heredoc_end(parser_state *p)
 
 %token <id>  tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tLABEL
 %token <nd>  tINTEGER tFLOAT tCHAR tXSTRING tREGEXP
-%token <nd>  tSTRING tSTRING_PART tSTRING_MID
+%token <nd>  tSTRING tSTRING_PART tSTRING_MID tLABEL_END
 %token <nd>  tNTH_REF tBACK_REF
 %token <num> tREGEXP_END
 
@@ -1097,7 +1098,7 @@ heredoc_end(parser_state *p)
 %type <nd> literal numeric cpath symbol
 %type <nd> top_compstmt top_stmts top_stmt
 %type <nd> bodystmt compstmt stmts stmt expr arg primary command command_call method_call
-%type <nd> expr_value arg_value arg_rhs primary_value
+%type <nd> expr_value arg_rhs primary_value
 %type <nd> if_tail opt_else case_body cases opt_rescue exc_list exc_var opt_ensure
 %type <nd> args call_args opt_call_args
 %type <nd> paren_args opt_paren_args variable
@@ -1322,7 +1323,7 @@ stmt            : keyword_alias fsym {p->lstate = EXPR_FNAME;} fsym
                     {
                       $$ = new_asgn(p, $1, new_array(p, $3));
                     }
-                | mlhs '=' arg_value
+                | mlhs '=' arg
                     {
                       $$ = new_masgn(p, $1, $3);
                     }
@@ -1401,7 +1402,10 @@ expr            : command_call
 expr_value      : expr
                     {
                       if (!$1) $$ = new_nil(p);
-                      else $$ = $1;
+                      else {
+                        void_expr_error(p, $1);
+                        $$ = $1;
+                      }
                     }
                 ;
 
@@ -1907,13 +1911,6 @@ arg             : lhs '=' arg_rhs
                     }
                 ;
 
-arg_value       : arg
-                    {
-                      $$ = $1;
-                      if (!$$) $$ = new_nil(p);
-                    }
-                ;
-
 aref_args       : none
                 | args trailer
                     {
@@ -1931,9 +1928,15 @@ aref_args       : none
                     }
                 ;
 
-arg_rhs         : arg   %prec tOP_ASGN
+arg_rhs         : arg %prec tOP_ASGN
+                    {
+                      void_expr_error(p, $1);
+                      $$ = $1;
+                    }
                 | arg modifier_rescue arg
                     {
+                      void_expr_error(p, $1);
+                      void_expr_error(p, $3);
                       $$ = new_mod_rescue(p, $1, $3);
                     }
                 ;
@@ -2005,7 +2008,7 @@ command_args    :  {
                     }
                 ;
 
-block_arg       : tAMPER arg_value
+block_arg       : tAMPER arg
                     {
                       $$ = new_block_arg(p, $2);
                     }
@@ -2021,44 +2024,53 @@ opt_block_arg   : ',' block_arg
                     }
                 ;
 
-args            : arg_value
+args            : arg
                     {
+                      void_expr_error(p, $1);
                       $$ = cons($1, 0);
                       NODE_LINENO($$, $1);
                     }
-                | tSTAR arg_value
+                | tSTAR arg
                     {
+                      void_expr_error(p, $2);
                       $$ = cons(new_splat(p, $2), 0);
                       NODE_LINENO($$, $2);
                     }
-                | args ',' arg_value
+                | args ',' arg
                     {
+                      void_expr_error(p, $3);
                       $$ = push($1, $3);
                     }
-                | args ',' tSTAR arg_value
+                | args ',' tSTAR arg
                     {
+                      void_expr_error(p, $4);
                       $$ = push($1, new_splat(p, $4));
                     }
-                | args ',' heredoc_bodies arg_value
+                | args ',' heredoc_bodies arg
                     {
+                      void_expr_error(p, $4);
                       $$ = push($1, $4);
                     }
-                | args ',' heredoc_bodies tSTAR arg_value
+                | args ',' heredoc_bodies tSTAR arg
                     {
+                      void_expr_error(p, $5);
                       $$ = push($1, new_splat(p, $5));
                     }
                 ;
 
-mrhs            : args ',' arg_value
+mrhs            : args ',' arg
                     {
+                      void_expr_error(p, $3);
                       $$ = push($1, $3);
                     }
-                | args ',' tSTAR arg_value
+                | args ',' tSTAR arg
                     {
+                      void_expr_error(p, $4);
                       $$ = push($1, new_splat(p, $4));
                     }
-                | tSTAR arg_value
+                | tSTAR arg
                     {
+                      void_expr_error(p, $2);
                       $$ = list1(new_splat(p, $2));
                     }
                 ;
@@ -2688,7 +2700,7 @@ opt_rescue      : keyword_rescue exc_list exc_var then
                 | none
                 ;
 
-exc_list        : arg_value
+exc_list        : arg
                     {
                         $$ = list1($1);
                     }
@@ -2972,7 +2984,7 @@ superclass      : /* term */
                   expr_value term
                     {
                       $$ = $3;
-                    } /* 
+                    } /*
                 | error term
                     {
                       yyerrok;
@@ -3115,7 +3127,7 @@ f_opt_asgn      : tIDENTIFIER '='
                     }
                 ;
 
-f_opt           : f_opt_asgn arg_value
+f_opt           : f_opt_asgn arg
                     {
                       $$ = cons(nsym($1), $2);
                     }
@@ -3233,13 +3245,25 @@ assocs          : assoc
                     }
                 ;
 
-assoc           : arg_value tASSOC arg_value
+assoc           : arg tASSOC arg
                     {
                       $$ = cons($1, $3);
                     }
-                | tLABEL arg_value
+                | tLABEL arg
                     {
                       $$ = cons(new_sym(p, $1), $2);
+                    }
+                | tLABEL_END arg
+                    {
+                      $$ = cons(new_sym(p, new_strsym(p, $1)), $2);
+                    }
+                | tSTRING_BEG tLABEL_END arg
+                    {
+                      $$ = cons(new_sym(p, new_strsym(p, $2)), $3);
+                    }
+                | tSTRING_BEG string_rep tLABEL_END arg
+                    {
+                      $$ = cons(new_dsym(p, push($2, $3)), $4);
                     }
                 ;
 
@@ -3415,6 +3439,25 @@ backref_error(parser_state *p, node *n)
   }
   else {
     mrb_bug(p->mrb, "Internal error in backref_error() : n=>car == %S", mrb_fixnum_value(c));
+  }
+}
+
+static void
+void_expr_error(parser_state *p, node *n)
+{
+  int c;
+
+  c = (int)(intptr_t)n->car;
+  switch (c) {
+  case NODE_BREAK:
+  case NODE_RETURN:
+  case NODE_NEXT:
+  case NODE_REDO:
+  case NODE_RETRY:
+    yyerror(p, "void value expression");
+    break;
+  default:
+    break;
   }
 }
 
@@ -3895,6 +3938,8 @@ parse_string(parser_state *p)
   int end = (intptr_t)p->lex_strterm->cdr->cdr->cdr;
   parser_heredoc_info *hinf = (type & STR_FUNC_HEREDOC) ? parsing_heredoc_inf(p) : NULL;
 
+  if (beg == 0) beg = -3;       /* should never happen */
+  if (end == 0) end = -3;
   newtok(p);
   while ((c = nextc(p)) != end || nest_level != 0) {
     if (hinf && (c == '\n' || c < 0)) {
@@ -4080,8 +4125,13 @@ parse_string(parser_state *p)
 
     return tREGEXP;
   }
-
   yylval.nd = new_str(p, tok(p), toklen(p));
+  if (IS_LABEL_SUFFIX(0)) {
+    p->lstate = EXPR_BEG;
+    nextc(p);
+    return tLABEL_END;
+  }
+
   return tSTRING;
 }
 
@@ -5460,7 +5510,10 @@ mrb_parser_parse(parser_state *p, mrbc_context *c)
     p->lex_strterm = NULL;
 
     parser_init_cxt(p, c);
-    yyparse(p);
+    if (yyparse(p) != 0 || p->nerr > 0) {
+      p->tree = 0;
+      return;
+    }
     if (!p->tree) {
       p->tree = new_nil(p);
     }
@@ -6487,8 +6540,8 @@ mrb_parser_dump(mrb_state *mrb, node *tree, int offset)
     break;
 
   case NODE_HEREDOC:
-    printf("NODE_HEREDOC:\n");
-    mrb_parser_dump(mrb, ((parser_heredoc_info*)tree)->doc, offset+1);
+    printf("NODE_HEREDOC (<<%s):\n", ((parser_heredoc_info*)tree)->term);
+    dump_recur(mrb, ((parser_heredoc_info*)tree)->doc, offset+1);
     break;
 
   default:

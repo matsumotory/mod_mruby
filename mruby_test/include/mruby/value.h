@@ -116,7 +116,8 @@ enum mrb_vtype {
   MRB_TT_ENV,         /*  20 */
   MRB_TT_DATA,        /*  21 */
   MRB_TT_FIBER,       /*  22 */
-  MRB_TT_MAXDEFINE    /*  23 */
+  MRB_TT_ISTRUCT,     /*  23 */
+  MRB_TT_MAXDEFINE    /*  24 */
 };
 
 #include <mruby/object.h>
@@ -210,6 +211,8 @@ mrb_obj_value(void *p)
 {
   mrb_value v;
   SET_OBJ_VALUE(v, (struct RBasic*)p);
+  mrb_assert(p == mrb_ptr(v));
+  mrb_assert(((struct RBasic*)p)->tt == mrb_type(v));
   return v;
 }
 
