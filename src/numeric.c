@@ -13,6 +13,7 @@
 #include <mruby/array.h>
 #include <mruby/numeric.h>
 #include <mruby/string.h>
+#include <mruby/class.h>
 
 #ifdef MRB_USE_FLOAT
 #define trunc(f) truncf(f)
@@ -356,7 +357,11 @@ flo_shift(mrb_state *mrb, mrb_value x, mrb_int width)
     while (width++) {
       val /= 2;
     }
+#if defined(_ISOC99_SOURCE)
     val = trunc(val);
+#else
+    val = val > 0 ? floor(val) : ceil(val);
+#endif
     if (val == 0 && mrb_float(x) < 0) {
       return mrb_fixnum_value(-1);
     }
@@ -1265,6 +1270,7 @@ mrb_init_numeric(mrb_state *mrb)
 
   /* Integer Class */
   integer = mrb_define_class(mrb, "Integer",  numeric);                          /* 15.2.8 */
+  MRB_SET_INSTANCE_TT(integer, MRB_TT_FIXNUM);
   mrb_undef_class_method(mrb, integer, "new");
   mrb_define_method(mrb, integer, "to_i", int_to_i, MRB_ARGS_NONE());            /* 15.2.8.3.24 */
   mrb_define_method(mrb, integer, "to_int", int_to_i, MRB_ARGS_NONE());
@@ -1291,6 +1297,7 @@ mrb_init_numeric(mrb_state *mrb)
 
   /* Float Class */
   mrb->float_class = fl = mrb_define_class(mrb, "Float", numeric);                 /* 15.2.9 */
+  MRB_SET_INSTANCE_TT(fl, MRB_TT_FLOAT);
   mrb_undef_class_method(mrb,  fl, "new");
   mrb_define_method(mrb, fl,      "+",         flo_plus,         MRB_ARGS_REQ(1)); /* 15.2.9.3.1  */
   mrb_define_method(mrb, fl,      "-",         flo_minus,        MRB_ARGS_REQ(1)); /* 15.2.9.3.2  */
