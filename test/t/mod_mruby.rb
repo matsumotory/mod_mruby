@@ -203,4 +203,9 @@ t.assert('mod_mruby', 'location /rack_base_push/index.txt') do
   t.assert_equal "</index.js>; rel=preload", res["link"]
 end
 
+t.assert('mod_mruby', 'location /response_time') do
+  res = HttpRequest.new.get base + '/response_time'
+  t.assert_equal "2", res["body"]
+end
+
 t.report

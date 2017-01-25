@@ -14,6 +14,7 @@
 #include "http_config.h"
 #include "http_core.h"
 #include "http_protocol.h"
+#include "util_time.h"
 
 request_rec *mrb_request_rec_state = NULL;
 
@@ -656,6 +657,14 @@ static mrb_value ap_mrb_get_request_no_local_copy(mrb_state *mrb, mrb_value str)
   return mrb_fixnum_value(val);
 }
 
+static mrb_value ap_mrb_get_request_response_time(mrb_state *mrb, mrb_value self)
+{
+  request_rec *r = ap_mrb_get_request();
+  apr_time_t duration = apr_time_now() - r->request_time;
+
+  return mrb_float_value(mrb, ((float)duration / (float)1000000));
+}
+
 static mrb_value ap_mrb_run_handler(mrb_state *mrb, mrb_value self)
 {
   request_rec *r = ap_mrb_get_request();
@@ -791,6 +800,7 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_request, "eos_sent", ap_mrb_get_request_eos_sent, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_request, "no_cache", ap_mrb_get_request_no_cache, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_request, "no_local_copy", ap_mrb_get_request_no_local_copy, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_request, "response_time", ap_mrb_get_request_response_time, MRB_ARGS_NONE());
 
   mrb_define_method(mrb, class_request, "main?", ap_mrb_get_request_main, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_request, "sub_request?", ap_mrb_get_request_main, MRB_ARGS_NONE());
