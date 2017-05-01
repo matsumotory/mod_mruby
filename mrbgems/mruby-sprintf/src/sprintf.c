@@ -116,8 +116,9 @@ mrb_fix2binstr(mrb_state *mrb, mrb_value x, int base)
 
 #define CHECK(l) do {\
 /*  int cr = ENC_CODERANGE(result);*/\
-  while (blen + (l) >= bsiz) {\
+  while ((l) >= bsiz - blen) {\
     bsiz*=2;\
+    if (bsiz < 0) mrb_raise(mrb, E_ARGUMENT_ERROR, "too big specifier"); \
   }\
   mrb_str_resize(mrb, result, bsiz);\
 /*  ENC_CODERANGE_SET(result, cr);*/\
@@ -219,7 +220,7 @@ check_name_arg(mrb_state *mrb, int posarg, const char *name, int len)
     tmp_v = GETNEXTARG(); \
     p = t; \
   } \
-  num = mrb_fixnum(tmp_v); \
+  num = mrb_int(mrb, tmp_v); \
 } while (0)
 
 static mrb_value
@@ -565,6 +566,7 @@ mrb_str_format(mrb_state *mrb, int argc, const mrb_value *argv, mrb_value fmt)
     mrb_sym id = 0;
 
     for (t = p; t < end && *t != '%'; t++) ;
+    if (t + 1 == end) ++t;
     PUSH(p, t - p);
     if (t >= end)
       goto sprint_exit; /* end of fmt string */
@@ -713,21 +715,15 @@ retry:
         c = RSTRING_PTR(tmp);
         n = RSTRING_LEN(tmp);
         if (!(flags & FWIDTH)) {
-          CHECK(n);
-          memcpy(buf+blen, c, n);
-          blen += n;
+          PUSH(c, n);
         }
         else if ((flags & FMINUS)) {
-          CHECK(n);
-          memcpy(buf+blen, c, n);
-          blen += n;
+          PUSH(c, n);
           if (width>0) FILL(' ', width-1);
         }
         else {
           if (width>0) FILL(' ', width-1);
-          CHECK(n);
-          memcpy(buf+blen, c, n);
-          blen += n;
+          PUSH(c, n);
         }
       }
       break;
@@ -747,7 +743,8 @@ retry:
           mrb_int tmp_n = len;
           RSTRING(result)->flags &= ~MRB_STR_EMBED_LEN_MASK;
           RSTRING(result)->flags |= tmp_n << MRB_STR_EMBED_LEN_SHIFT;
-        } else {
+        }
+        else {
           RSTRING(result)->as.heap.len = blen;
         }
         if (flags&(FPREC|FWIDTH)) {
@@ -764,19 +761,11 @@ retry:
           if ((flags&FWIDTH) && (width > slen)) {
             width -= (int)slen;
             if (!(flags&FMINUS)) {
-              CHECK(width);
-              while (width--) {
-                buf[blen++] = ' ';
-              }
+              FILL(' ', width);
             }
-            CHECK(len);
-            memcpy(&buf[blen], RSTRING_PTR(str), len);
-            blen += len;
+            PUSH(RSTRING_PTR(str), len);
             if (flags&FMINUS) {
-              CHECK(width);
-              while (width--) {
-                buf[blen++] = ' ';
-              }
+              FILL(' ', width);
             }
             break;
           }
@@ -891,7 +880,7 @@ retry:
         }
         else {
           s = nbuf;
-          if (v < 0) {
+          if (base != 10 && v < 0) {
             dots = 1;
           }
           switch (base) {
@@ -981,11 +970,8 @@ retry:
           width -= prec;
         }
 
-        if (!(flags&FMINUS)) {
-          CHECK(width);
-          while (width-- > 0) {
-            buf[blen++] = ' ';
-          }
+        if (!(flags&FMINUS) && width > 0) {
+          FILL(' ', width);
         }
 
         if (sc) PUSH(&sc, 1);
@@ -994,26 +980,20 @@ retry:
           int plen = (int)strlen(prefix);
           PUSH(prefix, plen);
         }
-        CHECK(prec - len);
         if (dots) PUSH("..", 2);
 
         if (v < 0) {
           char c = sign_bits(base, p);
-          while (len < prec--) {
-            buf[blen++] = c;
-          }
+          FILL(c, prec - len);
         }
         else if ((flags & (FMINUS|FPREC)) != FMINUS) {
           char c = '0';
-          while (len < prec--) {
-            buf[blen++] = c;
-          }
+          FILL(c, prec - len);
         }
 
         PUSH(s, len);
-        CHECK(width);
-        while (width-- > 0) {
-          buf[blen++] = ' ';
+        if (width > 0) {
+          FILL(' ', width);
         }
       }
       break;
@@ -1034,6 +1014,7 @@ retry:
         if (!isfinite(fval)) {
           const char *expr;
           const int elen = 3;
+          char sign = '\0';
 
           if (isnan(fval)) {
             expr = "NaN";
@@ -1042,32 +1023,26 @@ retry:
             expr = "Inf";
           }
           need = elen;
-          if ((!isnan(fval) && fval < 0.0) || (flags & FPLUS))
-            need++;
+          if (!isnan(fval) && fval < 0.0)
+            sign = '-';
+          else if (flags & (FPLUS|FSPACE))
+            sign = (flags & FPLUS) ? '+' : ' ';
+          if (sign)
+	    ++need;
           if ((flags & FWIDTH) && need < width)
             need = width;
 
-          CHECK(need + 1);
-          snprintf(&buf[blen], need + 1, "%*s", need, "");
+          FILL(' ', need);
           if (flags & FMINUS) {
-            if (!isnan(fval) && fval < 0.0)
-              buf[blen++] = '-';
-            else if (flags & FPLUS)
-              buf[blen++] = '+';
-            else if (flags & FSPACE)
-              blen++;
-            memcpy(&buf[blen], expr, elen);
+            if (sign)
+              buf[blen - need--] = sign;
+            memcpy(&buf[blen - need], expr, elen);
           }
           else {
-            if (!isnan(fval) && fval < 0.0)
-              buf[blen + need - elen - 1] = '-';
-            else if (flags & FPLUS)
-              buf[blen + need - elen - 1] = '+';
-            else if ((flags & FSPACE) && need > width)
-              blen++;
-            memcpy(&buf[blen + need - elen], expr, elen);
+            if (sign)
+              buf[blen - elen - 1] = sign;
+            memcpy(&buf[blen - elen], expr, elen);
           }
-          blen += strlen(&buf[blen]);
           break;
         }
 
@@ -1083,9 +1058,16 @@ retry:
         if ((flags&FWIDTH) && need < width)
           need = width;
         need += 20;
+        if (need <= 0) {
+          mrb_raise(mrb, E_ARGUMENT_ERROR,
+                    (width > prec ? "width too big" : "prec too big"));
+        }
 
         CHECK(need);
         n = snprintf(&buf[blen], need, fbuf, fval);
+        if (n < 0) {
+          mrb_raise(mrb, E_RUNTIME_ERROR, "formatting error");
+        }
         blen += n;
       }
       break;

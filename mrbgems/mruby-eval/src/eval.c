@@ -4,6 +4,10 @@
 #include <mruby/irep.h>
 #include <mruby/proc.h>
 #include <mruby/opcode.h>
+#include <mruby/error.h>
+
+mrb_value mrb_exec_irep(mrb_state *mrb, mrb_value self, struct RProc *p);
+mrb_value mrb_obj_instance_eval(mrb_state *mrb, mrb_value self);
 
 static struct mrb_irep *
 get_closure_irep(mrb_state *mrb, int level)
@@ -27,7 +31,7 @@ get_closure_irep(mrb_state *mrb, int level)
 
   if (!e) return NULL;
   if (!MRB_ENV_STACK_SHARED_P(e)) return NULL;
-
+  c = e->cxt.c;
   proc = c->cibase[e->cioff].proc;
 
   if (!proc || MRB_PROC_CFUNC_P(proc)) {
@@ -128,6 +132,12 @@ patch_irep(mrb_state *mrb, mrb_irep *irep, int bnest)
         }
       }
       break;
+
+    case OP_STOP:
+      if (mrb->c->ci->acc >= 0) {
+        irep->iseq[i] = MKOP_AB(OP_RETURN, irep->nlocals, OP_R_NORMAL);
+      }
+      break;
     }
   }
 }
@@ -166,12 +176,14 @@ create_proc_from_string(mrb_state *mrb, char *s, int len, mrb_value binding, con
 
   if (0 < p->nerr) {
     /* parse error */
-    char buf[256];
-    int n;
-    n = snprintf(buf, sizeof(buf), "line %d: %s\n", p->error_buffer[0].lineno, p->error_buffer[0].message);
+    mrb_value str;
+
+    str = mrb_format(mrb, "line %S: %S",
+                     mrb_fixnum_value(p->error_buffer[0].lineno),
+                     mrb_str_new_cstr(mrb, p->error_buffer[0].message));
     mrb_parser_free(p);
     mrbc_context_free(mrb, cxt);
-    mrb_exc_raise(mrb, mrb_exc_new(mrb, E_SYNTAX_ERROR, buf, n));
+    mrb_exc_raise(mrb, mrb_exc_new_str(mrb, E_SYNTAX_ERROR, str));
   }
 
   proc = mrb_generate_code(mrb, p);
@@ -187,11 +199,12 @@ create_proc_from_string(mrb_state *mrb, char *s, int len, mrb_value binding, con
   e = c->ci[-1].proc->env;
   if (!e) e = c->ci[-1].env;
   e = (struct REnv*)mrb_obj_alloc(mrb, MRB_TT_ENV, (struct RClass*)e);
-  e->mid = c->ci[-1].mid;
+  e->cxt.c = c;
   e->cioff = c->ci - c->cibase - 1;
   e->stack = c->ci->stackent;
   MRB_SET_ENV_STACK_LEN(e, c->ci[-1].proc->body.irep->nlocals);
-  c->ci->env = e;
+  c->ci->target_class = proc->target_class;
+  c->ci->env = 0;
   proc->env = e;
   patch_irep(mrb, proc->body.irep, 0);
 
@@ -202,6 +215,19 @@ create_proc_from_string(mrb_state *mrb, char *s, int len, mrb_value binding, con
 }
 
 static mrb_value
+exec_irep(mrb_state *mrb, mrb_value self, struct RProc *proc)
+{
+  if (mrb->c->ci->acc < 0) {
+    mrb_value ret = mrb_top_run(mrb, proc, mrb->c->stack[0], 0);
+    if (mrb->exc) {
+      mrb_exc_raise(mrb, mrb_obj_value(mrb->exc));
+    }
+    return ret;
+  }
+  return mrb_exec_irep(mrb, self, proc);
+}
+
+static mrb_value
 f_eval(mrb_state *mrb, mrb_value self)
 {
   char *s;
@@ -209,28 +235,18 @@ f_eval(mrb_state *mrb, mrb_value self)
   mrb_value binding = mrb_nil_value();
   char *file = NULL;
   mrb_int line = 1;
-  mrb_value ret;
   struct RProc *proc;
 
   mrb_get_args(mrb, "s|ozi", &s, &len, &binding, &file, &line);
 
   proc = create_proc_from_string(mrb, s, len, binding, file, line);
-  ret = mrb_top_run(mrb, proc, mrb->c->stack[0], 0);
-  if (mrb->exc) {
-    mrb_exc_raise(mrb, mrb_obj_value(mrb->exc));
-  }
-
-  return ret;
+  mrb_assert(!MRB_PROC_CFUNC_P(proc));
+  return exec_irep(mrb, self, proc);
 }
-
-mrb_value mrb_obj_instance_eval(mrb_state *mrb, mrb_value self);
-
-#define CI_ACC_SKIP    -1
 
 static mrb_value
 f_instance_eval(mrb_state *mrb, mrb_value self)
 {
-  struct mrb_context *c = mrb->c;
   mrb_value b;
   mrb_int argc; mrb_value *argv;
 
@@ -245,12 +261,12 @@ f_instance_eval(mrb_state *mrb, mrb_value self)
     struct RProc *proc;
 
     mrb_get_args(mrb, "s|zi", &s, &len, &file, &line);
-    c->ci->acc = CI_ACC_SKIP;
     cv = mrb_singleton_class(mrb, self);
-    c->ci->target_class = mrb_class_ptr(cv);
     proc = create_proc_from_string(mrb, s, len, mrb_nil_value(), file, line);
+    proc->target_class = mrb_class_ptr(cv);
     mrb->c->ci->env = NULL;
-    return mrb_vm_run(mrb, proc, mrb->c->stack[0], 0);
+    mrb_assert(!MRB_PROC_CFUNC_P(proc));
+    return exec_irep(mrb, self, proc);
   }
   else {
     mrb_get_args(mrb, "&", &b);
