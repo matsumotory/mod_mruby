@@ -759,7 +759,7 @@ mrb_mod_class_variables(mrb_state *mrb, mrb_value mod)
 }
 
 MRB_API mrb_value
-mrb_mod_cv_get(mrb_state *mrb, struct RClass * c, mrb_sym sym)
+mrb_mod_cv_get(mrb_state *mrb, struct RClass *c, mrb_sym sym)
 {
   struct RClass * cls = c;
   mrb_value v;
@@ -819,12 +819,32 @@ mrb_mod_cv_set(mrb_state *mrb, struct RClass *c, mrb_sym sym, mrb_value v)
     c = c->super;
   }
 
-  if (!cls->iv) {
-    cls->iv = iv_new(mrb);
+  if (cls && cls->tt == MRB_TT_SCLASS) {
+    mrb_value klass;
+
+    klass = mrb_obj_iv_get(mrb, (struct RObject*)cls,
+                           mrb_intern_lit(mrb, "__attached__"));
+    switch (mrb_type(klass)) {
+    case MRB_TT_CLASS:
+    case MRB_TT_MODULE:
+    case MRB_TT_SCLASS:
+      c = mrb_class_ptr(klass);
+      break;
+    default:
+      c = cls;
+      break;
+    }
+  }
+  else{
+    c = cls;
   }
 
-  mrb_write_barrier(mrb, (struct RBasic*)cls);
-  iv_put(mrb, cls->iv, sym, v);
+  if (!c->iv) {
+    c->iv = iv_new(mrb);
+  }
+
+  mrb_write_barrier(mrb, (struct RBasic*)c);
+  iv_put(mrb, c->iv, sym, v);
 }
 
 MRB_API void
@@ -933,14 +953,14 @@ mrb_vm_const_get(mrb_state *mrb, mrb_sym sym)
     if (c->iv && iv_get(mrb, c->iv, sym, &v)) {
       return v;
     }
-    if (c->tt == MRB_TT_SCLASS) {
+    c2 = c;
+    while (c2 && c2->tt == MRB_TT_SCLASS) {
       mrb_value klass;
-      klass = mrb_obj_iv_get(mrb, (struct RObject *)c,
+      klass = mrb_obj_iv_get(mrb, (struct RObject *)c2,
                              mrb_intern_lit(mrb, "__attached__"));
       c2 = mrb_class_ptr(klass);
-      if (c2->tt == MRB_TT_CLASS)
-        c = c2;
     }
+    if (c2->tt == MRB_TT_CLASS || c2->tt == MRB_TT_MODULE) c = c2;
     c2 = c;
     for (;;) {
       c2 = mrb_class_outer_module(mrb, c2);
