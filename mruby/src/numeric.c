@@ -372,7 +372,7 @@ flo_shift(mrb_state *mrb, mrb_value x, mrb_int width)
     }
   }
   if (FIXABLE(val)) {
-    return mrb_fixnum_value(val);
+    return mrb_fixnum_value((mrb_int)val);
   }
   return mrb_float_value(mrb, val);
 }
@@ -610,6 +610,17 @@ flo_round(mrb_state *mrb, mrb_value num)
   return mrb_fixnum_value((mrb_int)number);
 }
 
+void
+mrb_check_num_exact(mrb_state *mrb, mrb_float num)
+{
+  if (isinf(num)) {
+    mrb_raise(mrb, E_FLOATDOMAIN_ERROR, num < 0 ? "-Infinity" : "Infinity");
+  }
+  if (isnan(num)) {
+    mrb_raise(mrb, E_FLOATDOMAIN_ERROR, "NaN");
+  }
+}
+
 /* 15.2.9.3.14 */
 /* 15.2.9.3.15 */
 /*
@@ -630,6 +641,7 @@ flo_truncate(mrb_state *mrb, mrb_value num)
   if (f < 0.0) f = ceil(f);
 
   if (!FIXABLE(f)) {
+    mrb_check_num_exact(mrb, f);
     return mrb_float_value(mrb, f);
   }
   return mrb_fixnum_value((mrb_int)f);
@@ -926,13 +938,16 @@ fix_xor(mrb_state *mrb, mrb_value x)
 static mrb_value
 lshift(mrb_state *mrb, mrb_int val, mrb_int width)
 {
-  mrb_assert(width > 0);
+  if (width < 0) {              /* mrb_int overflow */
+    return mrb_float_value(mrb, INFINITY);
+  }
   if (val > 0) {
     if ((width > NUMERIC_SHIFT_WIDTH_MAX) ||
         (val   > (MRB_INT_MAX >> width))) {
       goto bit_overflow;
     }
-  } else {
+  }
+  else {
     if ((width > NUMERIC_SHIFT_WIDTH_MAX) ||
         (val   < (MRB_INT_MIN >> width))) {
       goto bit_overflow;
@@ -954,7 +969,9 @@ bit_overflow:
 static mrb_value
 rshift(mrb_int val, mrb_int width)
 {
-  mrb_assert(width > 0);
+  if (width < 0) {              /* mrb_int overflow */
+    return mrb_fixnum_value(0);
+  }
   if (width >= NUMERIC_SHIFT_WIDTH_MAX) {
     if (val < 0) {
       return mrb_fixnum_value(-1);
@@ -982,6 +999,7 @@ fix_lshift(mrb_state *mrb, mrb_value x)
     return x;
   }
   val = mrb_fixnum(x);
+  if (val == 0) return x;
   if (width < 0) {
     return rshift(val, -width);
   }
@@ -1006,6 +1024,7 @@ fix_rshift(mrb_state *mrb, mrb_value x)
     return x;
   }
   val = mrb_fixnum(x);
+  if (val == 0) return x;
   if (width < 0) {
     return lshift(mrb, val, -width);
   }
@@ -1044,7 +1063,7 @@ fix_to_f(mrb_state *mrb, mrb_value num)
 MRB_API mrb_value
 mrb_flo_to_fixnum(mrb_state *mrb, mrb_value x)
 {
-  mrb_int z;
+  mrb_int z = 0;
 
   if (!mrb_float_p(x)) {
     mrb_raise(mrb, E_TYPE_ERROR, "non float value");
