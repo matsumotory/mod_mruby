@@ -208,4 +208,17 @@ t.assert('mod_mruby', 'location /response_time') do
   t.assert_equal "2", res["body"]
 end
 
+t.assert('mod_mruby', 'location /custom_timeout') do
+  # custom timeout 3 sec by mod_mruby 
+  timer_msec = 4000
+  
+  start = Time.now.to_i * 1000 + Time.now.usec / 1000
+  # sleeping 10 sec in sleep.cgi
+  res = HttpRequest.new.get base + '/sleep.cgi'
+  finish = Time.now.to_i * 1000 + Time.now.usec / 1000
+
+  p (finish - start)
+  t.assert_true (finish - start) < timer_msec
+end
+
 t.report
