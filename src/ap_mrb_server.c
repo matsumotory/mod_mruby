@@ -22,6 +22,18 @@ static mrb_value ap_mrb_set_server_error_fname(mrb_state *mrb, mrb_value str)
   return val;
 }
 
+static mrb_value ap_mrb_set_server_timeout(mrb_state *mrb, mrb_value self)
+{
+  mrb_int timeout;
+  request_rec *r = ap_mrb_get_request();
+
+  mrb_get_args(mrb, "i", &timeout);
+
+  r->server->timeout = timeout;
+
+  return self;
+}
+
 // char read
 static mrb_value ap_mrb_get_server_error_fname(mrb_state *mrb, mrb_value str)
 {
@@ -180,6 +192,7 @@ void ap_mruby_server_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_method(mrb, class_server, "limit_req_fieldsize", ap_mrb_get_server_limit_req_fieldsize, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_server, "limit_req_fields", ap_mrb_get_server_limit_req_fields, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_server, "timeout", ap_mrb_get_server_timeout, MRB_ARGS_NONE());
+  mrb_define_method(mrb, class_server, "timeout=", ap_mrb_set_server_timeout, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, class_server, "keep_alive_timeout", ap_mrb_get_server_keep_alive_timeout, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_server, "redirect_server_port", ap_mrb_get_server_port, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_server, "defn_line_number", ap_mrb_get_server_defn_line_number, MRB_ARGS_NONE());

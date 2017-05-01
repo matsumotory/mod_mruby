@@ -65,6 +65,7 @@ test:
 		-e 's|__APLIBEXECDIR__|$(APLIBEXECDIR)|g' \
 		-e 's|__APDOCROOT__|$(APDOCROOT)|g' \
 		./test/conf/mod_mruby_test.conf >> ./test/conf/httpd.conf
+	cp -pr ./test/htdocs/* $(APDOCROOT)/.
 	$(APACHECTL) -f $(shell pwd)/test/conf/httpd.conf -k start
 	cp -p ./test/build_config.rb $(MRUBY_TEST_ROOT)/.
 	cd $(MRUBY_TEST_ROOT) && rake clean && $(RAKE)
