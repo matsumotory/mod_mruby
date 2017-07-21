@@ -685,13 +685,20 @@ mrb_str_modify(mrb_state *mrb, struct RString *s)
 
       p = RSTR_PTR(s);
       len = s->as.heap.len;
-      ptr = (char *)mrb_malloc(mrb, (size_t)len + 1);
+      if (len < RSTRING_EMBED_LEN_MAX) {
+        RSTR_SET_EMBED_FLAG(s);
+        RSTR_SET_EMBED_LEN(s, len);
+        ptr = RSTR_PTR(s);
+      }
+      else {
+        ptr = (char *)mrb_malloc(mrb, (size_t)len + 1);
+        s->as.heap.ptr = ptr;
+        s->as.heap.aux.capa = len;
+      }
       if (p) {
         memcpy(ptr, p, len);
       }
       ptr[len] = '\0';
-      s->as.heap.ptr = ptr;
-      s->as.heap.aux.capa = len;
       str_decref(mrb, shared);
     }
     RSTR_UNSET_SHARED_FLAG(s);
@@ -1514,13 +1521,13 @@ mrb_str_hash(mrb_state *mrb, mrb_value str)
   struct RString *s = mrb_str_ptr(str);
   mrb_int len = RSTR_LEN(s);
   char *p = RSTR_PTR(s);
-  mrb_int key = 0;
+  uint64_t key = 0;
 
   while (len--) {
     key = key*65599 + *p;
     p++;
   }
-  return key + (key>>5);
+  return (mrb_int)(key + (key>>5));
 }
 
 /* 15.2.10.5.20 */
@@ -1590,7 +1597,7 @@ mrb_str_index(mrb_state *mrb, mrb_value str)
   mrb_value sub;
   mrb_int pos, clen;
 
-  mrb_get_args(mrb, "*", &argv, &argc);
+  mrb_get_args(mrb, "*!", &argv, &argc);
   if (argc == 2) {
     mrb_get_args(mrb, "oi", &sub, &pos);
   }
@@ -1861,7 +1868,7 @@ mrb_str_rindex(mrb_state *mrb, mrb_value str)
   mrb_value sub;
   mrb_int pos, len = RSTRING_CHAR_LEN(str);
 
-  mrb_get_args(mrb, "*", &argv, &argc);
+  mrb_get_args(mrb, "*!", &argv, &argc);
   if (argc == 2) {
     mrb_get_args(mrb, "oi", &sub, &pos);
     if (pos < 0) {
@@ -1954,10 +1961,11 @@ mrb_str_split_m(mrb_state *mrb, mrb_value str)
   int argc;
   mrb_value spat = mrb_nil_value();
   enum {awk, string, regexp} split_type = string;
-  long i = 0, lim_p;
+  mrb_int i = 0;
   mrb_int beg;
   mrb_int end;
   mrb_int lim = 0;
+  mrb_bool lim_p;
   mrb_value result, tmp;
 
   argc = mrb_get_args(mrb, "|oi", &spat, &lim);
