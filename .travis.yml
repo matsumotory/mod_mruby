@@ -7,11 +7,11 @@ before_install:
 install:
     - sudo apt-get -qq install rake bison libcurl4-openssl-dev libmarkdown2-dev
 env:
-  - HTTPD_VERSION=httpd-2.2.32
+  - HTTPD_VERSION=httpd-2.2.34
     APR=apr-1.5.2
     APR_UTIL=apr-util-1.5.4
     HTTPD_CONFIG_OPT='--enable-module=all --enable-mods-shared=all --enable-proxy --enable-proxy-http --enable-cgid'
-  - HTTPD_VERSION=httpd-2.4.25
+  - HTTPD_VERSION=httpd-2.4.27
     APR=apr-1.5.2
     APR_UTIL=apr-util-1.5.4
     HTTPD_CONFIG_OPT=
