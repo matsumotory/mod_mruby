@@ -392,9 +392,14 @@ static mrb_value ap_mrb_set_request_headers_out(mrb_state *mrb, mrb_value str)
 {
   mrb_value key, val;
   request_rec *r = ap_mrb_get_request();
+  const char *set_cookie = "Set-Cookie";
 
   mrb_get_args(mrb, "oo", &key, &val);
-  apr_table_set(r->headers_out, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
+  if (strcmp(set_cookie, mrb_str_to_cstr(mrb, key)) == 0) {
+    apr_table_add(r->headers_out, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
+  } else {
+    apr_table_set(r->headers_out, mrb_str_to_cstr(mrb, key), mrb_str_to_cstr(mrb, val));
+  }
   return val;
 }
 
