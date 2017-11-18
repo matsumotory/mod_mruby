@@ -55,7 +55,7 @@ t.assert('mod_mruby', 'location /header') do
   t.assert_true res1["set-cookie"].instance_of?(Array)
   t.assert_equal 2, res1["set-cookie"].length
   t.assert_equal "hoge1", res1["set-cookie"][0]
-  t.assert_equal "hoge2", res2["set-cookie"][1]
+  t.assert_equal "hoge2", res1["set-cookie"][1]
   t.assert_false res1["x-response-header"].instance_of?(Array)
 
   t.assert_equal "X-REQUEST-HEADER not found", res1["body"]
