@@ -7,12 +7,10 @@ MRuby::Build.new do |conf|
   #
   # Recommended for mod_mruby
   #
-  conf.gem :github => 'iij/mruby-io'
   conf.gem :github => 'iij/mruby-env'
   conf.gem :github => 'iij/mruby-dir'
   conf.gem :github => 'iij/mruby-digest'
   conf.gem :github => 'iij/mruby-process'
-  conf.gem :github => 'iij/mruby-pack'
   conf.gem :github => 'mattn/mruby-json'
   conf.gem :github => 'mattn/mruby-onig-regexp'
   conf.gem :github => 'matsumoto-r/mruby-redis'
