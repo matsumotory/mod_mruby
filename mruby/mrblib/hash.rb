@@ -179,10 +179,9 @@ class Hash
   #
   # ISO 15.2.13.4.22
   def merge(other, &block)
-    h = {}
     raise TypeError, "can't convert argument into Hash" unless other.respond_to?(:to_hash)
     other = other.to_hash
-    self.each_key{|k| h[k] = self[k]}
+    h = self.dup
     if block
       other.each_key{|k|
         h[k] = (self.has_key?(k))? block.call(k, self[k], other[k]): other[k]
@@ -341,11 +340,6 @@ class Hash
       h[k] = v
     }
     self.replace(h)
-  end
-
-  def __update(h)
-    h.each_key{|k| self[k] = h[k]}
-    self
   end
 end
 

@@ -20,6 +20,7 @@ assert('String#<=>', '15.2.10.5.1') do
   assert_equal  1, c
   assert_equal(-1, d)
   assert_equal  1, e
+  assert_nil 'a' <=> 1024
 end
 
 assert('String#==', '15.2.10.5.2') do
@@ -685,7 +686,7 @@ assert('String#inspect', '15.2.10.5.46') do
   ("\1" * 100).inspect
   end
 
-  assert_equal "\"\\000\"", "\0".inspect
+  assert_equal "\"\\x00\"", "\0".inspect
 end
 
 # Not ISO specified
