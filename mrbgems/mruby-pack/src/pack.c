@@ -64,7 +64,7 @@ static int littleendian = 0;
 
 const static unsigned char base64chars[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-static signed char base64_dec_tab[128];
+static unsigned char base64_dec_tab[128];
 
 
 static int
@@ -1127,7 +1127,8 @@ mrb_pack_pack(mrb_state *mrb, mrb_value ary)
 #ifndef MRB_WITHOUT_FLOAT
       } else if (type == PACK_TYPE_FLOAT) {
         if (!mrb_float_p(o)) {
-          o = mrb_funcall(mrb, o, "to_f", 0);
+          mrb_float f = mrb_to_flo(mrb, o);
+          o = mrb_float_value(mrb, f);
         }
 #endif
       } else if (type == PACK_TYPE_STRING) {
