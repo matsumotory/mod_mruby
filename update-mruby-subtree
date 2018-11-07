@@ -1,7 +1,34 @@
 #!/bin/bash
 
-#git remote add dep-mruby https://github.com/mruby/mruby.git
-#git remote add dep-mruby-test https://github.com/mruby/mruby.git
+update_subtree() {
+  git remote | grep ${REMOTE_REPO_NAME} > /dev/null
+  if [ $? -ne 0 ]; then
+    echo "Missing remote repository ${REMOTE_REPO_NAME}"
+    echo -n "Do you want to add (y/n)? "
+    read answer
+    if [ X$answer == "Xy" -o X$answer == "XY" ]; then
+      git remote add ${REMOTE_REPO_NAME} ${REMOTE_REPO_URL}
+      echo "Added ${REMOTE_REPO_URL} as ${REMOTE_REPO_NAME}."
+    else
+      echo "Aborted."
+      exit 1
+    fi
+  fi
+  
+  git subtree pull --prefix=${SUBTREE_DIR} --squash ${REMOTE_REPO_NAME} master
+}
 
-git subtree pull --prefix=mruby --squash dep-mruby master
-git subtree pull --prefix=mruby_test --squash dep-mruby-test master
+REMOTE_REPO_NAME=dep-mruby
+REMOTE_REPO_URL=https://github.com/mruby/mruby.git
+SUBTREE_DIR=mruby
+
+update_subtree
+
+REMOTE_REPO_NAME=dep-mruby-test
+REMOTE_REPO_URL=https://github.com/mruby/mruby.git
+SUBTREE_DIR=mruby_test
+
+update_subtree
+
+exit 0
+
