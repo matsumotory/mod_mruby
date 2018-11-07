@@ -186,7 +186,7 @@ stack_extend_alloc(mrb_state *mrb, mrb_int room)
 
   if (off > size) size = off;
 #ifdef MRB_STACK_EXTEND_DOUBLING
-  if (room <= (size_t)size)
+  if ((size_t)room <= size)
     size *= 2;
   else
     size += room;
@@ -927,14 +927,15 @@ argnum_error(mrb_state *mrb, mrb_int num)
 #define BYTECODE_DECODER(x) (x)
 #endif
 
-
+#ifndef MRB_DISABLE_DIRECT_THREADING
 #if defined __GNUC__ || defined __clang__ || defined __INTEL_COMPILER
 #define DIRECT_THREADED
 #endif
+#endif /* ifndef MRB_DISABLE_DIRECT_THREADING */
 
 #ifndef DIRECT_THREADED
 
-#define INIT_DISPATCH for (;;) { insn = BYTECODE_DECODER(*pc); pc++; CODE_FETCH_HOOK(mrb, irep, pc, regs); switch (insn) {
+#define INIT_DISPATCH for (;;) { insn = BYTECODE_DECODER(*pc); CODE_FETCH_HOOK(mrb, irep, pc, regs); switch (insn) {
 #define CASE(insn,ops) case insn: pc++; FETCH_ ## ops ();; L_ ## insn ## _BODY:
 #define NEXT break
 #define JUMP NEXT
@@ -1008,6 +1009,7 @@ mrb_vm_exec(mrb_state *mrb, struct RProc *proc, mrb_code *pc)
   uint32_t a;
   uint16_t b;
   uint8_t c;
+  mrb_sym mid;
 
 #ifdef DIRECT_THREADED
   static void *optable[] = {
@@ -1385,9 +1387,18 @@ RETRY_TRY_BLOCK:
       SET_NIL_VALUE(regs[bidx]);
       goto L_SENDB;
     };
+    L_SEND_SYM:
+    {
+      /* push nil after arguments */
+      int bidx = (c == CALL_MAXARGS) ? a+2 : a+c+1;
+      SET_NIL_VALUE(regs[bidx]);
+      goto L_SENDB_SYM;
+    };
 
     CASE(OP_SENDB, BBB)
     L_SENDB:
+    mid = syms[b];
+    L_SENDB_SYM:
     {
       int argc = (c == CALL_MAXARGS) ? -1 : c;
       int bidx = (argc < 0) ? a+2 : a+c+1;
@@ -1395,7 +1406,6 @@ RETRY_TRY_BLOCK:
       struct RClass *cls;
       mrb_callinfo *ci = mrb->c->ci;
       mrb_value recv, blk;
-      mrb_sym mid = syms[b];
 
       mrb_assert(bidx < irep->nregs);
 
@@ -1770,11 +1780,9 @@ RETRY_TRY_BLOCK:
 
       /* strict argument check */
       if (mrb->c->ci->proc && MRB_PROC_STRICT_P(mrb->c->ci->proc)) {
-        if (argc >= 0 && !(argc <= 1 && kd)) {
-          if (argc < m1 + m2 + kd || (r == 0 && argc > len + kd)) {
-            argnum_error(mrb, m1+m2);
-            goto L_RAISE;
-          }
+        if (argc < m1 + m2 || (r == 0 && argc > len + kd)) {
+          argnum_error(mrb, m1+m2);
+          goto L_RAISE;
         }
       }
       /* extract first argument array to arguments */
@@ -1795,13 +1803,12 @@ RETRY_TRY_BLOCK:
             kdict = argv[argc-1];
             mrb_hash_check_kdict(mrb, kdict);
           }
-          else if (r) {
+          else if (r || argc <= m1+m2+o) {
             kdict = mrb_hash_new(mrb);
             kargs = 0;
           }
           else {
-            mrb_value str = mrb_str_new_lit(mrb, "Excepcted `Hash` as last argument for keyword arguments");
-            mrb_exc_set(mrb, mrb_exc_new_str(mrb, E_ARGUMENT_ERROR, str));
+            argnum_error(mrb, m1+m2);
             goto L_RAISE;
           }
           if (MRB_ASPEC_KEY(a) > 0) {
@@ -1818,7 +1825,7 @@ RETRY_TRY_BLOCK:
         }
         regs[blk_pos] = *blk; /* move block */
         if (kd) regs[len + 1] = kdict;
- 
+
         /* copy mandatory and optional arguments */
         if (argv0 != argv) {
           value_move(&regs[1], argv, argc-mlen); /* m1 + o */
@@ -1983,10 +1990,7 @@ RETRY_TRY_BLOCK:
                 while (c->eidx > ci->epos) {
                   ecall_adjust();
                 }
-                if (c->fib) {
-                  mrb_write_barrier(mrb, (struct RBasic*)c->fib);
-                }
-                mrb->c->status = MRB_FIBER_TERMINATED;
+                c->status = MRB_FIBER_TERMINATED;
                 mrb->c = c->prev;
                 c->prev = NULL;
                 goto L_RAISE;
@@ -2053,21 +2057,21 @@ RETRY_TRY_BLOCK:
         case OP_R_NORMAL:
         NORMAL_RETURN:
           if (ci == mrb->c->cibase) {
-            struct mrb_context *c;
+            struct mrb_context *c = mrb->c;
 
-            if (!mrb->c->prev) { /* toplevel return */
+            if (!c->prev) { /* toplevel return */
+              regs[irep->nlocals] = v;
               goto L_STOP;
             }
-            if (mrb->c->prev->ci == mrb->c->prev->cibase) {
+            if (c->prev->ci == c->prev->cibase) {
               mrb_value exc = mrb_exc_new_str_lit(mrb, E_FIBER_ERROR, "double resume");
               mrb_exc_set(mrb, exc);
               goto L_RAISE;
             }
-            while (mrb->c->eidx > 0) {
+            while (c->eidx > 0) {
               ecall(mrb);
             }
             /* automatic yield at the end */
-            c = mrb->c;
             c->status = MRB_FIBER_TERMINATED;
             mrb->c = c->prev;
             c->prev = NULL;
@@ -2077,7 +2081,7 @@ RETRY_TRY_BLOCK:
           break;
         case OP_R_BREAK:
           if (MRB_PROC_STRICT_P(proc)) goto NORMAL_RETURN;
-          if (MRB_PROC_ORPHAN_P(proc)) { 
+          if (MRB_PROC_ORPHAN_P(proc)) {
             mrb_value exc;
 
           L_BREAK_ERROR:
@@ -2206,7 +2210,7 @@ RETRY_TRY_BLOCK:
   v1(regs[a]) = v1(regs[a]) op v2(regs[a+1]);\
 } while(0)
 
-    CASE(OP_ADD, BB) {
+    CASE(OP_ADD, B) {
       /* need to check if op is overridden */
       switch (TYPES2(mrb_type(regs[a]),mrb_type(regs[a+1]))) {
       case TYPES2(MRB_TT_FIXNUM,MRB_TT_FIXNUM):
@@ -2261,13 +2265,14 @@ RETRY_TRY_BLOCK:
         break;
       default:
         c = 1;
-        goto L_SEND;
+        mid = mrb_intern_lit(mrb, "+");
+        goto L_SEND_SYM;
       }
       mrb_gc_arena_restore(mrb, ai);
       NEXT;
     }
 
-    CASE(OP_SUB, BB) {
+    CASE(OP_SUB, B) {
       /* need to check if op is overridden */
       switch (TYPES2(mrb_type(regs[a]),mrb_type(regs[a+1]))) {
       case TYPES2(MRB_TT_FIXNUM,MRB_TT_FIXNUM):
@@ -2318,12 +2323,13 @@ RETRY_TRY_BLOCK:
 #endif
       default:
         c = 1;
-        goto L_SEND;
+        mid = mrb_intern_lit(mrb, "-");
+        goto L_SEND_SYM;
       }
       NEXT;
     }
 
-    CASE(OP_MUL, BB) {
+    CASE(OP_MUL, B) {
       /* need to check if op is overridden */
       switch (TYPES2(mrb_type(regs[a]),mrb_type(regs[a+1]))) {
       case TYPES2(MRB_TT_FIXNUM,MRB_TT_FIXNUM):
@@ -2374,12 +2380,13 @@ RETRY_TRY_BLOCK:
 #endif
       default:
         c = 1;
-        goto L_SEND;
+        mid = mrb_intern_lit(mrb, "*");
+        goto L_SEND_SYM;
       }
       NEXT;
     }
 
-    CASE(OP_DIV, BB) {
+    CASE(OP_DIV, B) {
 #ifndef MRB_WITHOUT_FLOAT
       double x, y, f;
 #endif
@@ -2413,7 +2420,8 @@ RETRY_TRY_BLOCK:
 #endif
       default:
         c = 1;
-        goto L_SEND;
+        mid = mrb_intern_lit(mrb, "/");
+        goto L_SEND_SYM;
       }
 
 #ifndef MRB_WITHOUT_FLOAT
@@ -2430,13 +2438,13 @@ RETRY_TRY_BLOCK:
       NEXT;
     }
 
-    CASE(OP_ADDI, BBB) {
+    CASE(OP_ADDI, BB) {
       /* need to check if + is overridden */
       switch (mrb_type(regs[a])) {
       case MRB_TT_FIXNUM:
         {
           mrb_int x = mrb_fixnum(regs[a]);
-          mrb_int y = (mrb_int)c;
+          mrb_int y = (mrb_int)b;
           mrb_int z;
 
           if (mrb_int_add_overflow(x, y, &z)) {
@@ -2453,22 +2461,23 @@ RETRY_TRY_BLOCK:
 #ifdef MRB_WORD_BOXING
         {
           mrb_float x = mrb_float(regs[a]);
-          SET_FLOAT_VALUE(mrb, regs[a], x + c);
+          SET_FLOAT_VALUE(mrb, regs[a], x + b);
         }
 #else
-        mrb_float(regs[a]) += c;
+        mrb_float(regs[a]) += b;
 #endif
         break;
 #endif
       default:
-        SET_INT_VALUE(regs[a+1], c);
+        SET_INT_VALUE(regs[a+1], b);
         c = 1;
-        goto L_SEND;
+        mid = mrb_intern_lit(mrb, "+");
+        goto L_SEND_SYM;
       }
       NEXT;
     }
 
-    CASE(OP_SUBI, BBB) {
+    CASE(OP_SUBI, BB) {
       mrb_value *regs_a = regs + a;
 
       /* need to check if + is overridden */
@@ -2476,7 +2485,7 @@ RETRY_TRY_BLOCK:
       case MRB_TT_FIXNUM:
         {
           mrb_int x = mrb_fixnum(regs_a[0]);
-          mrb_int y = (mrb_int)c;
+          mrb_int y = (mrb_int)b;
           mrb_int z;
 
           if (mrb_int_sub_overflow(x, y, &z)) {
@@ -2493,17 +2502,18 @@ RETRY_TRY_BLOCK:
 #ifdef MRB_WORD_BOXING
         {
           mrb_float x = mrb_float(regs[a]);
-          SET_FLOAT_VALUE(mrb, regs[a], (mrb_float)x - (mrb_float)c);
+          SET_FLOAT_VALUE(mrb, regs[a], (mrb_float)x - (mrb_float)b);
         }
 #else
-        mrb_float(regs_a[0]) -= c;
+        mrb_float(regs_a[0]) -= b;
 #endif
         break;
 #endif
       default:
-        SET_INT_VALUE(regs_a[1], c);
+        SET_INT_VALUE(regs_a[1], b);
         c = 1;
-        goto L_SEND;
+        mid = mrb_intern_lit(mrb, "-");
+        goto L_SEND_SYM;
       }
       NEXT;
     }
@@ -2520,7 +2530,8 @@ RETRY_TRY_BLOCK:
     break;\
   default:\
     c = 1;\
-    goto L_SEND;\
+    mid = mrb_intern_lit(mrb, # op);\
+    goto L_SEND_SYM;\
   }\
   if (result) {\
     SET_TRUE_VALUE(regs[a]);\
@@ -2548,7 +2559,8 @@ RETRY_TRY_BLOCK:
     break;\
   default:\
     c = 1;\
-    goto L_SEND;\
+    mid = mrb_intern_lit(mrb, # op);\
+    goto L_SEND_SYM;\
   }\
   if (result) {\
     SET_TRUE_VALUE(regs[a]);\
@@ -2559,7 +2571,7 @@ RETRY_TRY_BLOCK:
 } while(0)
 #endif
 
-    CASE(OP_EQ, BB) {
+    CASE(OP_EQ, B) {
       if (mrb_obj_eq(mrb, regs[a], regs[a+1])) {
         SET_TRUE_VALUE(regs[a]);
       }
@@ -2569,22 +2581,22 @@ RETRY_TRY_BLOCK:
       NEXT;
     }
 
-    CASE(OP_LT, BB) {
+    CASE(OP_LT, B) {
       OP_CMP(<);
       NEXT;
     }
 
-    CASE(OP_LE, BB) {
+    CASE(OP_LE, B) {
       OP_CMP(<=);
       NEXT;
     }
 
-    CASE(OP_GT, BB) {
+    CASE(OP_GT, B) {
       OP_CMP(>);
       NEXT;
     }
 
-    CASE(OP_GE, BB) {
+    CASE(OP_GE, B) {
       OP_CMP(>=);
       NEXT;
     }

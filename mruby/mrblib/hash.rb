@@ -55,10 +55,9 @@ class Hash
   # ISO 15.2.13.4.8
   def delete(key, &block)
     if block && !self.has_key?(key)
-      block.call(key)
-    else
-      self.__delete(key)
+      return block.call(key)
     end
+    self.__delete(key)
   end
 
   ##
@@ -195,9 +194,16 @@ class Hash
   # internal method for Hash inspection
   def _inspect
     return "{}" if self.size == 0
-    "{"+self.map {|k,v|
-      k._inspect + "=>" + v._inspect
-    }.join(", ")+"}"
+    ary=[]
+    keys=self.keys
+    size=keys.size
+    i=0
+    while i<size
+      k=keys[i]
+      ary<<(k._inspect + "=>" + self[k]._inspect)
+      i+=1
+    end
+    "{"+ary.join(", ")+"}"
   end
   ##
   # Return the contents of this hash as a string.
@@ -317,29 +323,6 @@ class Hash
       end
     }
     h
-  end
-
-  ##
-  #  call-seq:
-  #    hsh.rehash -> hsh
-  #
-  #  Rebuilds the hash based on the current hash values for each key. If
-  #  values of key objects have changed since they were inserted, this
-  #  method will reindex <i>hsh</i>.
-  #
-  #     h = {"AAA" => "b"}
-  #     h.keys[0].chop!
-  #     h          #=> {"AA"=>"b"}
-  #     h["AA"]    #=> nil
-  #     h.rehash   #=> {"AA"=>"b"}
-  #     h["AA"]    #=> "b"
-  #
-  def rehash
-    h = {}
-    self.each{|k,v|
-      h[k] = v
-    }
-    self.replace(h)
   end
 end
 
