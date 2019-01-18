@@ -20,6 +20,7 @@ GTAGS
 # dir for compiling
 tmp
 vendors
+.vagrant
 
 iij
 Makefile
