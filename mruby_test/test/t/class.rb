@@ -236,6 +236,11 @@ assert('class to return the last value') do
   assert_equal(m, :m)
 end
 
+assert('class to return nil if body is empty') do
+  assert_nil(class C end)
+  assert_nil(class << self; end)
+end
+
 assert('raise when superclass is not a class') do
   module FirstModule; end
   assert_raise(TypeError, 'should raise TypeError') do
@@ -351,6 +356,13 @@ assert('singleton tests') do
       end
     end
   end if Object.const_defined?(:Float)
+
+  o = Object.new
+  sc = class << o; self end
+  o.freeze
+  assert_predicate(sc, :frozen?)
+
+  assert_predicate(class << Object.new.freeze; self end, :frozen?)
 end
 
 assert('clone Class') do
@@ -360,7 +372,7 @@ assert('clone Class') do
     end
   end
 
-  Foo.clone.new.func
+  assert_true(Foo.clone.new.func)
 end
 
 assert('class variable and class << self style class method') do
@@ -426,6 +438,25 @@ assert('overriding class variable with a module (#3235)') do
 
     assert_equal(1, @@class_variable)
   end
+end
+
+assert('class variable for frozen class/module') do
+  module CVarForFrozenModule
+    freeze
+    assert_raise(FrozenError) { @@cv = 1 }
+  end
+
+  class CVarForFrozenClassA
+    @@a = nil
+    freeze
+  end
+  class CVarForFrozenClassB < CVarForFrozenClassA
+    def a=(v)
+      @@a = v
+    end
+  end
+  b = CVarForFrozenClassB.new
+  assert_raise(FrozenError) { b.a = 1 }
 end
 
 assert('class with non-class/module outer raises TypeError') do

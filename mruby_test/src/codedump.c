@@ -48,11 +48,11 @@ print_lv_ab(mrb_state *mrb, mrb_irep *irep, uint16_t a, uint16_t b)
 }
 
 static void
-print_header(mrb_irep *irep, ptrdiff_t i)
+print_header(mrb_state *mrb, mrb_irep *irep, ptrdiff_t i)
 {
   int32_t line;
 
-  line = mrb_debug_get_line(irep, i);
+  line = mrb_debug_get_line(mrb, irep, i);
   if (line < 0) {
     printf("      ");
   }
@@ -69,13 +69,13 @@ static void
 codedump(mrb_state *mrb, mrb_irep *irep)
 {
   int ai;
-  mrb_code *pc, *pcend;
+  const mrb_code *pc, *pcend;
   mrb_code ins;
   const char *file = NULL, *next_file;
 
   if (!irep) return;
-  printf("irep %p nregs=%d nlocals=%d pools=%d syms=%d reps=%d\n", (void*)irep,
-         irep->nregs, irep->nlocals, (int)irep->plen, (int)irep->slen, (int)irep->rlen);
+  printf("irep %p nregs=%d nlocals=%d pools=%d syms=%d reps=%d iseq=%d\n", (void*)irep,
+         irep->nregs, irep->nlocals, (int)irep->plen, (int)irep->slen, (int)irep->rlen, (int)irep->ilen);
 
   if (irep->lv) {
     int i;
@@ -99,12 +99,12 @@ codedump(mrb_state *mrb, mrb_irep *irep)
     ai = mrb_gc_arena_save(mrb);
 
     i = pc - irep->iseq;
-    next_file = mrb_debug_get_filename(irep, i);
+    next_file = mrb_debug_get_filename(mrb, irep, i);
     if (next_file && file != next_file) {
       printf("file: %s\n", next_file);
       file = next_file;
     }
-    print_header(irep, i);
+    print_header(mrb, irep, i);
     ins = READ_B();
     switch (ins) {
     CASE(OP_NOP, Z):
@@ -266,13 +266,13 @@ codedump(mrb_state *mrb, mrb_irep *irep)
       break;
     CASE(OP_ENTER, W):
       printf("OP_ENTER\t%d:%d:%d:%d:%d:%d:%d\n",
-             (a>>18)&0x1f,
-             (a>>13)&0x1f,
-             (a>>12)&0x1,
-             (a>>7)&0x1f,
-             (a>>2)&0x1f,
-             (a>>1)&0x1,
-             a & 0x1);
+             MRB_ASPEC_REQ(a),
+             MRB_ASPEC_OPT(a),
+             MRB_ASPEC_REST(a),
+             MRB_ASPEC_POST(a),
+             MRB_ASPEC_KEY(a),
+             MRB_ASPEC_KDICT(a),
+             MRB_ASPEC_BLOCK(a));
       break;
     CASE(OP_KEY_P, BB):
       printf("OP_KEY_P\tR%d\t:%s\t", a, mrb_sym2name(mrb, irep->syms[b]));
@@ -491,7 +491,7 @@ codedump(mrb_state *mrb, mrb_irep *irep)
     CASE(OP_EXT1, Z):
       ins = READ_B();
       printf("OP_EXT1\n");
-      print_header(irep, pc-irep->iseq-2);
+      print_header(mrb, irep, pc-irep->iseq-2);
       switch (ins) {
 #define OPCODE(i,x) case OP_ ## i: FETCH_ ## x ## _1 (); goto L_OP_ ## i;
 #include "mruby/ops.h"
@@ -501,7 +501,7 @@ codedump(mrb_state *mrb, mrb_irep *irep)
     CASE(OP_EXT2, Z):
       ins = READ_B();
       printf("OP_EXT2\n");
-      print_header(irep, pc-irep->iseq-2);
+      print_header(mrb, irep, pc-irep->iseq-2);
       switch (ins) {
 #define OPCODE(i,x) case OP_ ## i: FETCH_ ## x ## _2 (); goto L_OP_ ## i;
 #include "mruby/ops.h"
@@ -511,7 +511,7 @@ codedump(mrb_state *mrb, mrb_irep *irep)
     CASE(OP_EXT3, Z):
       ins = READ_B();
       printf("OP_EXT3\n");
-      print_header(irep, pc-irep->iseq-2);
+      print_header(mrb, irep, pc-irep->iseq-2);
       switch (ins) {
 #define OPCODE(i,x) case OP_ ## i: FETCH_ ## x ## _3 (); goto L_OP_ ## i;
 #include "mruby/ops.h"

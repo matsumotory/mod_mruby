@@ -15,8 +15,9 @@ MRuby::Gem::Specification.new('mruby-test') do |spec|
   mrbtest_lib = libfile("#{build_dir}/mrbtest")
   mrbtest_objs = []
 
-  driver_obj = objfile("#{build_dir}/driver")
-  # driver = "#{spec.dir}/driver.c"
+  driver_objs = Dir.glob("#{dir}/*.{c,cpp,cxx,cc,m,asm,s,S}").map do |f|
+    objfile(f.relative_path_from(dir).to_s.pathmap("#{build_dir}/%X"))
+  end
 
   assert_c = "#{build_dir}/assert.c"
   assert_rb = "#{MRUBY_ROOT}/test/assert.rb"
@@ -133,7 +134,7 @@ MRuby::Gem::Specification.new('mruby-test') do |spec|
   end
 
   unless build.build_mrbtest_lib_only?
-    file exec => [driver_obj, mlib, mrbtest_lib, build.libmruby_static] do |t|
+    file exec => [*driver_objs, mlib, mrbtest_lib, build.libmruby_static] do |t|
       gem_flags = build.gems.map { |g| g.linker.flags }
       gem_flags_before_libraries = build.gems.map { |g| g.linker.flags_before_libraries }
       gem_flags_after_libraries = build.gems.map { |g| g.linker.flags_after_libraries }
@@ -143,8 +144,6 @@ MRuby::Gem::Specification.new('mruby-test') do |spec|
                        gem_flags_before_libraries, gem_flags_after_libraries
     end
   end
-
-  init = "#{spec.dir}/init_mrbtest.c"
 
   # store the last gem selection and make the re-build
   # of the test gem depending on a change to the gem
@@ -164,7 +163,7 @@ MRuby::Gem::Specification.new('mruby-test') do |spec|
   file clib => active_gems_path if active_gem_list != current_gem_list
 
   file mlib => clib
-  file clib => [init, build.mrbcfile, __FILE__] do |_t|
+  file clib => [build.mrbcfile, __FILE__] do |_t|
     _pp "GEN", "*.rb", "#{clib.relative_path}"
     FileUtils.mkdir_p File.dirname(clib)
     open(clib, 'w') do |f|
@@ -177,7 +176,8 @@ MRuby::Gem::Specification.new('mruby-test') do |spec|
       f.puts %Q[ *   All manual changes will get lost.]
       f.puts %Q[ */]
       f.puts %Q[]
-      f.puts IO.read(init)
+      f.puts %Q[struct mrb_state;]
+      f.puts %Q[typedef struct mrb_state mrb_state;]
       build.gems.each do |g|
         f.puts %Q[void GENERATED_TMP_mrb_#{g.funcname}_gem_test(mrb_state *mrb);]
       end
