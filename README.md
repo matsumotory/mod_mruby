@@ -1,11 +1,17 @@
 # Welcome to mod_mruby Pages
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/matsumotory/mod_mruby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![Build Status](https://travis-ci.org/matsumotory/mod_mruby.svg?branch=master)](https://travis-ci.org/matsumotory/mod_mruby) [![wercker status](https://app.wercker.com/status/b1759ed571827bd44891a1f454ea9ec4/s "wercker status")](https://app.wercker.com/project/bykey/b1759ed571827bd44891a1f454ea9ec4)
+<p align="center">
+  <img alt="mod_mruby" src="https://github.com/matsumotory/mod_mruby/blob/master/misc/logo/logo.png?raw=true" width="300">
+</p>
 
-[![ngx_mruby mod_mruby performance](https://github.com/matsumotory/mod_mruby/raw/master/images/performance_20140301.png)](http://blog.matsumoto-r.jp/?p=3974)
+<p align="center">
+  <strong>mod_mruby</strong>: A Fast and Memory-Efficient Apache httpd Extension Mechanism Scripting with mruby.
+</p>
 
-※ [hello world simple benchmark, see details of blog entry.](http://blog.matsumoto-r.jp/?p=3974)
+<p align="center">
+  <a href="https://travis-ci.org/matsumotory/mod_mruby" title="Build Status"><img src="https://travis-ci.org/matsumotory/mod_mruby.svg?branch=master"></a>
+  <a href="https://gitter.im/matsumoto-r/mod_mruby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge" title="Gitter"><img src="https://badges.gitter.im/Join%20Chat.svg"></a>
+</p>
 
 ## Documents
 - [Install](https://github.com/matsumotory/mod_mruby/wiki/Install)
@@ -13,6 +19,10 @@
 - [Directives](https://github.com/matsumotory/mod_mruby/wiki/Directives)
 - [Class and Method](https://github.com/matsumotory/mod_mruby/wiki/Class-and-Method)
 - [Use Case](https://github.com/matsumotory/mod_mruby/wiki/Use-Case)
+
+[![ngx_mruby mod_mruby performance](https://github.com/matsumotory/mod_mruby/raw/master/images/performance_20140301.png)](http://blog.matsumoto-r.jp/?p=3974)
+
+※ [hello world simple benchmark, see details of blog entry.](http://blog.matsumoto-r.jp/?p=3974)
 
 ## What's mod_mruby
 __mod_murby is A Fast and Memory-Efficient Web Server Extension Mechanism Using Scripting Language mruby for Apache httpd.__
