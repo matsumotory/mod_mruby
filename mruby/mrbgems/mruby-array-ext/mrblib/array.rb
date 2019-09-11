@@ -266,7 +266,6 @@ class Array
     self
   end
 
-  NONE=Object.new
   ##
   #  call-seq:
   #     ary.fetch(index)                    -> obj
@@ -816,12 +815,11 @@ class Array
   #  a.permutation(0).to_a #=> [[]] # one permutation of length 0
   #  a.permutation(4).to_a #=> []   # no permutations of length 4
   def permutation(n=self.size, &block)
-    size = self.size
     return to_enum(:permutation, n) unless block
-    return if n > size
+    size = self.size
     if n == 0
-       yield []
-    else
+      yield []
+    elsif 0 < n && n <= size
       i = 0
       while i<size
         result = [self[i]]
@@ -836,6 +834,7 @@ class Array
         i += 1
       end
     end
+    self
   end
 
   ##
@@ -862,9 +861,8 @@ class Array
   #    a.combination(5).to_a  #=> []   # no combinations of length 5
 
   def combination(n, &block)
-    size = self.size
     return to_enum(:combination, n) unless block
-    return if n > size
+    size = self.size
     if n == 0
        yield []
     elsif n == 1
@@ -873,7 +871,7 @@ class Array
         yield [self[i]]
         i += 1
       end
-    else
+    elsif n <= size
       i = 0
       while i<size
         result = [self[i]]
@@ -883,6 +881,7 @@ class Array
         i += 1
       end
     end
+    self
   end
 
   ##
@@ -904,8 +903,8 @@ class Array
     column_count = nil
     self.each do |row|
       raise TypeError unless row.is_a?(Array)
-      column_count ||= row.count
-      raise IndexError, 'element size differs' unless column_count == row.count
+      column_count ||= row.size
+      raise IndexError, 'element size differs' unless column_count == row.size
     end
 
     Array.new(column_count) do |column_index|
@@ -937,4 +936,7 @@ class Array
     end
     h
   end
+
+  alias append push
+  alias prepend unshift
 end

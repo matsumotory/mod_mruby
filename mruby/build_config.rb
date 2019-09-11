@@ -18,9 +18,9 @@ MRuby::Build.new do |conf|
   # end
   # conf.gem 'examples/mrbgems/c_and_ruby_extension_example'
   # conf.gem :core => 'mruby-eval'
-  # conf.gem :mgem => 'mruby-io'
-  # conf.gem :github => 'iij/mruby-io'
-  # conf.gem :git => 'git@github.com:iij/mruby-io.git', :branch => 'master', :options => '-v'
+  # conf.gem :mgem => 'mruby-onig-regexp'
+  # conf.gem :github => 'mattn/mruby-onig-regexp'
+  # conf.gem :git => 'git@github.com:mattn/mruby-onig-regexp.git', :branch => 'master', :options => '-v'
 
   # include the default GEMs
   conf.gembox 'default'
@@ -29,7 +29,7 @@ MRuby::Build.new do |conf|
   #   cc.command = ENV['CC'] || 'gcc'
   #   cc.flags = [ENV['CFLAGS'] || %w()]
   #   cc.include_paths = ["#{root}/include"]
-  #   cc.defines = %w(DISABLE_GEMS)
+  #   cc.defines = %w()
   #   cc.option_include_path = '-I%s'
   #   cc.option_define = '-D%s'
   #   cc.compile_options = "%{flags} -MMD -o %{outfile} -c %{infile}"
