@@ -1,5 +1,3 @@
-# Welcome to mod_mruby Pages
-
 <p align="center">
   <img alt="mod_mruby" src="https://github.com/matsumotory/mod_mruby/blob/master/misc/logo/logo.png?raw=true" width="300">
 </p>
