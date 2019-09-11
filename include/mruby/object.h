@@ -1,5 +1,5 @@
-/*
-** mruby/object.h - mruby object definition
+/**
+** @file mruby/object.h - mruby object definition
 **
 ** See Copyright Notice in mruby.h
 */
@@ -8,14 +8,13 @@
 #define MRUBY_OBJECT_H
 
 #define MRB_OBJECT_HEADER \
-  enum mrb_vtype tt:8;\
-  uint32_t color:3;\
-  uint32_t flags:21;\
-  struct RClass *c;\
-  struct RBasic *gcnext
+  struct RClass *c;       \
+  struct RBasic *gcnext;  \
+  enum mrb_vtype tt:8;    \
+  uint32_t color:3;       \
+  uint32_t flags:21
 
 #define MRB_FLAG_TEST(obj, flag) ((obj)->flags & (flag))
-
 
 struct RBasic {
   MRB_OBJECT_HEADER;
@@ -33,7 +32,6 @@ struct RObject {
 };
 #define mrb_obj_ptr(v)   ((struct RObject*)(mrb_ptr(v)))
 
-#define mrb_immediate_p(x) (mrb_type(x) < MRB_TT_HAS_BASIC)
 #define mrb_special_const_p(x) mrb_immediate_p(x)
 
 struct RFiber {

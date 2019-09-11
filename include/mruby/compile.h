@@ -1,5 +1,5 @@
-/*
-** mruby/compile.h - mruby parser
+/**
+** @file mruby/compile.h - mruby parser
 **
 ** See Copyright Notice in mruby.h
 */
@@ -24,7 +24,7 @@ typedef struct mrbc_context {
   mrb_sym *syms;
   int slen;
   char *filename;
-  short lineno;
+  uint16_t lineno;
   int (*partial_hook)(struct mrb_parser_state*);
   void *partial_data;
   struct RClass *target_class;
@@ -67,7 +67,7 @@ enum mrb_lex_state_enum {
 
 /* saved error message */
 struct mrb_parser_message {
-  int lineno;
+  uint16_t lineno;
   int column;
   char* message;
 };
@@ -105,7 +105,7 @@ struct mrb_parser_heredoc_info {
   mrb_ast_node *doc;
 };
 
-#define MRB_PARSER_TOKBUF_MAX 65536
+#define MRB_PARSER_TOKBUF_MAX (UINT16_MAX-1)
 #define MRB_PARSER_TOKBUF_SIZE 256
 
 /* parser structure */
@@ -118,8 +118,8 @@ struct mrb_parser_state {
   FILE *f;
 #endif
   mrbc_context *cxt;
-  char const *filename;
-  int lineno;
+  mrb_sym filename_sym;
+  uint16_t lineno;
   int column;
 
   enum mrb_lex_state_enum lstate;
@@ -168,7 +168,7 @@ MRB_API void mrb_parser_free(struct mrb_parser_state*);
 MRB_API void mrb_parser_parse(struct mrb_parser_state*,mrbc_context*);
 
 MRB_API void mrb_parser_set_filename(struct mrb_parser_state*, char const*);
-MRB_API char const* mrb_parser_get_filename(struct mrb_parser_state*, uint16_t idx);
+MRB_API mrb_sym mrb_parser_get_filename(struct mrb_parser_state*, uint16_t idx);
 
 /* utility functions */
 #ifndef MRB_DISABLE_STDIO
