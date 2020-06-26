@@ -6,7 +6,7 @@
 #include <mruby/debug.h>
 
 static mrb_value
-mrb_proc_lambda(mrb_state *mrb, mrb_value self)
+mrb_proc_lambda_p(mrb_state *mrb, mrb_value self)
 {
   struct RProc *p = mrb_proc_ptr(self);
   return mrb_bool_value(MRB_PROC_STRICT_P(p));
@@ -72,10 +72,7 @@ mrb_kernel_proc(mrb_state *mrb, mrb_value self)
 {
   mrb_value blk;
 
-  mrb_get_args(mrb, "&", &blk);
-  if (mrb_nil_p(blk)) {
-    mrb_raise(mrb, E_ARGUMENT_ERROR, "tried to create Proc object without a block");
-  }
+  mrb_get_args(mrb, "&!", &blk);
 
   return blk;
 }
@@ -153,7 +150,7 @@ mrb_proc_parameters(mrb_state *mrb, mrb_value self)
       mrb_ary_push(mrb, a, sname);
       if (i < max && irep->lv[i].name) {
         mrb_sym sym = irep->lv[i].name;
-        const char *name = mrb_sym2name(mrb, sym);
+        const char *name = mrb_sym_name(mrb, sym);
         switch (name[0]) {
         case '*': case '&':
           break;
@@ -172,14 +169,14 @@ void
 mrb_mruby_proc_ext_gem_init(mrb_state* mrb)
 {
   struct RClass *p = mrb->proc_class;
-  mrb_define_method(mrb, p, "lambda?",         mrb_proc_lambda,          MRB_ARGS_NONE());
+  mrb_define_method(mrb, p, "lambda?",         mrb_proc_lambda_p,        MRB_ARGS_NONE());
   mrb_define_method(mrb, p, "source_location", mrb_proc_source_location, MRB_ARGS_NONE());
   mrb_define_method(mrb, p, "to_s",            mrb_proc_inspect,         MRB_ARGS_NONE());
   mrb_define_method(mrb, p, "inspect",         mrb_proc_inspect,         MRB_ARGS_NONE());
   mrb_define_method(mrb, p, "parameters",      mrb_proc_parameters,      MRB_ARGS_NONE());
 
-  mrb_define_class_method(mrb, mrb->kernel_module, "proc", mrb_kernel_proc, MRB_ARGS_NONE());
-  mrb_define_method(mrb, mrb->kernel_module,       "proc", mrb_kernel_proc, MRB_ARGS_NONE());
+  mrb_define_class_method(mrb, mrb->kernel_module, "proc", mrb_kernel_proc, MRB_ARGS_NONE()|MRB_ARGS_BLOCK());
+  mrb_define_method(mrb, mrb->kernel_module,       "proc", mrb_kernel_proc, MRB_ARGS_NONE()|MRB_ARGS_BLOCK());
 }
 
 void

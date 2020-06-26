@@ -42,7 +42,7 @@ MRB_BEGIN_DECL
 /*
  * Minor release version number.
  */
-#define MRUBY_RELEASE_MINOR 0
+#define MRUBY_RELEASE_MINOR 1
 
 /*
  * Tiny release version number.
@@ -62,12 +62,12 @@ MRB_BEGIN_DECL
 /*
  * Release year.
  */
-#define MRUBY_RELEASE_YEAR 2019
+#define MRUBY_RELEASE_YEAR 2020
 
 /*
  * Release month.
  */
-#define MRUBY_RELEASE_MONTH 4
+#define MRUBY_RELEASE_MONTH 6
 
 /*
  * Release day.
@@ -106,9 +106,9 @@ MRB_BEGIN_DECL
 /*
  * mruby's version, and release date.
  */
-#define MRUBY_DESCRIPTION      \
-  "mruby " MRUBY_VERSION       \
-  " (" MRUBY_RELEASE_DATE ") " \
+#define MRUBY_DESCRIPTION     \
+  "mruby " MRUBY_VERSION      \
+  " (" MRUBY_RELEASE_DATE ")" \
 
 /*
  * mruby's copyright information.

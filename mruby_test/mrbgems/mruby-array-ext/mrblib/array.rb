@@ -90,6 +90,22 @@ class Array
 
   ##
   # call-seq:
+  #    ary.difference(other_ary1, other_ary2, ...)   -> new_ary
+  #
+  # Returns a new array that is a copy of the original array, removing all
+  # occurrences of any item that also appear in +other_ary+. The order is
+  # preserved from the original array.
+  #
+  def difference(*args)
+    ary = self
+    args.each do |x|
+      ary = ary - x
+    end
+    ary
+  end
+
+  ##
+  # call-seq:
   #    ary | other_ary     -> new_ary
   #
   # Set Union---Returns a new array by joining this array with
@@ -155,6 +171,24 @@ class Array
       idx += 1
     end
     array
+  end
+
+  ##
+  # call-seq:
+  #    ary.intersection(other_ary,...)  -> new_ary
+  #
+  # Set Intersection---Returns a new array containing elements common to
+  # this array and <i>other_ary</i>s, removing duplicates. The order is
+  # preserved from the original array.
+  #
+  #    [1, 2, 3].intersection([3, 4, 1], [1, 3, 5])  #=> [1, 3]
+  #
+  def intersection(*args)
+    ary = self
+    args.each do |x|
+      ary = ary & x
+    end
+    ary
   end
 
   ##
@@ -654,37 +688,6 @@ class Array
 
   ##
   #  call-seq:
-  #     ary.delete_if { |item| block }  -> ary
-  #     ary.delete_if                   -> Enumerator
-  #
-  #  Deletes every element of +self+ for which block evaluates to +true+.
-  #
-  #  The array is changed instantly every time the block is called, not after
-  #  the iteration is over.
-  #
-  #  See also Array#reject!
-  #
-  #  If no block is given, an Enumerator is returned instead.
-  #
-  #     scores = [ 97, 42, 75 ]
-  #     scores.delete_if {|score| score < 80 }   #=> [97]
-
-  def delete_if(&block)
-    return to_enum :delete_if unless block
-
-    idx = 0
-    while idx < self.size do
-      if block.call(self[idx])
-        self.delete_at(idx)
-      else
-        idx += 1
-      end
-    end
-    self
-  end
-
-  ##
-  #  call-seq:
   #     ary.keep_if { |item| block } -> ary
   #     ary.keep_if                  -> Enumerator
   #
@@ -939,4 +942,5 @@ class Array
 
   alias append push
   alias prepend unshift
+  alias filter! select!
 end

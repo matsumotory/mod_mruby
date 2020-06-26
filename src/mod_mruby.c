@@ -431,7 +431,7 @@ static int ap_mruby_run_nr(server_rec *s, mod_mruby_code_t *code)
                "%s DEBUG %s: [CONFIG PHASE] [CACHE FORCE ENABLED] run mruby code: %s", MODULE_NAME, __func__,
                code->code.path);
 
-  mrb_run(mrb, code->proc, mrb_top_self(mrb));
+  mrb_toplevel_run(mrb, code->proc);
 
   if (mrb->exc) {
     ap_mrb_raise_error(mrb, mrb_obj_value(mrb->exc), code);
@@ -469,7 +469,7 @@ static int ap_mruby_run(mrb_state *mrb, request_rec *r, mod_mruby_code_t *code, 
                 MODULE_NAME, __func__, code->code.path, code->irep_idx_start, code->irep_idx_end, code->cache);
 
   ap_mrb_set_status_code(OK);
-  mrb_run(mrb, code->proc, mrb_top_self(mrb));
+  mrb_toplevel_run(mrb, code->proc);
   mrb_gc_arena_restore(mrb, ai);
 
   if (mrb->exc) {
@@ -508,7 +508,7 @@ static int ap_mruby_run_inline(mrb_state *mrb, request_rec *r, mod_mruby_code_t 
                 __func__, c->irep_idx_start, c->code.code);
 
   ap_mrb_set_status_code(OK);
-  mrb_run(mrb, c->proc, mrb_top_self(mrb));
+  mrb_toplevel_run(mrb, c->proc);
 
   if (mrb->exc) {
     ap_mrb_raise_error(mrb, mrb_obj_value(mrb->exc), c);
