@@ -7,7 +7,6 @@
 #include "mod_mruby.h"
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
-#include "apr_arch_file_io.h"
 #include "mruby/hash.h"
 
 #define CORE_PRIVATE
@@ -496,10 +495,12 @@ static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, mrb_value s
 }
 
 #if !defined(OS2) && !defined(WIN32)
+mode_t apr_unix_perms2mode(apr_fileperms_t perms);
+
 static mrb_value ap_mrb_get_request_finfo_perm2mode(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
-  mode_t mode = apr_unix_perms2mode(r->finfo.protection)
+  mode_t mode = apr_unix_perms2mode(r->finfo.protection);
   return mrb_fixnum_value((mrb_int)mode);
 }
 #endif
