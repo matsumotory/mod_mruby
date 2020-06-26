@@ -138,6 +138,7 @@ module ModMruby
       Apache::rputs "## Finfo Class Test".to_html
       f = Apache::Request.new.finfo
       Apache.rputs "- permission = #{f.permission.to_s}".to_html
+      Apache.rputs "- mode = #{"%o" % f.mode}".to_html if f.respond_to?(:mode)
       Apache.rputs "- filetype regular file = #{f.filetype == Apache::Finfo::APR_REG}".to_html
       Apache.rputs "- user = #{f.user.to_s}".to_html
       Apache.rputs "- group = #{f.group.to_s}".to_html
