@@ -38,7 +38,7 @@ puts [1,2,3]
 3
 ```
 
-#### mruby [2.0.1 (2019-4-4)]
+#### mruby [2.1.1 (2020-06-04)]
 
 ```
 [1, 2, 3]
@@ -61,7 +61,7 @@ end
 
 `ZeroDivisionError` is raised.
 
-#### mruby [2.0.1 (2019-4-4)]
+#### mruby [2.1.1 (2020-06-04)]
 
 No exception is raised.
 
@@ -89,14 +89,14 @@ p Liste.new "foobar"
 
 ` [] `
 
-#### mruby [2.0.1 (2019-4-4)]
+#### mruby [2.1.1 (2020-06-04)]
 
 `ArgumentError` is raised.
 
 ## Method visibility
 
 For simplicity reasons no method visibility (public/private/protected) is
-supported.
+supported. Those methods are defined but they are dummy methods.
 
 ```ruby
 class VisibleTest
@@ -119,11 +119,47 @@ false
 true
 ```
 
-#### mruby [2.0.1 (2019-4-4)]
+#### mruby [2.1.1 (2020-06-04)]
 
 ```
 true
 true
+```
+
+### Visibility Declaration
+
+The declaration form of following visibility methods are not implemented.
+
+* `public`
+* `private`
+* `protected`
+* `module_function`
+
+Especially, `module_function` method is not dummy, but no declaration form.
+
+```
+module TestModule
+  module_function
+  def test_func
+    p 'test_func called'
+  end
+
+  test_func
+end
+
+p 'ok'
+```
+
+#### Ruby [ruby 2.5.5p157 (2019-03-15 revision 67260)]
+
+```
+ok
+```
+
+#### mruby [2.1.1 (2020-06-04)]
+
+```
+test.rb:8: undefined method 'test_func' (NoMethodError)
 ```
 
 ## `defined?`
@@ -142,7 +178,7 @@ defined?(Foo)
 nil
 ```
 
-#### mruby [2.0.1 (2019-4-4)]
+#### mruby [2.1.1 (2020-06-04)]
 
 `NameError` is raised.
 
@@ -159,7 +195,7 @@ alias $a $__a__
 
 ` nil `
 
-#### mruby [2.0.1 (2019-4-4)]
+#### mruby [2.1.1 (2020-06-04)]
 
 Syntax error
 
@@ -181,7 +217,7 @@ end
 `ArgumentError` is raised.
 The re-defined `+` operator does not accept any arguments.
 
-#### mruby [2.0.1 (2019-4-4)]
+#### mruby [2.1.1 (2020-06-04)]
 
 ` 'ab' `
 Behavior of the operator wasn't changed.
@@ -197,7 +233,7 @@ $ ruby -e 'puts Proc.new {}.binding'
 #<Binding:0x00000e9deabb9950>
 ```
 
-#### mruby [2.0.1 (2019-4-4)]
+#### mruby [2.1.1 (2020-06-04)]
 
 ```
 $ ./bin/mruby -e 'puts Proc.new {}.binding'
@@ -219,7 +255,7 @@ $ ruby -e 'def m(*r,**k) p [r,k] end; m("a"=>1,:b=>2)'
 [[{"a"=>1}], {:b=>2}]
 ```
 
-#### mruby [mruby 2.0.1]
+#### mruby [mruby 2.1.1]
 
 ```
 $ ./bin/mruby -e 'def m(*r,**k) p [r,k] end; m("a"=>1,:b=>2)'
