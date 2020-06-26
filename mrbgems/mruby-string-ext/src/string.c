@@ -90,70 +90,6 @@ int_chr_utf8(mrb_state *mrb, mrb_value num)
 }
 #endif
 
-static mrb_value
-mrb_str_getbyte(mrb_state *mrb, mrb_value str)
-{
-  mrb_int pos;
-  mrb_get_args(mrb, "i", &pos);
-
-  if (pos < 0)
-    pos += RSTRING_LEN(str);
-  if (pos < 0 ||  RSTRING_LEN(str) <= pos)
-    return mrb_nil_value();
-
-  return mrb_fixnum_value((unsigned char)RSTRING_PTR(str)[pos]);
-}
-
-static mrb_value
-mrb_str_setbyte(mrb_state *mrb, mrb_value str)
-{
-  mrb_int pos, byte;
-  mrb_int len;
-
-  mrb_get_args(mrb, "ii", &pos, &byte);
-
-  len = RSTRING_LEN(str);
-  if (pos < -len || len <= pos)
-    mrb_raisef(mrb, E_INDEX_ERROR, "index %i out of string", pos);
-  if (pos < 0)
-    pos += len;
-
-  mrb_str_modify(mrb, mrb_str_ptr(str));
-  byte &= 0xff;
-  RSTRING_PTR(str)[pos] = (unsigned char)byte;
-  return mrb_fixnum_value((unsigned char)byte);
-}
-
-static mrb_value
-mrb_str_byteslice(mrb_state *mrb, mrb_value str)
-{
-  mrb_value a1, a2;
-  mrb_int str_len = RSTRING_LEN(str), beg, len;
-  mrb_bool empty = TRUE;
-
-  if (mrb_get_args(mrb, "o|o", &a1, &a2) == 2) {
-    beg = mrb_fixnum(mrb_to_int(mrb, a1));
-    len = mrb_fixnum(mrb_to_int(mrb, a2));
-  }
-  else if (mrb_type(a1) == MRB_TT_RANGE) {
-    if (mrb_range_beg_len(mrb, a1, &beg, &len, str_len, TRUE) != MRB_RANGE_OK) {
-      return mrb_nil_value();
-    }
-  }
-  else {
-    beg = mrb_fixnum(mrb_to_int(mrb, a1));
-    len = 1;
-    empty = FALSE;
-  }
-
-  if (mrb_str_beg_len(str_len, &beg, &len) && (empty || len != 0)) {
-    return mrb_str_byte_subseq(mrb, str, beg, len);
-  }
-  else {
-    return mrb_nil_value();
-  }
-}
-
 /*
  *  call-seq:
  *     str.swapcase!   -> str or nil
@@ -228,9 +164,8 @@ mrb_str_swapcase(mrb_state *mrb, mrb_value self)
 static mrb_value
 mrb_str_concat_m(mrb_state *mrb, mrb_value self)
 {
-  mrb_value str;
+  mrb_value str = mrb_get_arg1(mrb);
 
-  mrb_get_args(mrb, "o", &str);
   if (mrb_fixnum_p(str) || mrb_float_p(str))
 #ifdef MRB_UTF8_STRING
     str = int_chr_utf8(mrb, str);
@@ -238,8 +173,8 @@ mrb_str_concat_m(mrb_state *mrb, mrb_value self)
     str = int_chr_binary(mrb, str);
 #endif
   else
-    str = mrb_ensure_string_type(mrb, str);
-  mrb_str_concat(mrb, self, str);
+    mrb_ensure_string_type(mrb, str);
+  mrb_str_cat_str(mrb, self, str);
   return self;
 }
 
@@ -399,7 +334,7 @@ tr_parse_pattern(mrb_state *mrb, struct tr_pattern *ret, const mrb_value v_patte
 
       len = i - start_pos;
       if (len > UINT16_MAX) {
-        mrb_raise(mrb, E_ARGUMENT_ERROR, "tr pattern too long (max 65536)");
+        mrb_raise(mrb, E_ARGUMENT_ERROR, "tr pattern too long (max 65535)");
       }
       if (pat1 == NULL && ret) {
         goto nomem;
@@ -407,9 +342,9 @@ tr_parse_pattern(mrb_state *mrb, struct tr_pattern *ret, const mrb_value v_patte
       pat1->type = TR_IN_ORDER;
       pat1->flag_reverse = flag_reverse;
       pat1->flag_on_heap = !ret_uninit;
-      pat1->n = len;
+      pat1->n = (uint16_t)len;
       pat1->next = NULL;
-      pat1->val.start_pos = start_pos;
+      pat1->val.start_pos = (uint16_t)start_pos;
     }
 
     if (ret == NULL || ret_uninit) {
@@ -1145,7 +1080,7 @@ mrb_str_del_prefix_bang(mrb_state *mrb, mrb_value self)
   if (plen > slen) return mrb_nil_value();
   s = RSTR_PTR(str);
   if (memcmp(s, ptr, plen) != 0) return mrb_nil_value();
-  if (!MRB_FROZEN_P(str) && (RSTR_SHARED_P(str) || RSTR_FSHARED_P(str))) {
+  if (!mrb_frozen_p(str) && (RSTR_SHARED_P(str) || RSTR_FSHARED_P(str))) {
     str->as.heap.ptr += plen;
   }
   else {
@@ -1202,7 +1137,7 @@ mrb_str_del_suffix_bang(mrb_state *mrb, mrb_value self)
   if (plen > slen) return mrb_nil_value();
   s = RSTR_PTR(str);
   if (memcmp(s+slen-plen, ptr, plen) != 0) return mrb_nil_value();
-  if (!MRB_FROZEN_P(str) && (RSTR_SHARED_P(str) || RSTR_FSHARED_P(str))) {
+  if (!mrb_frozen_p(str) && (RSTR_SHARED_P(str) || RSTR_FSHARED_P(str))) {
     /* no need to modify string */
   }
   else {
@@ -1245,8 +1180,6 @@ mrb_str_lines(mrb_state *mrb, mrb_value self)
   char *p = b, *t;
   char *e = b + RSTRING_LEN(self);
 
-  mrb_get_args(mrb, "");
-
   result = mrb_ary_new(mrb);
   ai = mrb_gc_arena_save(mrb);
   while (p < e) {
@@ -1266,9 +1199,6 @@ mrb_mruby_string_ext_gem_init(mrb_state* mrb)
   struct RClass * s = mrb->string_class;
 
   mrb_define_method(mrb, s, "dump",            mrb_str_dump,            MRB_ARGS_NONE());
-  mrb_define_method(mrb, s, "getbyte",         mrb_str_getbyte,         MRB_ARGS_REQ(1));
-  mrb_define_method(mrb, s, "setbyte",         mrb_str_setbyte,         MRB_ARGS_REQ(2));
-  mrb_define_method(mrb, s, "byteslice",       mrb_str_byteslice,       MRB_ARGS_REQ(1)|MRB_ARGS_OPT(1));
   mrb_define_method(mrb, s, "swapcase!",       mrb_str_swapcase_bang,   MRB_ARGS_NONE());
   mrb_define_method(mrb, s, "swapcase",        mrb_str_swapcase,        MRB_ARGS_NONE());
   mrb_define_method(mrb, s, "concat",          mrb_str_concat_m,        MRB_ARGS_REQ(1));
@@ -1289,8 +1219,8 @@ mrb_mruby_string_ext_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, s, "chr",             mrb_str_chr,             MRB_ARGS_NONE());
   mrb_define_method(mrb, s, "succ",            mrb_str_succ,            MRB_ARGS_NONE());
   mrb_define_method(mrb, s, "succ!",           mrb_str_succ_bang,       MRB_ARGS_NONE());
-  mrb_define_alias(mrb,  s, "next",            "succ");
-  mrb_define_alias(mrb,  s, "next!",           "succ!");
+  mrb_define_method(mrb, s, "next",            mrb_str_succ,            MRB_ARGS_NONE());
+  mrb_define_method(mrb, s, "next!",           mrb_str_succ_bang,       MRB_ARGS_NONE());
   mrb_define_method(mrb, s, "ord",             mrb_str_ord,             MRB_ARGS_NONE());
   mrb_define_method(mrb, s, "delete_prefix!",  mrb_str_del_prefix_bang, MRB_ARGS_REQ(1));
   mrb_define_method(mrb, s, "delete_prefix",   mrb_str_del_prefix,      MRB_ARGS_REQ(1));

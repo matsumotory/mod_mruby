@@ -455,7 +455,7 @@ mrb_basicsocket_setsockopt(mrb_state *mrb, mrb_value self)
     level = mrb_fixnum(so);
     if (mrb_string_p(optval)) {
       /* that's good */
-    } else if (mrb_type(optval) == MRB_TT_TRUE || mrb_type(optval) == MRB_TT_FALSE) {
+    } else if (mrb_true_p(optval) || mrb_false_p(optval)) {
       mrb_int i = mrb_test(optval) ? 1 : 0;
       optval = mrb_str_new(mrb, (char*)&i, sizeof(i));
     } else if (mrb_fixnum_p(optval)) {
@@ -476,7 +476,7 @@ mrb_basicsocket_setsockopt(mrb_state *mrb, mrb_value self)
     optname = mrb_fixnum(mrb_funcall(mrb, so, "optname", 0));
     optval = mrb_funcall(mrb, so, "data", 0);
   } else {
-    mrb_raisef(mrb, E_ARGUMENT_ERROR, "wrong number of arguments (%i for 3)", argc);
+    mrb_argnum_error(mrb, argc, 3, 3);
   }
 
   s = socket_fd(mrb, self);
