@@ -91,6 +91,9 @@ module MRuby
         build.libmruby_objs << @objs
 
         instance_eval(&@build_config_initializer) if @build_config_initializer
+
+        repo_url = build.gem_dir_to_repo_url[dir]
+        build.locks[repo_url]['version'] = version if repo_url
       end
 
       def setup_compilers
@@ -101,6 +104,15 @@ module MRuby
         end
 
         define_gem_init_builder if @generate_functions
+      end
+
+      def for_windows?
+        if build.kind_of?(MRuby::CrossBuild)
+          return %w(x86_64-w64-mingw32 i686-w64-mingw32).include?(build.host_target)
+        elsif build.kind_of?(MRuby::Build)
+          return ('A'..'Z').to_a.any? { |vol| Dir.exist?("#{vol}:") }
+        end
+        return false
       end
 
       def add_dependency(name, *requirements)
@@ -154,7 +166,7 @@ module MRuby
       def define_gem_init_builder
         file objfile("#{build_dir}/gem_init") => [ "#{build_dir}/gem_init.c", File.join(dir, "mrbgem.rake") ]
         file "#{build_dir}/gem_init.c" => [build.mrbcfile, __FILE__] + [rbfiles].flatten do |t|
-          FileUtils.mkdir_p build_dir
+          mkdir_p build_dir
           generate_gem_init("#{build_dir}/gem_init.c")
         end
       end
