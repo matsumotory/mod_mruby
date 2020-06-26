@@ -139,6 +139,7 @@ module ModMruby
       Apache::echo "## Finfo Class Test"
       f = Apache::Request.new.finfo
       Apache.echo "- permission = #{f.permission.to_s}"
+      Apache.echo "- mode = #{"%o" % f.mode}" if f.respond_to?(:mode)
       Apache.echo "- filetype regular file = #{f.filetype == Apache::Finfo::APR_REG}"
       Apache.echo "- user = #{f.user.to_s}"
       Apache.echo "- group = #{f.group.to_s}"
