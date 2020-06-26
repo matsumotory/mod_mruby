@@ -7,6 +7,7 @@
 #include "mod_mruby.h"
 #include "ap_mrb_init.h"
 #include "ap_mrb_request.h"
+#include "apr_arch_file_io.h"
 #include "mruby/hash.h"
 
 #define CORE_PRIVATE
@@ -494,6 +495,15 @@ static mrb_value ap_mrb_get_request_finfo_protection(mrb_state *mrb, mrb_value s
   return mrb_fixnum_value((mrb_int)r->finfo.protection);
 }
 
+#if !defined(OS2) && !defined(WIN32)
+static mrb_value ap_mrb_get_request_finfo_perm2mode(mrb_state *mrb, mrb_value str)
+{
+  request_rec *r = ap_mrb_get_request();
+  mode_t mode = apr_unix_perms2mode(r->finfo.protection)
+  return mrb_fixnum_value((mrb_int)mode);
+}
+#endif
+
 static mrb_value ap_mrb_get_request_finfo_filetype(mrb_state *mrb, mrb_value str)
 {
   request_rec *r = ap_mrb_get_request();
@@ -845,6 +855,9 @@ void ap_mruby_request_init(mrb_state *mrb, struct RClass *class_core)
   mrb_define_const(mrb, class_finfo, "APR_SOCK", mrb_fixnum_value(APR_SOCK));
   mrb_define_const(mrb, class_finfo, "APR_UNKFILE", mrb_fixnum_value(APR_UNKFILE));
   mrb_define_method(mrb, class_finfo, "permission", ap_mrb_get_request_finfo_protection, MRB_ARGS_NONE());
+#if !defined(OS2) && !defined(WIN32)
+  mrb_define_method(mrb, class_finfo, "mode", ap_mrb_get_request_finfo_perm2mode, MRB_ARGS_NONE());
+#endif
   mrb_define_method(mrb, class_finfo, "filetype", ap_mrb_get_request_finfo_filetype, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_finfo, "group", ap_mrb_get_request_finfo_group, MRB_ARGS_NONE());
   mrb_define_method(mrb, class_finfo, "user", ap_mrb_get_request_finfo_user, MRB_ARGS_NONE());
